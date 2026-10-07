@@ -1,0 +1,696 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T00:00:41.624Z",
+  "title": "Design System: Halo Forge",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "tonalRamp": [
+          "oklch(15.00% 0.00824 91.48)",
+          "oklch(26.43% 0.00824 91.48)",
+          "oklch(37.86% 0.00824 91.48)",
+          "oklch(49.29% 0.00824 91.48)",
+          "oklch(60.71% 0.00824 91.48)",
+          "oklch(72.14% 0.00824 91.48)",
+          "oklch(83.57% 0.00824 91.48)",
+          "oklch(95.00% 0.00824 91.48)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Primary Foreground",
+        "tonalRamp": [
+          "oklch(15.00% 0.01225 91.80)",
+          "oklch(26.43% 0.01225 91.80)",
+          "oklch(37.86% 0.01225 91.80)",
+          "oklch(49.29% 0.01225 91.80)",
+          "oklch(60.71% 0.01225 91.80)",
+          "oklch(72.14% 0.01225 91.80)",
+          "oklch(83.57% 0.01225 91.80)",
+          "oklch(95.00% 0.01225 91.80)"
+        ]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "Gold",
+        "tonalRamp": [
+          "oklch(15.00% 0.08382 85.06)",
+          "oklch(26.43% 0.08382 85.06)",
+          "oklch(37.86% 0.08382 85.06)",
+          "oklch(49.29% 0.08382 85.06)",
+          "oklch(60.71% 0.08382 85.06)",
+          "oklch(72.14% 0.08382 85.06)",
+          "oklch(83.57% 0.08382 85.06)",
+          "oklch(95.00% 0.08382 85.06)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Background",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Foreground",
+        "tonalRamp": [
+          "oklch(15.00% 0.01081 95.16)",
+          "oklch(26.43% 0.01081 95.16)",
+          "oklch(37.86% 0.01081 95.16)",
+          "oklch(49.29% 0.01081 95.16)",
+          "oklch(60.71% 0.01081 95.16)",
+          "oklch(72.14% 0.01081 95.16)",
+          "oklch(83.57% 0.01081 95.16)",
+          "oklch(95.00% 0.01081 95.16)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "popover": {
+        "role": "neutral",
+        "displayName": "Popover",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Secondary",
+        "tonalRamp": [
+          "oklch(15.00% 0.00398 84.58)",
+          "oklch(26.43% 0.00398 84.58)",
+          "oklch(37.86% 0.00398 84.58)",
+          "oklch(49.29% 0.00398 84.58)",
+          "oklch(60.71% 0.00398 84.58)",
+          "oklch(72.14% 0.00398 84.58)",
+          "oklch(83.57% 0.00398 84.58)",
+          "oklch(95.00% 0.00398 84.58)"
+        ]
+      },
+      "secondary-foreground": {
+        "role": "neutral",
+        "displayName": "Secondary Foreground",
+        "tonalRamp": [
+          "oklch(15.00% 0.01688 88.00)",
+          "oklch(26.43% 0.01688 88.00)",
+          "oklch(37.86% 0.01688 88.00)",
+          "oklch(49.29% 0.01688 88.00)",
+          "oklch(60.71% 0.01688 88.00)",
+          "oklch(72.14% 0.01688 88.00)",
+          "oklch(83.57% 0.01688 88.00)",
+          "oklch(95.00% 0.01688 88.00)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(15.00% 0.00381 106.71)",
+          "oklch(26.43% 0.00381 106.71)",
+          "oklch(37.86% 0.00381 106.71)",
+          "oklch(49.29% 0.00381 106.71)",
+          "oklch(60.71% 0.00381 106.71)",
+          "oklch(72.14% 0.00381 106.71)",
+          "oklch(83.57% 0.00381 106.71)",
+          "oklch(95.00% 0.00381 106.71)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Muted Foreground",
+        "tonalRamp": [
+          "oklch(15.00% 0.01188 89.75)",
+          "oklch(26.43% 0.01188 89.75)",
+          "oklch(37.86% 0.01188 89.75)",
+          "oklch(49.29% 0.01188 89.75)",
+          "oklch(60.71% 0.01188 89.75)",
+          "oklch(72.14% 0.01188 89.75)",
+          "oklch(83.57% 0.01188 89.75)",
+          "oklch(95.00% 0.01188 89.75)"
+        ]
+      },
+      "accent": {
+        "role": "neutral",
+        "displayName": "Accent",
+        "tonalRamp": [
+          "oklch(15.00% 0.03276 83.84)",
+          "oklch(26.43% 0.03276 83.84)",
+          "oklch(37.86% 0.03276 83.84)",
+          "oklch(49.29% 0.03276 83.84)",
+          "oklch(60.71% 0.03276 83.84)",
+          "oklch(72.14% 0.03276 83.84)",
+          "oklch(83.57% 0.03276 83.84)",
+          "oklch(95.00% 0.03276 83.84)"
+        ]
+      },
+      "accent-foreground": {
+        "role": "neutral",
+        "displayName": "Accent Foreground",
+        "tonalRamp": [
+          "oklch(15.00% 0.12517 87.58)",
+          "oklch(26.43% 0.12517 87.58)",
+          "oklch(37.86% 0.12517 87.58)",
+          "oklch(49.29% 0.12517 87.58)",
+          "oklch(60.71% 0.12517 87.58)",
+          "oklch(72.14% 0.12517 87.58)",
+          "oklch(83.57% 0.12517 87.58)",
+          "oklch(95.00% 0.12517 87.58)"
+        ]
+      },
+      "destructive": {
+        "role": "secondary",
+        "displayName": "Destructive",
+        "tonalRamp": [
+          "oklch(15.00% 0.12271 26.25)",
+          "oklch(26.43% 0.12271 26.25)",
+          "oklch(37.86% 0.12271 26.25)",
+          "oklch(49.29% 0.12271 26.25)",
+          "oklch(60.71% 0.12271 26.25)",
+          "oklch(72.14% 0.12271 26.25)",
+          "oklch(83.57% 0.12271 26.25)",
+          "oklch(95.00% 0.12271 26.25)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "tonalRamp": [
+          "oklch(15.00% 0.01080 91.67)",
+          "oklch(26.43% 0.01080 91.67)",
+          "oklch(37.86% 0.01080 91.67)",
+          "oklch(49.29% 0.01080 91.67)",
+          "oklch(60.71% 0.01080 91.67)",
+          "oklch(72.14% 0.01080 91.67)",
+          "oklch(83.57% 0.01080 91.67)",
+          "oklch(95.00% 0.01080 91.67)"
+        ]
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Input",
+        "tonalRamp": [
+          "oklch(15.00% 0.02230 86.16)",
+          "oklch(26.43% 0.02230 86.16)",
+          "oklch(37.86% 0.02230 86.16)",
+          "oklch(49.29% 0.02230 86.16)",
+          "oklch(60.71% 0.02230 86.16)",
+          "oklch(72.14% 0.02230 86.16)",
+          "oklch(83.57% 0.02230 86.16)",
+          "oklch(95.00% 0.02230 86.16)"
+        ]
+      },
+      "ring": {
+        "role": "secondary",
+        "displayName": "Ring",
+        "tonalRamp": [
+          "oklch(15.00% 0.08382 85.06)",
+          "oklch(26.43% 0.08382 85.06)",
+          "oklch(37.86% 0.08382 85.06)",
+          "oklch(49.29% 0.08382 85.06)",
+          "oklch(60.71% 0.08382 85.06)",
+          "oklch(72.14% 0.08382 85.06)",
+          "oklch(83.57% 0.08382 85.06)",
+          "oklch(95.00% 0.08382 85.06)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Primary Hover",
+        "tonalRamp": [
+          "oklch(15.00% 0.00973 93.58)",
+          "oklch(26.43% 0.00973 93.58)",
+          "oklch(37.86% 0.00973 93.58)",
+          "oklch(49.29% 0.00973 93.58)",
+          "oklch(60.71% 0.00973 93.58)",
+          "oklch(72.14% 0.00973 93.58)",
+          "oklch(83.57% 0.00973 93.58)",
+          "oklch(95.00% 0.00973 93.58)"
+        ]
+      },
+      "row-hover": {
+        "role": "neutral",
+        "displayName": "Row Hover",
+        "tonalRamp": [
+          "oklch(15.00% 0.00193 106.56)",
+          "oklch(26.43% 0.00193 106.56)",
+          "oklch(37.86% 0.00193 106.56)",
+          "oklch(49.29% 0.00193 106.56)",
+          "oklch(60.71% 0.00193 106.56)",
+          "oklch(72.14% 0.00193 106.56)",
+          "oklch(83.57% 0.00193 106.56)",
+          "oklch(95.00% 0.00193 106.56)"
+        ]
+      },
+      "status-text": {
+        "role": "secondary",
+        "displayName": "Status Text",
+        "tonalRamp": [
+          "oklch(15.00% 0.05765 90.33)",
+          "oklch(26.43% 0.05765 90.33)",
+          "oklch(37.86% 0.05765 90.33)",
+          "oklch(49.29% 0.05765 90.33)",
+          "oklch(60.71% 0.05765 90.33)",
+          "oklch(72.14% 0.05765 90.33)",
+          "oklch(83.57% 0.05765 90.33)",
+          "oklch(95.00% 0.05765 90.33)"
+        ]
+      },
+      "status-surface": {
+        "role": "secondary",
+        "displayName": "Status Surface",
+        "tonalRamp": [
+          "oklch(15.00% 0.00825 84.59)",
+          "oklch(26.43% 0.00825 84.59)",
+          "oklch(37.86% 0.00825 84.59)",
+          "oklch(49.29% 0.00825 84.59)",
+          "oklch(60.71% 0.00825 84.59)",
+          "oklch(72.14% 0.00825 84.59)",
+          "oklch(83.57% 0.00825 84.59)",
+          "oklch(95.00% 0.00825 84.59)"
+        ]
+      },
+      "status-border": {
+        "role": "secondary",
+        "displayName": "Status Border",
+        "tonalRamp": [
+          "oklch(15.00% 0.02583 85.91)",
+          "oklch(26.43% 0.02583 85.91)",
+          "oklch(37.86% 0.02583 85.91)",
+          "oklch(49.29% 0.02583 85.91)",
+          "oklch(60.71% 0.02583 85.91)",
+          "oklch(72.14% 0.02583 85.91)",
+          "oklch(83.57% 0.02583 85.91)",
+          "oklch(95.00% 0.02583 85.91)"
+        ]
+      },
+      "text-link": {
+        "role": "secondary",
+        "displayName": "Text Link",
+        "tonalRamp": [
+          "oklch(15.00% 0.04896 85.76)",
+          "oklch(26.43% 0.04896 85.76)",
+          "oklch(37.86% 0.04896 85.76)",
+          "oklch(49.29% 0.04896 85.76)",
+          "oklch(60.71% 0.04896 85.76)",
+          "oklch(72.14% 0.04896 85.76)",
+          "oklch(83.57% 0.04896 85.76)",
+          "oklch(95.00% 0.04896 85.76)"
+        ]
+      },
+      "focus-ink": {
+        "role": "neutral",
+        "displayName": "Focus Ink",
+        "tonalRamp": [
+          "oklch(15.00% 0.00549 106.78)",
+          "oklch(26.43% 0.00549 106.78)",
+          "oklch(37.86% 0.00549 106.78)",
+          "oklch(49.29% 0.00549 106.78)",
+          "oklch(60.71% 0.00549 106.78)",
+          "oklch(72.14% 0.00549 106.78)",
+          "oklch(83.57% 0.00549 106.78)",
+          "oklch(95.00% 0.00549 106.78)"
+        ]
+      },
+      "focus-muted": {
+        "role": "neutral",
+        "displayName": "Focus Muted",
+        "tonalRamp": [
+          "oklch(15.00% 0.01831 86.47)",
+          "oklch(26.43% 0.01831 86.47)",
+          "oklch(37.86% 0.01831 86.47)",
+          "oklch(49.29% 0.01831 86.47)",
+          "oklch(60.71% 0.01831 86.47)",
+          "oklch(72.14% 0.01831 86.47)",
+          "oklch(83.57% 0.01831 86.47)",
+          "oklch(95.00% 0.01831 86.47)"
+        ]
+      },
+      "focus-rule": {
+        "role": "neutral",
+        "displayName": "Focus Rule",
+        "tonalRamp": [
+          "oklch(15.00% 0.01152 89.74)",
+          "oklch(26.43% 0.01152 89.74)",
+          "oklch(37.86% 0.01152 89.74)",
+          "oklch(49.29% 0.01152 89.74)",
+          "oklch(60.71% 0.01152 89.74)",
+          "oklch(72.14% 0.01152 89.74)",
+          "oklch(83.57% 0.01152 89.74)",
+          "oklch(95.00% 0.01152 89.74)"
+        ]
+      },
+      "focus-agent": {
+        "role": "neutral",
+        "displayName": "Focus Agent",
+        "tonalRamp": [
+          "oklch(15.00% 0.01250 91.52)",
+          "oklch(26.43% 0.01250 91.52)",
+          "oklch(37.86% 0.01250 91.52)",
+          "oklch(49.29% 0.01250 91.52)",
+          "oklch(60.71% 0.01250 91.52)",
+          "oklch(72.14% 0.01250 91.52)",
+          "oklch(83.57% 0.01250 91.52)",
+          "oklch(95.00% 0.01250 91.52)"
+        ]
+      },
+      "focus-hover": {
+        "role": "neutral",
+        "displayName": "Focus Hover",
+        "tonalRamp": [
+          "oklch(15.00% 0.01683 91.57)",
+          "oklch(26.43% 0.01683 91.57)",
+          "oklch(37.86% 0.01683 91.57)",
+          "oklch(49.29% 0.01683 91.57)",
+          "oklch(60.71% 0.01683 91.57)",
+          "oklch(72.14% 0.01683 91.57)",
+          "oklch(83.57% 0.01683 91.57)",
+          "oklch(95.00% 0.01683 91.57)"
+        ]
+      },
+      "panel-border": {
+        "role": "neutral",
+        "displayName": "Panel Border",
+        "tonalRamp": [
+          "oklch(15.00% 0.00726 95.31)",
+          "oklch(26.43% 0.00726 95.31)",
+          "oklch(37.86% 0.00726 95.31)",
+          "oklch(49.29% 0.00726 95.31)",
+          "oklch(60.71% 0.00726 95.31)",
+          "oklch(72.14% 0.00726 95.31)",
+          "oklch(83.57% 0.00726 95.31)",
+          "oklch(95.00% 0.00726 95.31)"
+        ]
+      },
+      "row-alternate": {
+        "role": "neutral",
+        "displayName": "Row Alternate",
+        "tonalRamp": [
+          "oklch(15.00% 0.00201 106.60)",
+          "oklch(26.43% 0.00201 106.60)",
+          "oklch(37.86% 0.00201 106.60)",
+          "oklch(49.29% 0.00201 106.60)",
+          "oklch(60.71% 0.00201 106.60)",
+          "oklch(72.14% 0.00201 106.60)",
+          "oklch(83.57% 0.00201 106.60)",
+          "oklch(95.00% 0.00201 106.60)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "display",
+        "purpose": "Overview mission heading."
+      },
+      "headline": {
+        "displayName": "headline",
+        "purpose": "headline role extracted from the final cascade."
+      },
+      "section": {
+        "displayName": "section",
+        "purpose": "section role extracted from the final cascade."
+      },
+      "panel-title": {
+        "displayName": "panel-title",
+        "purpose": "panel-title role extracted from the final cascade."
+      },
+      "title": {
+        "displayName": "title",
+        "purpose": "title role extracted from the final cascade."
+      },
+      "body": {
+        "displayName": "body",
+        "purpose": "body role extracted from the final cascade."
+      },
+      "button": {
+        "displayName": "button",
+        "purpose": "button role extracted from the final cascade."
+      },
+      "label": {
+        "displayName": "label",
+        "purpose": "label role extracted from the final cascade."
+      },
+      "metric": {
+        "displayName": "metric",
+        "purpose": "Headline research totals in Geist; 32px on phones."
+      },
+      "mono": {
+        "displayName": "mono",
+        "purpose": "mono role extracted from the final cascade."
+      },
+      "team-title": {
+        "displayName": "Founding agent title",
+        "purpose": "Names in the method-specific agent register."
+      },
+      "focus-title": {
+        "displayName": "Research method title",
+        "purpose": "Selected method explanation on the light research panel."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sheet-overlay",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "shadcn Sheet ambient elevation; persistent panels remain flat."
+      },
+      {
+        "name": "field-focus",
+        "value": "0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)",
+        "purpose": "Field focus only; final generic button CSS suppresses box shadows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "navigation-card-state",
+        "value": "160ms",
+        "purpose": "Color and border changes without lift."
+      },
+      {
+        "name": "team-row-state",
+        "value": "180ms ease-out",
+        "purpose": "Background change on record hover."
+      },
+      {
+        "name": "sheet",
+        "value": "200ms ease-in-out",
+        "purpose": "Temporary navigation panel transition."
+      },
+      {
+        "name": "sheet-backdrop",
+        "value": "150ms",
+        "purpose": "Overlay opacity transition."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "Disable animation and transitions when reduced motion is requested."
+      },
+      {
+        "name": "method-symbol",
+        "value": "220ms ease-out",
+        "purpose": "Move method symbol up 3px on row hover; disabled under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "directory-tight",
+        "value": "1200px"
+      },
+      {
+        "name": "masthead-tight",
+        "value": "1100px"
+      },
+      {
+        "name": "content-stack",
+        "value": "980px"
+      },
+      {
+        "name": "sheet-navigation",
+        "value": "900px"
+      },
+      {
+        "name": "input-small-text-min",
+        "value": "768px"
+      },
+      {
+        "name": "narrow-controls",
+        "value": "760px"
+      },
+      {
+        "name": "phone",
+        "value": "600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default-size shadcn action with final 2px corners and 44px minimum height.",
+      "html": "<button class=\"ds-button-primary\">Launch an agent</button>",
+      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 10px;border:1px solid transparent;border-radius:2px;font-family:var(--font-sans,\"Geist Variable\",sans-serif);font-size:14px;font-weight:550;line-height:20px;text-decoration:none;cursor:pointer;transition:all .15s;box-shadow:none;background:var(--primary,#f5f3ed);color:var(--primary-foreground,#12100a);}.ds-button-primary:hover{background:#dad8d1;}.ds-button-primary:focus-visible{outline:none;border-color:var(--ring,#c2a66b)}.ds-button-primary:active{transform:translateY(1px)}.ds-button-primary:disabled{opacity:.5;pointer-events:none}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none}}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Default-size shadcn action with final 2px corners and 44px minimum height.",
+      "html": "<button class=\"ds-button-outline\">Explore the research</button>",
+      "css": ".ds-button-outline{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 10px;border:1px solid transparent;border-radius:2px;font-family:var(--font-sans,\"Geist Variable\",sans-serif);font-size:14px;font-weight:550;line-height:20px;text-decoration:none;cursor:pointer;transition:all .15s;box-shadow:none;background:color-mix(in oklab,var(--input,#514b3e) 30%,transparent);color:var(--foreground,#f5f3eb);border-color:var(--input,#514b3e);}.ds-button-outline:hover{background:color-mix(in oklab,var(--input,#514b3e) 50%,transparent);}.ds-button-outline:focus-visible{outline:none;border-color:var(--ring,#c2a66b)}.ds-button-outline:active{transform:translateY(1px)}.ds-button-outline:disabled{opacity:.5;pointer-events:none}@media(prefers-reduced-motion:reduce){.ds-button-outline{transition:none}}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Default-size shadcn action with final 2px corners and 44px minimum height.",
+      "html": "<button class=\"ds-button-ghost\">View details</button>",
+      "css": ".ds-button-ghost{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 10px;border:1px solid transparent;border-radius:2px;font-family:var(--font-sans,\"Geist Variable\",sans-serif);font-size:14px;font-weight:550;line-height:20px;text-decoration:none;cursor:pointer;transition:all .15s;box-shadow:none;background:transparent;color:var(--foreground,#f5f3eb);}.ds-button-ghost:hover{background:color-mix(in oklab,var(--muted,#1b1b19) 50%,transparent);}.ds-button-ghost:focus-visible{outline:none;border-color:var(--ring,#c2a66b)}.ds-button-ghost:active{transform:translateY(1px)}.ds-button-ghost:disabled{opacity:.5;pointer-events:none}@media(prefers-reduced-motion:reduce){.ds-button-ghost{transition:none}}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Dark shadcn field with gold focus and responsive sizing.",
+      "html": "<input class=\"ds-input\" aria-label=\"Agent name\" placeholder=\"Agent name\" />",
+      "css": ".ds-input{width:100%;min-width:0;height:32px;padding:4px 10px;border:1px solid var(--input,#514b3e);border-radius:2px;background:color-mix(in oklab,var(--input,#514b3e) 30%,transparent);color:var(--foreground,#f5f3eb);font-family:var(--font-sans,\"Geist Variable\",sans-serif);font-size:16px;transition:color .15s,border-color .15s;caret-color:var(--primary,#f5f3ed)}.ds-input::placeholder{color:var(--muted-foreground,#a9a69e)}.ds-input:focus-visible{outline:none;border-color:var(--ring,#c2a66b);box-shadow:0 0 0 3px color-mix(in oklab,var(--ring,#c2a66b) 50%,transparent)}.ds-input:disabled{opacity:.5;pointer-events:none}.ds-input[aria-invalid=true]{border-color:var(--destructive,#ff9a90)}@media(min-width:768px){.ds-input{font-size:14px}}@media(max-width:760px){.ds-input{min-height:44px}}@media(prefers-reduced-motion:reduce){.ds-input{transition:none}}"
+    },
+    {
+      "name": "Masthead Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Desktop horizontal navigation with quiet gold current-page underline.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Preview navigation\"><a class=\"ds-nav-link\" href=\"#overview\" aria-current=\"page\">Overview</a><a class=\"ds-nav-link\" href=\"#agents\">Agents</a><a class=\"ds-nav-link\" href=\"#findings\">Findings</a></nav>",
+      "css": ".ds-nav{display:flex;gap:6px;background:var(--background,#090909);font-family:var(--font-sans,\"Geist Variable\",sans-serif);}.ds-nav-link{display:flex;align-items:center;min-height:41px;padding:28px 10px;border-bottom:2px solid transparent;color:#b0aca4;font-size:12px;text-decoration:none;transition:background .16s,color .16s}.ds-nav-link[aria-current=page]{color:#f5f3eb;border-bottom-color:var(--gold,#c2a66b)}.ds-nav-link:hover{background:#191711;color:var(--foreground,#f5f3eb)}.ds-nav-link:focus-visible{outline:2px solid var(--primary,#f5f3ed);outline-offset:5px;}@media(prefers-reduced-motion:reduce){.ds-nav-link{transition:none}}"
+    },
+    {
+      "name": "Outline Badge",
+      "kind": "chip",
+      "refersTo": "chip-outline",
+      "description": "Informational rectangular label for illustrative records.",
+      "html": "<span class=\"ds-badge\">Illustrative</span>",
+      "css": ".ds-badge{display:inline-flex;align-items:center;justify-content:center;height:20px;padding:2px 8px;border:1px solid var(--border,#33312b);border-radius:2px;background:transparent;color:var(--foreground,#f5f3eb);font-family:var(--font-sans,\"Geist Variable\",sans-serif);font-size:12px;font-weight:500;white-space:nowrap}"
+    },
+    {
+      "name": "Agent Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Directory record, shown with explicitly illustrative content.",
+      "html": "<a class=\"ds-card\" href=\"#agent\"><h3 class=\"ds-card-title\">Example research agent</h3><p class=\"ds-card-copy\">Illustrative record. Research execution awaits setup.</p><span class=\"ds-card-foot\">Independent review required</span></a>",
+      "css": ".ds-card{display:block;padding:21px;border:1px solid var(--border,#33312b);border-radius:2px;background:var(--card,#111111);color:var(--foreground,#f5f3eb);font-family:var(--font-sans,\"Geist Variable\",sans-serif);text-decoration:none;transition:border-color .16s,background .16s}.ds-card:hover{border-color:#9f9b93;background:#20201e}.ds-card:focus-visible{outline:2px solid var(--primary,#f5f3ed);outline-offset:5px;}.ds-card-title{margin:0;font-size:16px;font-weight:600;line-height:1.25;letter-spacing:-.015em}.ds-card-copy{margin:10px 0 20px;min-height:58px;font-size:11px;line-height:1.8;color:#aca8a0}.ds-card-foot{display:block;border-top:1px solid var(--border,#33312b);padding-top:14px;font-size:10px;color:#b8b4ac}@media(prefers-reduced-motion:reduce){.ds-card{transition:none}}"
+    },
+    {
+      "name": "Evidence Panel",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "Flat ruled panel with square evidence count nodes; sample counts are illustrative.",
+      "html": "<section class=\"ds-panel\"><div class=\"ds-panel-heading\"><h2 class=\"ds-panel-title\">Follow the evidence</h2><p class=\"ds-panel-copy\">Illustrative preview counts</p></div><div class=\"ds-stage\"><span class=\"ds-node\">00</span><strong class=\"ds-stage-label\">Submitted</strong><span class=\"ds-stage-caption\">Local records</span></div></section>",
+      "css": ".ds-panel{border:1px solid #2c2b27;border-radius:2px;background:#101010;color:var(--foreground,#f5f3eb);overflow:hidden;font-family:var(--font-sans,\"Geist Variable\",sans-serif);}.ds-panel-heading{padding:21px 24px}.ds-panel-title{margin:0;font-size:22px;font-weight:500;line-height:1.25;letter-spacing:-.03em}.ds-panel-copy{margin:5px 0 0;font-size:13px;color:var(--muted-foreground,#a9a69e)}.ds-stage{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 24px 28px}.ds-node{display:grid;place-items:center;width:50px;height:50px;border:1px solid #4a4438;border-radius:0;background:transparent;color:#cbc3b1;font-family:var(--font-mono,\"Geist Mono Variable\",monospace);font-size:20px;margin-bottom:12px}.ds-stage-label{font-size:13px;font-weight:480}.ds-stage-caption{font-size:11px;color:var(--muted-foreground,#a9a69e)}"
+    },
+    {
+      "name": "Forge Identity",
+      "kind": "custom",
+      "refersTo": "forge-mark",
+      "description": "Original three-part geometric identity with lowercase wordmark.",
+      "html": "<a class=\"ds-forge-brand\" href=\"#home\" aria-label=\"Halo Forge home\"><svg class=\"ds-forge-mark\" viewBox=\"0 0 64 64\" fill=\"none\" aria-hidden=\"true\"><path d=\"M32 4 56 18 44 25 32 18 20 25 8 18 32 4Z\" fill=\"currentColor\"/><path d=\"M56 21v25L34 59V45l10-6V28l12-7Z\" fill=\"currentColor\"/><path d=\"m8 21 12 7v11l10 6v14L8 46V21Z\" fill=\"currentColor\"/></svg><span>halo<span class=\"ds-forge-light\">forge</span></span></a>",
+      "css": ".ds-forge-brand{display:inline-flex;align-items:center;gap:11px;color:var(--foreground,#f5f3eb);font-family:var(--font-sans,\"Geist Variable\",sans-serif);font-size:26px;font-weight:650;letter-spacing:-.04em;text-decoration:none}.ds-forge-mark{width:36px;height:36px;flex:none}.ds-forge-light{font-weight:400}.ds-forge-brand:focus-visible{outline:2px solid var(--primary,#f5f3ed);outline-offset:5px}.ds-forge-brand:hover{color:var(--foreground,#f5f3eb)}"
+    },
+    {
+      "name": "Research Focus",
+      "kind": "custom",
+      "refersTo": "research-focus",
+      "description": "Scalar state preview of the shadcn research tabs; the application switches diagrams for all three methods.",
+      "html": "<section class=\"ds-focus\" aria-label=\"Research method preview\"><div class=\"ds-focus-header\"><span>Inside the research</span><span class=\"ds-focus-state\">Pilot / awaiting setup</span></div><div class=\"ds-focus-tabs\" role=\"tablist\" aria-label=\"Research methods preview\"><button class=\"ds-focus-tab\" role=\"tab\" aria-selected=\"true\">Scalars</button><button class=\"ds-focus-tab\" role=\"tab\" aria-selected=\"false\">Memory</button><button class=\"ds-focus-tab\" role=\"tab\" aria-selected=\"false\">Scheduling</button></div><div class=\"ds-focus-content\"><h2 class=\"ds-focus-title\">Convert once. Reuse the work.</h2><p class=\"ds-focus-detail\">Cache each scalar’s byte representation across bucket passes within one MSM invocation.</p><div class=\"ds-diagram\" aria-label=\"Scalar input to convert once to reuse in passes. Conceptual research diagram.\"><svg viewBox=\"0 0 440 150\" fill=\"none\" aria-hidden=\"true\"><path d=\"M60 75h310\" stroke=\"#bdbbb4\"/><rect x=\"32\" y=\"40\" width=\"49\" height=\"49\" fill=\"#eeece5\" stroke=\"#242421\"/><rect x=\"37\" y=\"45\" width=\"49\" height=\"49\" fill=\"#eeece5\" stroke=\"#242421\"/><rect x=\"42\" y=\"50\" width=\"49\" height=\"49\" fill=\"#eeece5\" stroke=\"#242421\"/><rect x=\"47\" y=\"55\" width=\"49\" height=\"49\" fill=\"#eeece5\" stroke=\"#242421\"/><rect x=\"193\" y=\"48\" width=\"54\" height=\"54\" fill=\"#242421\"/><path d=\"m210 75 8 8 14-18\" stroke=\"#f5f3eb\" stroke-width=\"2\"/><path d=\"M247 75h54V47h42\" stroke=\"#706959\"/><rect x=\"343\" y=\"39\" width=\"55\" height=\"17\" fill=\"#dedbd1\" stroke=\"#777064\"/><path d=\"M247 75h54V76h42\" stroke=\"#706959\"/><rect x=\"343\" y=\"68\" width=\"55\" height=\"17\" fill=\"#dedbd1\" stroke=\"#777064\"/><path d=\"M247 75h54V105h42\" stroke=\"#706959\"/><rect x=\"343\" y=\"97\" width=\"55\" height=\"17\" fill=\"#dedbd1\" stroke=\"#777064\"/></svg><div class=\"ds-diagram-labels\"><span>Scalar input</span><span>Convert once</span><span>Reuse in passes</span></div></div><div class=\"ds-focus-caption\"><span>Search target: repeated scalar conversion</span><span>Schematic, not results</span></div></div><a class=\"ds-focus-agent\" href=\"#bucket-scout\"><span><span class=\"ds-focus-code\">S1</span> Bucket Scout</span><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></a></section>",
+      "css": ".ds-focus{padding:23px 26px 0;background:var(--foreground,#f5f3eb);color:#242421;font-family:var(--font-sans,\"Geist Variable\",sans-serif);min-width:0}.ds-focus-header{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;font-weight:600;margin-bottom:22px}.ds-focus-state{font-size:11px;color:#666153;font-weight:400}.ds-focus-tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #c8c5bd}.ds-focus-tab{height:44px;min-height:44px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#656158;font:500 12px var(--font-sans,\"Geist Variable\",sans-serif);cursor:pointer;box-shadow:none}.ds-focus-tab[aria-selected=true]{color:#191918;border-bottom-color:#242421}.ds-focus-tab:hover{background:#e5e2d9}.ds-focus-tab:focus-visible{outline:2px solid #736346;outline-offset:-4px}.ds-focus-content{padding-top:22px}.ds-focus-title{margin:0;max-width:18ch;min-height:60px;font-size:25px;font-weight:550;line-height:1.2;letter-spacing:-.035em;text-wrap:balance}.ds-focus-detail{margin:12px 0 0;min-height:60px;font-size:12px;line-height:1.65;color:#625d52}.ds-diagram{margin:15px 0 21px}.ds-diagram>svg{display:block;width:100%;height:auto}.ds-diagram-labels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;font-size:10px;font-weight:500}.ds-focus-caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:7px;padding:14px 0;border-top:1px solid #cbc8bf;color:#676253;font-size:10px}.ds-focus-agent{display:flex;justify-content:space-between;align-items:center;min-height:56px;background:#e6e3da;margin:0 -26px;padding:12px 26px;color:#242421;font-size:12px;font-weight:550;text-decoration:none;transition:background .18s ease-out}.ds-focus-code{font-family:var(--font-mono,\"Geist Mono Variable\",monospace);font-size:11px;color:#736346;margin-right:12px}.ds-focus-agent:hover{background:#d9d5c9}.ds-focus-agent:focus-visible{outline:2px solid var(--primary,#f5f3ed);outline-offset:5px}@media(max-width:600px){.ds-focus{padding:20px 20px 0}.ds-focus-header{font-size:12px}.ds-focus-state{font-size:10px}.ds-focus-title{font-size:28px;min-height:0}.ds-focus-detail{min-height:0}.ds-focus-agent{margin:0 -20px;padding:12px 20px}}@media(prefers-reduced-motion:reduce){.ds-focus-agent{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Zcash Research Register",
+    "overview": "Black surfaces, warm white type and fine rules give Halo Forge the clarity of a cryptography research register. Larger Geist headings and a light conceptual research panel establish contrast. Geist Mono identifies code and detailed evidence counts; headline metrics use Geist. Gold remains a quiet navigation and state accent, while white carries primary actions.\n\nThe Hashsmashers reference informs the horizontal shell and ruled records. The user rejected pixel typography and broad gold treatment. The refined identity uses an original three-part geometric mark, method-specific line diagrams and shadcn/ui controls. Research schematics explain the work without presenting projected results as achieved progress.",
+    "keyCharacteristics": [
+      "Black and white first, with restrained gold accents.",
+      "Three-part geometric mark and a light conceptual research panel.",
+      "Larger Geist hierarchy, ruled agent records and method-specific SVG symbols.",
+      "Explicit preview, setup and conditional reward states."
+    ],
+    "rules": [
+      {
+        "name": "The Quiet Gold Rule",
+        "body": "Use white for primary actions, the geometric mark and reading hierarchy. Keep gold to small navigation, focus and state accents.",
+        "section": "colors"
+      },
+      {
+        "name": "The Evidence Signal Rule",
+        "body": "Pair state color with written status; styling must not imply verified, funded or paid activity.",
+        "section": "colors"
+      },
+      {
+        "name": "The Identifier Rule",
+        "body": "Use Geist Mono for identifiers, code and detailed evidence counts. Use Geist for prose, headings, navigation and headline metrics.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ruled Surface Rule",
+        "body": "Separate persistent records with tonal contrast and fine borders. Reserve elevation for temporary overlays.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do retain the black and white research register, shadcn/ui components and self-hosted Geist pairing.",
+      "Do keep gold restrained and primary actions white.",
+      "Do pair states with written labels and keep the live-disabled preview notice visible on mobile.",
+      "Do preserve visible keyboard focus, reduced motion and responsive record stacking.",
+      "Do distinguish planned rewards and illustrative records from funded or verified activity.",
+      "Do use the three-part mark and labeled conceptual diagrams to explain research without claiming measured results."
+    ],
+    "donts": [
+      "Don't use pixel fonts, broad gold surfaces, gradients or generated artwork.",
+      "Don't restore the superseded lime brand palette or fixed desktop sidebar.",
+      "Don't add another component kit, stock template or decorative kicker above the mission heading.",
+      "Don't turn inherited small-caption styles or residual semantic success colors into new brand defaults.",
+      "Don't imply real discoveries or payouts with sample metrics or remove functional overlay and focus treatments."
+    ]
+  }
+}

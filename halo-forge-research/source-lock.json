@@ -1,0 +1,26 @@
+[
+  {
+    "name": "halo2",
+    "commit": "4afa97f221b439450626f2fd03b390e252341e67",
+    "upstream": "https://github.com/zcash/halo2.git",
+    "commit_time": "2026-09-29T15:54:51-06:00"
+  },
+  {
+    "name": "orchard",
+    "commit": "616a669df8c9a59c33d47064d3ce04b25d026b2e",
+    "upstream": "https://github.com/zcash/orchard.git",
+    "commit_time": "2026-09-30T16:15:05-06:00"
+  },
+  {
+    "name": "librustzcash",
+    "commit": "eb3e586765236a808dc82eee85f2be47e11e48c6",
+    "upstream": "https://github.com/zcash/librustzcash.git",
+    "commit_time": "2026-10-06T14:39:56-06:00"
+  },
+  {
+    "name": "pump-public-docs",
+    "commit": "cb188ce08b5069196eef1f3e4a0c43b70099793b",
+    "upstream": "https://github.com/pump-fun/pump-public-docs.git",
+    "commit_time": "2026-09-29T15:50:38+04:00"
+  }
+]

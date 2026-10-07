@@ -1,0 +1,51 @@
+[
+  {
+    "assetId": "nep141:zec.omft.near",
+    "decimals": 8,
+    "blockchain": "zec",
+    "symbol": "ZEC",
+    "price": 1339.22,
+    "priceUpdatedAt": "2026-10-06T21:04:30.725Z",
+    "coingeckoId": "zcash"
+  },
+  {
+    "assetId": "1cs_v1:sol:spl:A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
+    "decimals": 8,
+    "blockchain": "sol",
+    "symbol": "ZEC",
+    "price": 1339.22,
+    "priceUpdatedAt": "2026-10-06T21:04:30.725Z",
+    "contractAddress": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
+    "coingeckoId": "zcash"
+  },
+  {
+    "assetId": "1cs_v1:starknet:erc20:0x05ce53b9b68fb8e9ecab9283a96d97948914733fd6ed8d9a53a276a419497841",
+    "decimals": 8,
+    "blockchain": "starknet",
+    "symbol": "ZEC",
+    "price": 1339.22,
+    "priceUpdatedAt": "2026-10-06T21:04:30.725Z",
+    "contractAddress": "0x05ce53b9b68fb8e9ecab9283a96d97948914733fd6ed8d9a53a276a419497841",
+    "coingeckoId": "zcash"
+  },
+  {
+    "assetId": "1cs_v1:aptos:aptos-fa:0x261c85bc1bb5acc3ffcf769530c732d4182c3bbd84936d427125fcd4732e9879",
+    "decimals": 8,
+    "blockchain": "aptos",
+    "symbol": "ZEC",
+    "price": 1339.22,
+    "priceUpdatedAt": "2026-10-06T21:04:30.725Z",
+    "contractAddress": "0x261c85bc1bb5acc3ffcf769530c732d4182c3bbd84936d427125fcd4732e9879",
+    "coingeckoId": "zcash"
+  },
+  {
+    "assetId": "1cs_v1:near:nep141:zec.omft.near",
+    "decimals": 8,
+    "blockchain": "near",
+    "symbol": "ZEC",
+    "price": 1339.22,
+    "priceUpdatedAt": "2026-10-06T21:04:30.725Z",
+    "contractAddress": "zec.omft.near",
+    "coingeckoId": "zcash"
+  }
+]

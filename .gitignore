@@ -1,0 +1,25 @@
+# Local credentials and runtime state
+.env*
+!.env.example
+*.pem
+*.key
+*.sqlite*
+*.db
+node_modules/
+.next/
+.data/
+.eve/
+.output/
+.nitro/
+.vercel/
+dist/
+build/
+target/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

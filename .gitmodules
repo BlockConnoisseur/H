@@ -1,0 +1,19 @@
+[submodule "halo2"]
+	path = halo-forge-research/sources/halo2
+	url = https://github.com/zcash/halo2.git
+
+[submodule "orchard"]
+	path = halo-forge-research/sources/orchard
+	url = https://github.com/zcash/orchard.git
+
+[submodule "librustzcash"]
+	path = halo-forge-research/sources/librustzcash
+	url = https://github.com/zcash/librustzcash.git
+
+[submodule "pump-public-docs"]
+	path = halo-forge-research/sources/pump-public-docs
+	url = https://github.com/pump-fun/pump-public-docs.git
+
+[submodule "impeccable"]
+	path = halo-forge-research/sources/impeccable
+	url = https://github.com/pbakaus/impeccable.git

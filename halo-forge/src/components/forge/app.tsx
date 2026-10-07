@@ -1,0 +1,566 @@
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import bs58 from "bs58";
+import {
+  ArrowUpRight,
+  Check,
+  ChevronRight,
+  CircleHelp,
+  Compass,
+  Cpu,
+  FlaskConical,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Orbit,
+  Search,
+  Settings2,
+  ShieldCheck,
+  Trophy,
+  Wallet,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { short, type Data, type Action } from "./shared";
+import { Overview, Agents, AgentDetail, Launch } from "./research-pages";
+import { ForgeMark } from "./identity";
+import {
+  Challenges,
+  ChallengeDetail,
+  Findings,
+  FindingDetail,
+  Leaderboard,
+  Rewards,
+  Compute,
+  Review,
+  Settings,
+  Guide,
+} from "./evidence-pages";
+const nav = [
+  { href: "/", name: "Overview", icon: LayoutDashboard },
+  { href: "/agents", name: "Agents", icon: Orbit },
+  { href: "/challenges", name: "Challenges", icon: Compass },
+  { href: "/findings", name: "Findings", icon: FlaskConical },
+  { href: "/leaderboard", name: "Leaderboard", icon: Trophy },
+  { href: "/rewards", name: "Rewards", icon: Wallet },
+  { href: "/compute", name: "Compute", icon: Cpu },
+];
+type Provider = {
+  connect: () => Promise<{ publicKey: { toString: () => string } }>;
+  signMessage: (
+    m: Uint8Array,
+    encoding?: string,
+  ) => Promise<{ signature: Uint8Array }>;
+};
+export type PageProps = {
+  data: Data;
+  action: Action;
+  busy: boolean;
+  connect: () => void;
+};
+function Navigation({
+  path,
+  data,
+  close,
+}: {
+  path: string;
+  data: Data | null;
+  close: () => void;
+}) {
+  return (
+    <>
+      <Link className="brand" href="/" onClick={close}>
+        <ForgeMark className="forge-mark" />
+        <span>
+          halo<span className="brand-light">forge</span>
+        </span>
+        <span className="brand-beta">LAB</span>
+      </Link>
+      <div className="workspace-label">
+        <span className="tiny-dot" /> Research workspace
+      </div>
+      <nav aria-label="Main navigation">
+        {nav.map((n) => (
+          <Link
+            key={n.href}
+            href={n.href}
+            className={`nav-link ${(n.href === "/" ? path === "/" : path.startsWith(n.href)) ? "selected" : ""}`}
+            onClick={close}
+          >
+            <n.icon size={18} />
+            {n.name}
+            {n.name === "Findings" && data && (
+              <span className="nav-count">{data.findings.length}</span>
+            )}
+          </Link>
+        ))}
+      </nav>
+      <div className="sidebar-bottom">
+        <div className="network-box">
+          <div>
+            <span className="tiny-dot amber" /> Local development
+          </div>
+          <p>Evidence before rewards.</p>
+        </div>
+        <Link className="nav-link" href="/review" onClick={close}>
+          <ShieldCheck size={18} />
+          Review workspace
+        </Link>
+        <Link className="nav-link" href="/guide" onClick={close}>
+          <CircleHelp size={18} />
+          How it works
+        </Link>
+        <Link className="nav-link" href="/settings" onClick={close}>
+          <Settings2 size={18} />
+          Settings
+        </Link>
+        <div className="sidebar-foot">
+          Built for better cryptography.
+          <br />
+          Measured. Reviewed. Reproducible.
+        </div>
+      </div>
+    </>
+  );
+}
+export function ForgeApp() {
+  const path = usePathname();
+  const router = useRouter();
+  const [data, setData] = useState<Data | null>(null);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [walletOpen, setWalletOpen] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const load = useCallback(async () => {
+    try {
+      const r = await fetch("/api/state", { cache: "no-store" });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      setData(d);
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Could not load the workspace.",
+      );
+    }
+  }, []);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/state", { cache: "no-store" })
+      .then(async (r) => {
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        return d;
+      })
+      .then((d) => {
+        if (active) setData(d);
+      })
+      .catch((e) => {
+        if (active)
+          setError(
+            e instanceof Error ? e.message : "Could not load the workspace.",
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+  useEffect(() => {
+    const handle = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handle);
+    return () => window.removeEventListener("keydown", handle);
+  }, []);
+  const post = async (url: string, body: unknown) => {
+    const r = await fetch(`/api/${url}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    return d;
+  };
+  const action: Action = async (name, input) => {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const d = await post("actions", {
+        action: name,
+        input,
+        key: crypto.randomUUID(),
+      });
+      await load();
+      setNotice(
+        (
+          {
+            launch: "Agent registered in your local workspace.",
+            topup: "Preview credit added. No payment was taken.",
+            queue:
+              "Session queued. Credit reserved; awaiting a configured worker.",
+            cancel: "Session cancelled. Unused credit returned.",
+            submit: "Artifact frozen and submitted for review.",
+            settings: "Agent settings saved.",
+            review: "Review decision recorded.",
+          } as Record<string, string>
+        )[name] || "Saved.",
+      );
+      return d.result;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "The action failed.");
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  };
+  async function connect(preview = false) {
+    setBusy(true);
+    setError("");
+    try {
+      if (preview) {
+        await post("auth/preview", {});
+      } else {
+        const provider = (window as unknown as { solana?: Provider }).solana;
+        if (!provider?.signMessage)
+          throw new Error(
+            "No compatible injected Solana wallet was found. Open this app in a browser with Phantom or another signMessage-compatible wallet.",
+          );
+        const { publicKey } = await provider.connect();
+        const challenge = await post("auth/challenge", {
+          wallet: publicKey.toString(),
+        });
+        const signed = await provider.signMessage(
+          new TextEncoder().encode(challenge.message),
+          "utf8",
+        );
+        await post("auth/verify", {
+          id: challenge.id,
+          signature: bs58.encode(signed.signature),
+        });
+      }
+      await load();
+      setWalletOpen(false);
+      setNotice(
+        preview
+          ? "Local preview account connected. Test credits have no monetary value."
+          : "Wallet signature verified. Live financial operations remain disabled.",
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Sign-in failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function logout() {
+    try {
+      await post("auth/logout", {});
+      await load();
+      setWalletOpen(false);
+      setNotice("Signed out.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not sign out.");
+    }
+  }
+  const current =
+    nav.find((n) => n.href !== "/" && path.startsWith(n.href))?.name ||
+    (
+      {
+        "/launch": "Launch agent",
+        "/review": "Review workspace",
+        "/settings": "Settings",
+        "/guide": "How it works",
+      } as Record<string, string>
+    )[path] ||
+    "Overview";
+
+  let page: React.ReactNode;
+  if (data) {
+    const props = { data, action, busy, connect: () => setWalletOpen(true) };
+    const seg = path.split("/").filter(Boolean);
+    if (!seg.length) page = <Overview {...props} />;
+    else if (seg[0] === "agents" && seg.length === 1)
+      page = <Agents {...props} />;
+    else if (seg[0] === "agents" && seg.length === 2)
+      page = <AgentDetail {...props} id={seg[1]} />;
+    else if (path === "/launch") page = <Launch {...props} />;
+    else if (path === "/challenges") page = <Challenges {...props} />;
+    else if (seg[0] === "challenges" && seg.length === 2)
+      page = <ChallengeDetail {...props} id={seg[1]} />;
+    else if (path === "/findings") page = <Findings {...props} />;
+    else if (seg[0] === "findings" && seg.length === 2)
+      page = <FindingDetail {...props} id={seg[1]} />;
+    else if (path === "/leaderboard") page = <Leaderboard {...props} />;
+    else if (path === "/rewards") page = <Rewards {...props} />;
+    else if (path === "/compute") page = <Compute {...props} />;
+    else if (path === "/review") page = <Review {...props} />;
+    else if (path === "/settings") page = <Settings {...props} />;
+    else if (path === "/guide") page = <Guide />;
+    else
+      page = (
+        <div className="empty">
+          <h1>Page not found</h1>
+          <Link href="/">Return to the workspace</Link>
+        </div>
+      );
+  }
+  const results = data
+    ? [
+        ...data.agents.map((a) => ({
+          name: a.name,
+          type: "Agent",
+          href: `/agents/${a.id}`,
+        })),
+        ...data.findings.map((f) => ({
+          name: f.title,
+          type: "Finding",
+          href: `/findings/${f.id}`,
+        })),
+        {
+          name: "Zcash prover CPU challenge",
+          type: "Challenge",
+          href: "/challenges/ZEC-PROVER-CPU-001",
+        },
+      ].filter((r) => r.name.toLowerCase().includes(search.toLowerCase()))
+    : [];
+  return (
+    <div className="app-shell">
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <aside className="sidebar masthead">
+        <Navigation path={path} data={data} close={() => setMobile(false)} />
+      </aside>
+      <div className="app-main">
+        <header className="topbar">
+          <div className="topbar-left">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="mobile-menu"
+              aria-label="Open navigation"
+              onClick={() => setMobile(true)}
+            >
+              <Menu />
+            </Button>
+            <Link
+              href="/"
+              className="mobile-brand"
+              aria-label="Halo Forge home"
+            >
+              <ForgeMark className="forge-mark" />
+              <span>haloforge</span>
+            </Link>
+            <span className="crumb-root">Research lab</span>
+            <ChevronRight size={14} />
+            <span className="current-page">{current}</span>
+          </div>
+          <div className="topbar-actions">
+            <Button
+              variant="ghost"
+              className="search-button"
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search size={16} />
+              <span>Search workspace</span>
+              <kbd>Ctrl K</kbd>
+            </Button>
+            <div className="utility-links">
+              <Link href="/guide">How it works</Link>
+              <Link href="/review">Review</Link>
+              <Link href="/settings">Settings</Link>
+            </div>
+            <span className="header-divider" />
+            <Button
+              variant="outline"
+              className="wallet-button"
+              onClick={() => setWalletOpen(true)}
+            >
+              <Wallet size={15} />
+              {data?.actor ? short(data.actor.wallet) : "Connect wallet"}
+            </Button>
+          </div>
+        </header>
+        <div className="preview-strip">
+          <FlaskConical size={13} />
+          <span>
+            Local preview · Live research and payouts disabled.
+            <span className="preview-long">
+              {" "}
+              Token launches are also disabled.
+            </span>
+          </span>
+          <Link href="/settings">
+            Readiness <ArrowUpRight size={12} />
+          </Link>
+        </div>
+        <main id="main" tabIndex={-1}>
+          <div className="messages" aria-live="polite">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Dismiss error"
+                  onClick={() => setError("")}
+                >
+                  <X size={15} />
+                </Button>
+              </Alert>
+            )}
+            {notice && (
+              <Alert>
+                <Check size={16} />
+                <AlertDescription>{notice}</AlertDescription>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Dismiss notification"
+                  onClick={() => setNotice("")}
+                >
+                  <X size={15} />
+                </Button>
+              </Alert>
+            )}
+          </div>
+          {data ? (
+            <div className="page-content" key={path}>
+              {page}
+            </div>
+          ) : (
+            <div className="loading-page">
+              <Skeleton className="h-10 w-64" />
+              <Skeleton className="h-6 w-96 max-w-full" />
+              <Skeleton className="h-72 w-full" />
+              {error && <Button onClick={load}>Retry loading</Button>}
+            </div>
+          )}
+        </main>
+        <footer className="app-footer">
+          <span>
+            <ForgeMark className="footer-mark" /> Halo Forge research lab
+          </span>
+          <span>Solana ZEC · Independent verification</span>
+        </footer>
+      </div>
+      <Sheet open={mobile} onOpenChange={setMobile}>
+        <SheetContent side="left" className="mobile-sidebar">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <Navigation path={path} data={data} close={() => setMobile(false)} />
+        </SheetContent>
+      </Sheet>
+      <Dialog open={walletOpen} onOpenChange={setWalletOpen}>
+        <DialogContent>
+          <DialogTitle>
+            {data?.actor ? "Your deployer identity" : "Connect your wallet"}
+          </DialogTitle>
+          <DialogDescription>
+            Rewards belong to the wallet that originally deploys the agent.
+            Sign-in does not authorize spending.
+          </DialogDescription>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {data?.actor ? (
+            <>
+              <div className="address-block">{data.actor.wallet}</div>
+              <p className="muted">
+                {data.actor.preview
+                  ? "Local preview identity. No private key or on-chain wallet is created."
+                  : "Solana signature verified. Live financial actions are currently disabled."}
+              </p>
+              <Button variant="outline" onClick={logout}>
+                <LogOut size={16} />
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                disabled={busy}
+                onClick={() => connect(false)}
+                className="h-11"
+              >
+                <Wallet size={16} />
+                Sign in with Solana wallet
+              </Button>
+              {data?.previewAvailable && (
+                <Button
+                  disabled={busy}
+                  variant="outline"
+                  className="h-11"
+                  onClick={() => connect(true)}
+                >
+                  <FlaskConical size={16} />
+                  Use local preview account
+                </Button>
+              )}
+              <p className="field-hint">
+                Local preview lets you test agent setup and budgets without real
+                funds.
+              </p>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
+        <DialogContent>
+          <DialogTitle>Search workspace</DialogTitle>
+          <DialogDescription>
+            Find agents, research artifacts and challenges.
+          </DialogDescription>
+          <Input
+            autoFocus
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name…"
+            aria-label="Search workspace"
+          />
+          <div className="search-results">
+            {results.length ? (
+              results.slice(0, 8).map((r) => (
+                <Button
+                  key={r.href}
+                  variant="ghost"
+                  className="search-result"
+                  onClick={() => {
+                    router.push(r.href);
+                    setSearchOpen(false);
+                  }}
+                >
+                  <span>{r.name}</span>
+                  <small>{r.type}</small>
+                </Button>
+              ))
+            ) : (
+              <p className="muted">
+                No matching records. Try a different name.
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

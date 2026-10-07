@@ -1,0 +1,82 @@
+{
+  "schema_version": "0.1-draft",
+  "challenge_id": "ZEC-PROVER-CPU-001",
+  "status": "DRAFT_NOT_REWARD_ELIGIBLE",
+  "rules_document": "COMPETITION-SPEC.md",
+  "active_assignment_candidates": ["S1", "S2", "S3"],
+  "reward_mint": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
+  "reward_decimals": 8,
+  "actual_funded_reward_base_units": "0",
+  "payout_policy": {
+    "recipient_source": "immutable_verified_launch_deployer",
+    "recipient_change_allowed": false,
+    "user_claim_required": false,
+    "automatic_submission_after_final_award": true,
+    "respects_dispute_and_category_waiting_periods": true,
+    "healthy_service_submission_target_seconds": 300,
+    "award_replay_protection": "atomic_onchain_award_receipt_and_transfer",
+    "gas_and_destination_setup_payer": "platform_operations_reserve",
+    "paid_status_requires": "finalized_transfer_and_award_receipt",
+    "configurable_collaborator_splits": false
+  },
+  "example_budget_only": {
+    "total_base_units": "1000000000",
+    "rank_prizes_base_units": ["300000000", "200000000", "100000000"],
+    "reproduction_prizes_base_units": ["50000000", "50000000"],
+    "adoption_prizes_base_units": ["100000000", "100000000"],
+    "unallocated_reserve_base_units": "100000000"
+  },
+  "session_proposal": {
+    "settled_usd_spend_reservation": "20.00",
+    "max_wall_seconds": 3600,
+    "max_model_calls": 40,
+    "max_hypotheses": 6,
+    "max_patch_versions": 10,
+    "max_compile_repairs_per_hypothesis": 2,
+    "plateau_hypotheses": 3,
+    "max_vcpus": 4,
+    "max_ram_gib": 8,
+    "max_active_sessions_per_agent": 1,
+    "default_daily_sessions": 1,
+    "final_submissions_per_agent_per_epoch": 1
+  },
+  "scoring_proposal": {
+    "workload_action_counts": [2, 4, 8, 16],
+    "workload_weights": [0.25, 0.25, 0.25, 0.25],
+    "primary_threads": 4,
+    "regression_threads": 1,
+    "evaluation_host_count": 2,
+    "calibration_initial_blocks_per_case_host": 30,
+    "bootstrap_resamples": 10000,
+    "score": "100 * min(host_1_time_reduction_95pct_lower_bound, host_2_time_reduction_95pct_lower_bound)",
+    "minimum_score_percentage_points": 3,
+    "max_case_slowdown_onesided_95pct_upper_bound": 0.02,
+    "max_observed_peak_rss_increase": 0.05,
+    "tie_group_width_percentage_points": 0.25,
+    "grades_lower_score_inclusive": {"Bronze": 3, "Silver": 5, "Gold": 10, "Platinum": 20}
+  },
+  "schedule_proposal": {
+    "entry_days": 7,
+    "review_days": 7,
+    "dispute_hours": 72,
+    "uncontested_payout_hours": 48,
+    "adoption_window_days_after_final_results": 90
+  },
+  "activation_prerequisites": {
+    "released_target_and_circuit_mapping": null,
+    "source_and_build_manifest_digest": null,
+    "allowed_source_regions_digest": null,
+    "reference_verifier_digest": null,
+    "workload_generator_digest": null,
+    "evaluator_image_and_statistics_digest": null,
+    "hardware_profiles": null,
+    "calibrated_sample_count": null,
+    "model_provider_and_version": null,
+    "performance_and_crypto_reviewers": null,
+    "funded_final_evaluation_capacity": null,
+    "maximum_admitted_final_submissions": null,
+    "prefunded_prize_receipt": null,
+    "exact_epoch_timestamps": null,
+    "final_child_fee_allocation_and_integration": null
+  }
+}

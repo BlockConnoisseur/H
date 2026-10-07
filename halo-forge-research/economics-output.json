@@ -1,0 +1,212 @@
+{
+  "prepared_date": "2026-10-06",
+  "kind": "ILLUSTRATIVE_PLANNING_ASSUMPTIONS_NOT_MEASURED_BILLS",
+  "rate_sources": {
+    "model_reference": "https://vercel.com/ai-gateway/models/gpt-6-sol-fast",
+    "sandbox_iad1": "https://vercel.com/docs/sandbox/pricing",
+    "creator_fee_schedule": "https://pump.fun/docs/fees"
+  },
+  "rates": {
+    "input_usd_per_million": "4",
+    "output_usd_per_million": "20",
+    "active_vcpu_hour_usd": "0.128",
+    "provisioned_gb_hour_usd": "0.0212",
+    "evaluator_worker_hour_usd_assumption": "1.50",
+    "contingency_fraction": "0.20"
+  },
+  "profiles": {
+    "light": {
+      "usage_assumptions": {
+        "calls": 10,
+        "input_tokens_per_call": 20000,
+        "billable_output_tokens_per_call": 800,
+        "active_vcpu_hours": "0.5",
+        "provisioned_gb_hours": "2",
+        "evaluator_worker_hours": "0.25"
+      },
+      "cost": {
+        "model_input_usd": "0.8",
+        "model_output_usd": "0.160",
+        "builder_cpu_usd": "0.0640",
+        "builder_memory_usd": "0.0424",
+        "evaluator_usd_assumption": "0.3750",
+        "subtotal_usd": "1.4414",
+        "with_contingency_usd": "1.729680"
+      }
+    },
+    "standard": {
+      "usage_assumptions": {
+        "calls": 40,
+        "input_tokens_per_call": 60000,
+        "billable_output_tokens_per_call": 2000,
+        "active_vcpu_hours": "4",
+        "provisioned_gb_hours": "16",
+        "evaluator_worker_hours": "0.75"
+      },
+      "cost": {
+        "model_input_usd": "9.6",
+        "model_output_usd": "1.60",
+        "builder_cpu_usd": "0.512",
+        "builder_memory_usd": "0.3392",
+        "evaluator_usd_assumption": "1.1250",
+        "subtotal_usd": "13.1762",
+        "with_contingency_usd": "15.811440"
+      }
+    },
+    "deep": {
+      "usage_assumptions": {
+        "calls": 100,
+        "input_tokens_per_call": 100000,
+        "billable_output_tokens_per_call": 4000,
+        "active_vcpu_hours": "16",
+        "provisioned_gb_hours": "64",
+        "evaluator_worker_hours": "2"
+      },
+      "cost": {
+        "model_input_usd": "40",
+        "model_output_usd": "8.0",
+        "builder_cpu_usd": "2.048",
+        "builder_memory_usd": "1.3568",
+        "evaluator_usd_assumption": "3.00",
+        "subtotal_usd": "54.4048",
+        "with_contingency_usd": "65.285760"
+      }
+    }
+  },
+  "daily_revenue_scenarios": [
+    {
+      "eligible_volume_usd": "0",
+      "effective_creator_fee_fraction_assumption": "0.0005",
+      "gross_creator_revenue_usd": "0.0000",
+      "main_compute_usd": "0.000000",
+      "reward_allocation_usd_before_zec_purchase": "0.000000",
+      "operations_verification_reserve_usd": "0.000000",
+      "funded_sessions_before_other_costs": 0
+    },
+    {
+      "eligible_volume_usd": "0",
+      "effective_creator_fee_fraction_assumption": "0.003",
+      "gross_creator_revenue_usd": "0.000",
+      "main_compute_usd": "0.00000",
+      "reward_allocation_usd_before_zec_purchase": "0.00000",
+      "operations_verification_reserve_usd": "0.00000",
+      "funded_sessions_before_other_costs": 0
+    },
+    {
+      "eligible_volume_usd": "0",
+      "effective_creator_fee_fraction_assumption": "0.0095",
+      "gross_creator_revenue_usd": "0.0000",
+      "main_compute_usd": "0.000000",
+      "reward_allocation_usd_before_zec_purchase": "0.000000",
+      "operations_verification_reserve_usd": "0.000000",
+      "funded_sessions_before_other_costs": 0
+    },
+    {
+      "eligible_volume_usd": "10000",
+      "effective_creator_fee_fraction_assumption": "0.0005",
+      "gross_creator_revenue_usd": "5.0000",
+      "main_compute_usd": "3.000000",
+      "reward_allocation_usd_before_zec_purchase": "1.250000",
+      "operations_verification_reserve_usd": "0.750000",
+      "funded_sessions_before_other_costs": 0
+    },
+    {
+      "eligible_volume_usd": "10000",
+      "effective_creator_fee_fraction_assumption": "0.003",
+      "gross_creator_revenue_usd": "30.000",
+      "main_compute_usd": "18.00000",
+      "reward_allocation_usd_before_zec_purchase": "7.50000",
+      "operations_verification_reserve_usd": "4.50000",
+      "funded_sessions_before_other_costs": 1
+    },
+    {
+      "eligible_volume_usd": "10000",
+      "effective_creator_fee_fraction_assumption": "0.0095",
+      "gross_creator_revenue_usd": "95.0000",
+      "main_compute_usd": "57.000000",
+      "reward_allocation_usd_before_zec_purchase": "23.750000",
+      "operations_verification_reserve_usd": "14.250000",
+      "funded_sessions_before_other_costs": 3
+    },
+    {
+      "eligible_volume_usd": "100000",
+      "effective_creator_fee_fraction_assumption": "0.0005",
+      "gross_creator_revenue_usd": "50.0000",
+      "main_compute_usd": "30.000000",
+      "reward_allocation_usd_before_zec_purchase": "12.500000",
+      "operations_verification_reserve_usd": "7.500000",
+      "funded_sessions_before_other_costs": 1
+    },
+    {
+      "eligible_volume_usd": "100000",
+      "effective_creator_fee_fraction_assumption": "0.003",
+      "gross_creator_revenue_usd": "300.000",
+      "main_compute_usd": "180.00000",
+      "reward_allocation_usd_before_zec_purchase": "75.00000",
+      "operations_verification_reserve_usd": "45.00000",
+      "funded_sessions_before_other_costs": 11
+    },
+    {
+      "eligible_volume_usd": "100000",
+      "effective_creator_fee_fraction_assumption": "0.0095",
+      "gross_creator_revenue_usd": "950.0000",
+      "main_compute_usd": "570.000000",
+      "reward_allocation_usd_before_zec_purchase": "237.500000",
+      "operations_verification_reserve_usd": "142.500000",
+      "funded_sessions_before_other_costs": 35
+    },
+    {
+      "eligible_volume_usd": "1000000",
+      "effective_creator_fee_fraction_assumption": "0.0005",
+      "gross_creator_revenue_usd": "500.0000",
+      "main_compute_usd": "300.000000",
+      "reward_allocation_usd_before_zec_purchase": "125.000000",
+      "operations_verification_reserve_usd": "75.000000",
+      "funded_sessions_before_other_costs": 18
+    },
+    {
+      "eligible_volume_usd": "1000000",
+      "effective_creator_fee_fraction_assumption": "0.003",
+      "gross_creator_revenue_usd": "3000.000",
+      "main_compute_usd": "1800.00000",
+      "reward_allocation_usd_before_zec_purchase": "750.00000",
+      "operations_verification_reserve_usd": "450.00000",
+      "funded_sessions_before_other_costs": 112
+    },
+    {
+      "eligible_volume_usd": "1000000",
+      "effective_creator_fee_fraction_assumption": "0.0095",
+      "gross_creator_revenue_usd": "9500.0000",
+      "main_compute_usd": "5700.000000",
+      "reward_allocation_usd_before_zec_purchase": "2375.000000",
+      "operations_verification_reserve_usd": "1425.000000",
+      "funded_sessions_before_other_costs": 356
+    }
+  ],
+  "fifty_sessions_daily": {
+    "compute_allowance_usd": "800",
+    "required_main_creator_revenue_usd": "1333.333333333333333333333333",
+    "eligible_volume_at_0_30_percent": "444444.4444444444444444444443",
+    "eligible_volume_at_0_05_percent": "2666666.666666666666666666666"
+  },
+  "exclusions": [
+    "human cryptographic review",
+    "engineering",
+    "support",
+    "monthly platform minimums",
+    "legal and accounting",
+    "taxes",
+    "Solana rent and transaction fees",
+    "swap fees and price impact",
+    "storage and egress",
+    "bridge costs",
+    "reward inventory price movements"
+  ],
+  "notes": [
+    "Output includes billable reasoning; measured provider usage must replace token assumptions.",
+    "No prompt-cache discounts assumed. Actual provider/long-context prices may differ.",
+    "Eligible volume is volume that actually earns the specified creator fee.",
+    "Child-token revenue is excluded from main-token scenarios and earmarked 100% for its agent.",
+    "Reference model price is not a claim that this model is the best research worker."
+  ]
+}

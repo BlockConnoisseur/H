@@ -1,0 +1,15 @@
+# Documentation handoff
+
+Updated `DESIGN.md` and `.impeccable/design.json` by merging the selected editorial research register with the shipped implementation. Direction remains concept seed `a2a9e134`, selection 5/7. No separate direction contract was supplied; existing DESIGN.md and PRODUCT.md were the recorded authority. PRODUCT.md and application code were not changed.
+
+The handoff preserves warm charcoal/lime/amber, self-hosted Geist, shadcn/ui, research progress first, token details per agent, conventional navigation and the six-stage evidence progression. It replaces the old prose-only token list with normative YAML and the eight canonical sections. Corrected documentation includes base section type (19px), panel title type (16px), standard shadcn control corners (12px), derived small-control corners, actual responsive breakpoints and the implemented 44px mobile minimums.
+
+The former ad hoc sidecar is now Impeccable schema version 2: extensions, eight self-contained component snippets and narrative. Token primitives live in DESIGN.md. Color ramps are synthesized OKLCH display aids required by the sidecar reference; they are not shipped palette tokens. Snippets expand utilities, use scoped classes and source custom properties with literal fallbacks, include meaningful focus/hover states, and label sample research content as illustrative.
+
+Evidence checked: `src/app/globals.css`, `src/app/layout.tsx`, sampled forge components, shadcn button/input/badge/dialog/sheet sources, installed Tailwind theme defaults, and final `desktop.jpg` / `mobile.jpg` review screenshots. Documentation structure follows the [official DESIGN.md format](https://raw.githubusercontent.com/google-labs-code/design.md/main/docs/spec.md); sidecar structure follows the shipped Impeccable `reference/document.md`, rather than claiming that the Google format defines an Impeccable sidecar.
+
+Validation passed: YAML and JSON parse; canonical section order; all recorded colors occur in source and match the final active dark overrides where applicable; component properties use the eight supported names; token references resolve; color metadata keys and eight-step ramps match; eight snippets have scoped classes and applicable focus states; narrative rules and do/don't text match the Markdown. This was a source and schema-shape check, not execution of an external official linter or browser rendering of every sidecar snippet.
+
+Not canonized or repaired: existing tiny 9–11px metadata/status text is not a general-purpose recommended text scale; unused mission-top CSS remains implementation residue. Other palette literals and one-off typography remain local treatments, not an expanded token system. These are outside the authorized two-fix batch. The removed mission eyebrow is not a system pattern. No whole-surface accessibility approval, product readiness or quality-bar approval is asserted.
+
+The finish-review ship disposition covers only the resolved eyebrow removal and mobile target corrections. This documentation pass does not broaden that verdict or claim real funding, measured AI improvement, discoveries, integrated mainnet launch or payouts.

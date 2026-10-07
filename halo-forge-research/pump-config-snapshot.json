@@ -1,0 +1,989 @@
+{
+  "retrieved_at": "2026-10-06T21:15:06.766793+00:00",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "getMultipleAccounts",
+    "params": [
+      [
+        "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+        "6z6GDdfb2AjR9ZhJmAUQ5cipJCVxQvLJhB2H8mCwTFBP"
+      ],
+      {
+        "encoding": "base64",
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "rpc": {
+    "jsonrpc": "2.0",
+    "result": {
+      "context": {
+        "apiVersion": "4.3.0",
+        "slot": 454018869
+      },
+      "value": [
+        {
+          "data": [
+            "p+joschscn8B07uMqzQc4FKEV/LDgX0yeEQZY9zVX+1YuiTJmd2sAqpKwvjQ3Vy8l+MonBl8tQYqVPPZVrnOblEV+WVnqlyz5gAQ2EfjzwMAAKwj/AYAAAAAeMX7UdECAACAxqR+jQMAXwAAAAAAAAAf6nQ58860xO9Lucx77kChpiYXG2hBX+3tQLeolW+E5wHB4eQAAAAAAAUAAAAAAAAAYIzMHfzpYbQ7d5wZFQWm4tO/RdWk20YYrXbILWF1RTVjg3MADqIssmTTSv9koEte+r+7dN3NBImXsZgVR9fREIOEdCkuZ1qUtDbssKmYiUIyioPdxiM4ApYSZ8XNYRfLjRgaDISfqTem80re0wge+VcAqssMm7PZCaS5FHUnpOutEeak/ClEpPqCUb74FUJuG/soxrZkZndgfGrZ9WamRteqj7Bg2CkbTE1HXa/3Yslr3A2s6zbAEurRLtOpSEFh4ATIfOuY+lzkf4A4Bv0seUXSlSSVmuwA3tl4FPOPeEYf6nQ58860xO9Lucx77kChpiYXG2hBX+3tQLeolW+E5wchXZlAeTaU4RYGbORZuBj9+bugx7QbeD+joSDKQZUyAaKLX9JqtHmmqcxsv2sLI+thiFo3HgEgrKkTvu89E4p46JMUH7GOnxV02BDheOGeMGBOMXWqLkoy38hgByfRBwkBNYRTYlYJT5EoGRJ++k5Ea0MzcheT0Th2+arb89x9C19udQGCIPlCZ3ADI3tNa0U3WbSlxpC1nDXZuxh6CQy9KjOYep67E2eZq1mSWxPl3Iswgd8AXbQnwUePpG/4w0egdOlUPz43otBGInrdy06cd0xEJYxD7fJKqKrh8AIUZlvaTDjNbbdDj1m0CLuew7TKnorR8fJGU8SZtXlsINv5sy3dnuo/ObNyEVxxhHwYRc+lNsaFB04DDkTQId4++eNcTLeA8I7i/uhL7ERqV3gl2mjUOfqKXaOwxc/1D2P0VGsBQ55lEMA9ZfrZMeidBL4Ltw1Rlx9RxBX7NEwH20GfISICI1UWqRcTTGdYjEk4IK4VXulmZVd6wbcY2kfdzyoFDuan4iBou4hkCqV/kJMIxh/vcRoBY/WnVcBwvIYNH2NnIHzs2lvMbLHq8PFtaEBFZrGNVtJIGssxcDJlbpBVHHhElkH4SVjcc6dqhdh1b1XALNrKiboZMnkMNoqxV+ktc8VLlrXJMZQeRupL4uDjESd0T8a3TPtFXv6vi9VxeSztRPwfePlKM9CQnF5rX7AhVwrY262N6P2z0g7RzZnrjk6HcBV+6+tnimVduZs39rEybHZX25DPuKh6vvjHtvLIaYgTAAAAAAAAALnS/wAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQEsAQAAAAAAAPbjY/aFP8BoR4dSDPaZvZ0/rDjsLVijekDffE1+UZWPAQ==",
+            "base64"
+          ],
+          "executable": false,
+          "lamports": 4089837831,
+          "owner": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+          "rentEpoch": 18446744073709551615,
+          "space": 1087
+        },
+        {
+          "data": [
+            "OPQj7sHVoskYojP1qe+msVc1W3SP/1V++We9HX/dNzVqdSlZFoeUm3n2brMjTYlxEhZS6UXVGWW+fMcPXG9WjXue3VTMaPb8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADHAAAAIzzqR01stRPa1CHILmgfgO11EkVd+5H8aDY7mdkVZYKAVzoAAAAAAGblGIoTCKHbkLbTHz+9yow98meMgRLf3T0ZLFo8xFeo4aJHBwAAAAAFPzjY6ShelCe76h/4gp0iTbwfatQ3oP5WaBNgAgUVnBCvLwAAAAAAB+jcLN57I6DXQ/jxJ2tlfYqe6gaVC6Z6jTAzxTxM3k+LnSoZAAAAAAfo/FeK7Q/ddSPSr3MGA4mMIT7E/fcg1mbqJuhVXNnw26BP6AAAAAAGfDIJ7raBL6HbIYinqsDLd/1BQxLVdfrVeoIDlMH0vDhFEwEAAAAAB+g1gkEf6hSC8JlLgKpRKpfJTyXfKDvsWmejgfyGK0qDeJ8zAAAAAAfoGrUJ4eUplG56Y4h7EwYXquLdhe/tGgTaVgwGI3YkRGfGGQAAAAAH6KUOFA/aV5H0VmqVf9OuP4c+ajRm/8E9eRGd+pq1Ch8STFEAAAAABoCe3L90JaszWF3JHL7s4XoW/hSwqj214uF5VCHvhYCk3SIBAAAAAAfoZAOvj/uGv+NHiPXEQ9o2S0d8DCURbmW8YwwwEcgk0YkudgAAAAAH6BZfUlSRPxCfKxCyNueuNxWChzty6Sb1Mgz+YSapkmv9oGkAAAAAB+j+3/YAqx5dhJ+pCXhiDc6ZN7jopA40FNxi/tmwBleX/oIzAAAAAAfo//LUhlqE7TjY14XKBMeJ3UyDSH1R0GsYdZgQ8vrxZS4ErwAAAAAH6LQ6qvXovatKSfMoTTBKrtMVJTXKavhW0QnBVEbjN9maLs0wAAAAB+ige1bOkma5kqpf1kRcPHeYsuu3Mzweft4GLGuGB+VNrOk6AAAAAAfo5k3uds9kjs7No7C7X5UTPceUrS2C8Lhqw2x1HYAxO113VAAAAAAFddC8z4a1hfAceYum4H0D+mgF0MTkAVuxnA8WHIOp2X2qugUAAAAAuHzDVd+WadAYKNA2dBzcNatBBCbRhpvAuHpKpaDu6Kj/TkcDAAAAAAfo3BzIudPyAiblFKS5QWBXhpmY5aGq96770Xi4ItApqoIDZgAAAAAH6OUjwObe8WcYObN6+vLm/g2qKNzNJsSrb+1vZvPnhkl4sCQAAAAAoHwPRqg3DkEPW/mREBEth8OevUygkdAIfhhGDxTIIwiEKVMGAAAAAAfoLnBaKlo52YqJtAKCi0NVKixMi5Buc8QghNWrQU0Tdf4nOAAAAAAGxxSTCNcuTbGgSY3ZkIKDNBllCF9O6ar8RuVtJIlBimnm9gAAAAAA5J2v5ZOMJWpYrJfkXrGjdZJReS03VmPSCPTnFvTz8USJpYmTAAAAAAfomr60xy0hUDf1xWkDmkfUXbZuHga48YEPPmdBj0Gk8xJFGgAAAAAH6ALNE6K1GiFfTw1mXFPTbG2rozsx+ICbyqBOJ+3AwyIdYUwAAAAAB+ibN/idQpHkEXQOiWtfwl8v8ohWT/mApbRe5cN9ZF2nXMHhAAAAAAfotAUh0z1L95jbJPr43BCsWnYnBxWQzeslWfwrHSUpHkWbGAMAAAAH6A9xUY6pGpEZXpzPqFUyl9PV5qYlPOr92hcpPM7BC5+J1CYAAAAABn+BVGJ0Bx+LGl6QFHUthGMYN46NUNB3i3jIqTPxGhwUEx4AAAAAAIrlQLFuPoOV4BlGRwE2gjridkvvQUojIvki1df56mP7phaQQgAAAAAFOypzIFiehOWmENkDNGYIW4Rje+qj1Bc3dfE+SZfy/BTfDAEAAAAAB+i6dSUQ8rN19fJjiFLfJk1LreTUrxHpf28Y4HETuNh64o00AAAAAAT0JBCAu+BrS9zxdqXug9ZcTRXS8ryF4HvYSuaRXuC2ZyArAAAAAAAKmRGfSlVTI+1lXvn7foWHl7Krs7dxiFIOavIBJAOAKBJBuwEAAAAAeOF/+c+e8osV49WDJ0Hs54BOB9XJf0LvM+1fBZx0kl8+KX9PCAAAAFFquEVytIpILgpnAszzNvJHVfalt0l5zcpfW+psgIt3mC6rfAAAAAAHkCmxYtbQJgKNNr29CgDOYVuhnS1JJNFKk1XJCZTZJVJ2OTddBQAABW1P0jhNxf+LplcpgvPC6nuZQOMEP2YRFvwpU4NOtOvIOscAAAAAAAU7TjKmAhmSZMFzS2jfjh8oJ2EQerr3aWbUNq+YhrLev5KvAAAAAACXG1DAJR6PDs1SbSZlMOkz3pJMGxj6TXis/QRrozbZG61+BwEAAAAAtsWH/nUOpu162Z3D/Z7udLpADZVlRzSVVHP+Ey94dUZ9fYMWAAAAAPhS6geDRUsLG2zgusp7IzW1hPMh+DW0AVifCFji3b2/dyivBgAAAACZyYvypz0swk2AZ63im7ssY1M4PzHYNr84hTlzkYUdFQpx4gAAAAAABHL2iu/QLpB0x5/sHdF3mLZcpGXv6LDtbrGh3OgUb1fVfcUAAAAAAAT88bDlUR4ha6Kc9qBSoo5MIb0fNL1BHOm86FJLfoOZX24UAgAAAAAFMPwCtjKSuA+j6M/efzoNCh2ZUiDF9MIespOyHjLopoLLcwYAAAAABbLegqLQhXGb/kOojE/FsZ/Wc6o/IGbyH2LjsbWSn2/aoB0HAAAAAAYDF2KLMDiyxvacYu+FSAcMYvlVoa3FGGpEtQtcOARoJk7gGAAAAAAGM8ApPILDQrHGOyfNLj6xJOr+QBA/9/+IWW+AlCLObJ+KUAEAAAAABk4nKMZWWmaxV1YwMQoHvoKR9fJ5AS+T+/dXtFaPifUvSYwNAAAAAAZ5sOhGmNiktRtq8Uv/hZ9r7FJuJ4wgJliRxnx2cOJoP4YwAQAAAAAGf3Kzwbp5vVZXOwfMSCxZT0gWPiWpriYI0S0l787sJT0cqSEAAAAABwQPnRJmlo3pDWhHDN38jsF278vFJenDHgyYj5SIMpRDDxsCAAAAAMvQ5rwBJf2w4McZSIDvoX+KR/dyuJrNMfykpXl+mPxu8Tve3BMAAAANNtXBKB2PTmSUHuEpvwaqRddfZKHUeqxUFPZewTbLxwNMdIECAAAAviYvC4G9U9HvJWMrrpm65vQ2YZ5TQ1C+xnCAkvUQT2THEIHsLAMAAAVUmY6Eo2umErp7QPsGw3fJY/EOTLoMT4ybfVve3HzCWigkqxwAAAAGhy5n8ISalMzG7ymHy+9WRfySX8UyJoMZKzXUb6/npz890IsCAAAABbGpDphjwPDa0GDhQrr46hJtaF/9GWI2SnKFX2hLQ2JCXs2xi0cAAEUpXicUlHaEEU1FtQbVj8GxFDxjLSy3nRHN0FrWJM5u3h4A6mUGAAAMPrp5R+9ba8lTGtyQTpBHD5ZHkSNNoA3nDFq8hXkFlWF0QEi6AAAABn2Z0g1BQvatL1CjDVq0eyhlmogSqjRZxa7LrVxMAqZ9gmGEDAAAAAklXyIh5eEgysqBN7ctWduS5kXKk50gE9PJ6V3QMRG8bE0dJcI4AAACvirDLv8nXFadw7SM5Z4w0To4TyHgYVYwBLVCAy6WhrmSMiZHGwAArB4MwWEA2uBBMrxlwNUQDmV6/yxFqfO2sKVWpMSe8ht0JOXnJwIAAAxF99+NnnKVYoSTP22Yt1cDLoPfhGBPteEX//YdWxL5jCFs0XoAAACblWenvFZ0Dlo/VPxKGwBcMSv9rEUeYRhHmIPswBMUYQmBmhoAAAAAq7IJegss1qlEHA+CC0BQJ8FwGiqPSRoryLxWLAx1QaNorDUAAAAAALW2pd8X899Ve9CZsU5WDT/zchIWJPnjHpDM+fZZI/M84rhXAAAAAAB/8DCzQ/yj2FaBaVO6LaAuFU/R2ikIki1HPvOYJ8LQP3HxkEIFAAAAtwC+IRpn1dXHvy8WkhcHH52mIuz0Gdv7SuO8ek6yVzIrP/EJAAAAAAwA2864zqpzWJRaR1vKnwAq0LLm2LBjyCWoWBZDufV1xS9vO40CAADlHTuGhuNlh2+F3M0z3pGnq+kjTTMpHMm9Vej6LmWSUQ9hLQ4AAAAAt8x+Kyx7YWuQoGaHEwQHNScMFq2hIDAX2gSD9BXMmdFY9bpAAAAAAAd89IjdVVQgrUpcerU4fUAciPopsFsFf8Lwi5dP92guSSi/HwAAAAD0iUFuaZq/qfFuyr3U6WF2WIqjiWySlSSVEMMHq8bQZAuUoF0AAAAABoC3SXFihVq/inC5Kgtx27kiiLh6j1PU8IQwpLnvLPyT/8wBAAAAALAJJghzmni3hIIYyIK1BECkIw/e01adGeOsunM35K054uxV5HMKAAAH5/+AbaLxv/bpMxAO6zjWu96D2rjEtCaRMFOnnBn4rP1LkC8PAAAAjmmHruKjh6w5Tx3hJanP/DEgASn0IU4WwP8vuh2J07bRt4BsAAAAABs2l0zKvivbN8eto8MzRRJvlz2gtUMAwa4GuIDCSqz/R++gQA4AAADEQFGpEbVMfs/8fuCwpAr0izKK51WplTPIQCyybfQ4B5/2kssQAAAAdh3WhlWMoB33WhINKlDdj/ey3uUN9fIN7I1JIxm134Me88eOGAAAAAQxzKvQxLUUyhWIpNurEtjYmkOeEBSURm47tP69f0G/EH+z8g8AAACs7PSmcLVz/xiwbPBWE6Kj+LZN1rs0d4NkR7D//E2er23R3WMTAAAAvDWf1XhSHvO1FkUGXDcgTmdmmwqn933rLUkUYBJw5F+7NKORKQAAAMsn0aXUZhgjPnFZS8B0QtJqoobQa/62DnuOb5kCXsOGOghA/DIAAAAFW0HsLxNP6Eg2WZNRDnPsr1lBXLtYBipWNkVno301z7QhpFlLAAAA98RtYOZFHDTQpOkO94U5J1DVIubUGWt7SIG4BWSzxL9s2xThNQAAALIgppkEtu7YigvpiRQpgPzRqB6FRzMygyYxy7YuEWKP0tvRtCgAAAC/eBBXQxQY9NrsaqQzg1oSp778PWe8+gEs+BKXeCJTXVpK0HBUAAAAvA8SeICnogezRTabpnF1vbf3mBNFcetd6BfO27vV3f/qPmiBOwAAAKozcsfY7iKEIzgQ7ZEuNkowqdgJ0d9LqvsqAIBBuIqfNPh7WooAAACuvINwbyuFZm9aXfMMfe/2Bu7IW0IRY4DEmc/1T7lAjxZda0VaAAAA40SlLgAZOZvvAvdi4e2MwF+M/ae9pVeWubmEGq/gBj+bXXUXRgAAAP57HlUuBhvRLHKOc7K33Tu79pm21KTLcZ7WXs+AoLWPKG43iG0AAABMrJLZdqMzNZRpbVhLlmUU8Jy9yIdEa5cogG5FBag0LwUIVExfAAAAT+lZd52wENU1tRadPYOL8znBcqt9SlYRayHrjju6cZ809D/OaQAAAAppFR2mUNewFqofqOYHuRWQtaFaCAvH4iAg87uC7N3F1J4TUwUAAAAGfFo+Bf5BRxKnour+Qr52ELzZDL9XFid1g3PLitDYpCFuq3ksAAAAvAfFbmCtPT8Xc4LqxlSPuh/TLP2QygKz58+hhf3Oc5iOTAMXu1AAAMX5+zL0kRGrIMM/JZj8g2wRPikYgawh7ikWk5QBEkTk0KNxGwMAAABWW3i67FvW/wZjMxjqIOf2OY0vMoDo9/jDgE4ojninjYVtnmEAAAAABS7XHji0Y8oWKlgJF73nGuvgWDE6XcuuhpIFy+qp+62YZwtOAgAAAG/rYF/dbTYOQ4OSo9JxNBsYNNDWDICmJFly+C5VuRqrjRg0IqcAAADqIwmfRQY8Qq/MoK5773/sVi6SB/2HWscdLEyJHvy7b8dQK10kAgAA/TH0MAylsAo+gke2qtVNn3vWGyZ/YImYzF/p8tl8PUWcBX6HtQAAAErj0yCCBUT/+i5trmD47SvDQm2N49f3fd81DBj9azGU52CLXCMAAAAdjM+HrAFHuudW65Y6LvYkTJaRVpqOwI8AIKLrj721oS41CEhTAAAAN5mMy/LQRYthXLzGsaNnxHSen+9zBmIuGxtYkQEgvJoS+4NZAAAAAIW8WUAjnHPP4uC/eDOYxidqpBAkpHPJTdF8j4vrVepPBynILsEBAACmCh22YKTf+EDJVPgAOiW7VHGJlhFpnBQYjkBql7tHrwodPPvMAAAA78SyDdN38fra07z29t9XR7Y4tik6OD6d0XXODcG8dw9LYxsfCAIAAHlowlSSAv9383dIDxSULVJiv0Gh/wwCZCgICQntF7RvAWltDVMBAABafPcRAoF6TlD+gO6bf0GDYLuPgdRoYBVCObGnC0AKv/iXGOI3AgAABuAyPvWXOsgu0LJdW827wTfZCn2iKFSOBIsECpJImW/zAb0WjAQAAG3lUcOshqyIo3x7mBjG5c9KzrJZyArBHyXIQvYm5Mh/JIv6cR0BAACdno21/QEW7nukWsZr24D/jGdfvN/4EmvmN9mFUF3Y3xef8OnzAQAA9s3Wlwd01ndAZJTGRvfnCjrHmGigJgDzQ6dtyV6JIVYfqCmXwC0AAE5UE/oNHqMiOPUmEcEntcOs96JEScldtZpfuu8gLHfpQvNJL50OAADVAvIhjfGLj9QI+37fgqRNpQIsIO5qM+KukHxyCM04EjfOC0wAAAAABQ1JQteEk5+F2SIL0wiPFZzeeScGN/BAsqr9S1mFOQM2G9ttNgAAAAZ0Rn4WnC85KSDiyrNz3iDwMy8tFtAKqv/bl6hwZy1uDTTjCAAAAAB2FjeO1veUYhiroNgNd02HkdpcalpIRtBxmtCoXZ0sX093qA0OAwAABcCazawOxmCmO6QL4JHioDESrCHUEuswJwMYOVmwytYqaeYUAAAAANUFMCyIkE0S8bI1QHSqwYOagd4LPbbOxALDxhnUgbqmCnKMCAAAAACa2x9hP4VIbEcfImMaO6+GmnFbY8ZOVqe60TCyi+5n+ZAgCgUAAAAAiuaDif8fIzx3IzwYZDTMZUqwHUIi911r069nxCVzPD/IjkwAAAAAAAT9HO3M9/8PtfWEiFyW4hM/TaYTV8f15jzkhuif13sgBXWhBAAAAAAHjL9vHC2WzrMvkWTz+tb2wI8rhw1Ud1mOkN1+vlcVzja5Rw0AAAAABkTgEGVMIQUVj5YPBADKlRx92ZK6Tujrea2oHaiz/uzQPKEZAAAAAHjZ7UgLc4lfZtqqO3XEfXUagIrIUIpvxK34JqRe9tQvZOOQToAAAAAHB2BshTEx8jSkN4YjdYyU8tB7yB9wdAuxvFklHykC2DbhWgEAAAAABbHpFaLB1pL+gwkB5jis07zhnttUJsCnGlT5DCZ93TT/5YeS9QYAAJdZq5hlJnWEWXvXPHDYWRVJnaNwAZMjioIMYw4GwwjUJNqEFAAAAACQP8DDjezlSjGHy/Mp5LcOI++fSj5i3eEKWoYohxhHP5xbtrQLAAAA5ZTLIxtItqMujkdXSqDGOPrI1ipNAOcCGceK9sNx90/CoJQFlAAAAPe9gfnZh/WOfMlGsGiYOdj9ddjxvDyp9/U7DqX5lob/L6P5K1gAAADACZf/OpraOznvuYYcoGitbFDxuaWjqPSaAn/i6T4lj302IQ7iAQAATG1k6Ipp9weHaf4sQye3BlzMqEORjsR6afGFnZLtcc8kcSZ6YQAAACYALdcnlssEwUkx9WFzEVx87wZmTwkC/+w9Zld35tZrabyfPZQAAACXkAYlT7Yg6aOai95OPtxZFcYfs4gZcPliJwWKtTBEb6RztuxGAAAAABgVTBWD31/mmPefqLUdtj2OHUXWcBlGtbGBVTSebA8cuhDrXgAAAJRO86Q3E1UlSyPt7K+8XPsEzY9t/oQQgRb2olZkOyPPLEMIoPQAAACaduu/psxaJvbqxz1QO/u+asbWnog1a+iNpuLQfIzpfriCTOuhAgAADYXjfR79yIm5nk9TMiv9J/KaA+qFKieHfAOjRBKglqRCQ1HMCAAAANeACXXRwc0LtHvGLx1RDAeycH8eXQgPBaDj+NeOyyAlEDYXGAAAAACW7pYP/v+pTQgefKcqVQ/ub7m++xE5DX4K81q+AAV7v9q6zgEAAAAAODnytu1VblTssuBEYV14hMwU36E2WQq9KG2qtT+cAb+gpQVXgAAAAKt6xCoW+OYP1g9TlxCMeGq2PXEIc/UzxCZbXU/lFjhyJLLjOwAAAACL64xCJI+m1zAq6+1RE7czjVDf1VqjpxRP1rUwkoSrnObd7lF3AQAA70gXyNiymg7z1SG+AYPDWJfvro9jT4Yid8LxYZuAid9M9SYpSAEAALfbIJyn8B6A8PjaOHPVGftaInggdIdHafYzhQnj9k2fdMwNJUsCAADoYdSU0bYONqKVevRviY6Ezo6whric7TelOjLtWp+CDyu6L3TIAAAAh2nTr1mD30RsTr8lhACv2hJdccE/EsYUfPvKMTye8hN19l0OAAAAAAT1KD+rPO8slkmtmLUJbEcf8maj4pRl2/LWF1pEI/jmMAljAAAAAACl2im0Npk/3StXce4hKvHkz47/1EyTizeo+f3+znRUx5HQhagCAAAABjGgg9GuWGpNbWwGUaw3F5UyXOEstlSaeZqe9YEZC3vvv0wEAAAAAA0Kpjr0+72Avr2cVs1RZrdaVeAmK3R8FjH+9REK+e7zq47arkAAAAAHBgCiYJtdhFejQMlm6i3h217JIXY65vMdtO/UIJytISkRpgQAAAAAsiCp4BiaG7Acl41CZ3049Fg5ma9NAlsN2I7fvI9rXhrG6EICAAAAAAV7S3SZjpaSIUne4beh/TZzeJ9mxxNq8/taC2njurEqXP1/BAAAAACjh4BTXbMT0pVWGtXjhPRzQmTdQxvtlJvVB+tPEZlH3q2+L8f6EgAAi/ZoOKQdqw5ASV/6o7Y1ytP162bunZHaDJ4gN4HYIfvHRaYAAAAAAMDwQqqsn4I3RswQ4QTTY1WRzy16NHGubwcnwI/bJ02Fqa0xdQMAAABZswvCSAYAiCWlbQ+i+x1vdS42ws7l3y/l/tht1b+grzlc0xNDAAAArGYjIprtkmN0zgFawEDWlqdjPCXyBrjYIXSqzZRBpK9ITEo1CgMAAHl4txRFPNPoeusfwJvwZ/ls0tTWm1cTlaqb8Yav+do/hn5kcwQAAABCeEX2xPs5Bl7k5X3qnj+Sv9rG11ol6FIpfogymCeMvYsQasgRAAAAqbfWeg8KCRUyZCWVzDF2kWwFUKHxfz/XEgix8tHhEtFg1h8CAAAAADT63kVy4x9xFdDz6rMb/jYPFJuVBpFodZ06T1sozEBskdGulqsjAAAGNRE+CVAUNMdUIEFgriPizf06efUJrKE6xwniAHlrXNgDwAQAAAAABoH7ikK2/EQw0dq1EyfiXv9HTvfEVe2TYiQ2xSNRrQ9dMTAGAAAAAF0dQagOUVJ/WwHarK5a3BMdurFNNzY11at17wYFolkfp2v2KAMpAAAJHibFLtOC3N1QTuTLMq7qTmGDkZ7yMxcbQRdwoN4d0C7OexsBAAAAbGKCJX+qS/lp00fiATM+imrK5fVeB7JbTmUOy6v3n59FUiPLugEAAKxO+jSJt5gEDcloFTiysLbZntq+aiFTCbzoge1JjkeXiZunF2gAAAD3/WPqK+MvEE6yPgJeOklMAbTgEYFau+FTnqARpJ8zn7ncI+ybAQAAyLjmStDvTmeMFQQyTMoXeU1ELeT7UU12WY9ldCXC9SUYDQsBAAAAAAVobmCqiRb1Wx8bkOdgnqNqBENl7RnayrUm3f/SSB1+t6MOEgAAAAAJHfOoIjMN6vacHE0nP5LcC+V8AuDVwux30LqMlahOn+9+XtICAAAABjqqhhZkit3kSjHqGbKJQfr2fGqjBOr7MZFkHxxAN+1IoaACAAAAAAVxaEk2RFWd9eGAF472/umZu2yr7dBU0lFfPar33cX7uNfgAgAAAACX9UkeqDGQ8GxSsoVrC1H8mT0YXtIc7AISUBmamZqoC72xqQAAAAAADH/DnwEzbZsl8Z6t44El4aLxf75rzl8i+SVMeEFASwfAIsJKAAAAAAv8UP75EBQqEkvqgen8rTzlmP4SluVTnYbTo74td1+ffWVkeZoAAAAFwcwaoLC2eOEIfUgSzEC/6VPHsViJyDIdDrkzNdEGvAsy5kMAAAAAmYeebPatmBXXW09UU1VtZArSluGPX10ZdXf+OeN4zhStJi8AAAAAAGB9MWFDNsnUTAfONASsPIjEz37vPR6s146Z+fXudStPVacJFnkAAADvYufU+KXafWMsYIN2ja80Zwuocd99bgVOkKZYQAQBVOsFhiSqIgAADP0UT9xn6Q2VWQgm6lBJeX+ijeKzdRiU6rQBQ9K+djFg6Co+KQUAAMi7EjjhR0aQL2E4xAGjy27Uw1HGFcnn3F5V3b7hE+pfAuuYBAAAAABIjKSb4V/7uL/UUvQVBAK0GbctqFpYv8awNXQ8L04ZD5SmqWvoAAAAsGfOdUQuKuZryk/HFFRGMDSHeEU/8QKEOsGlST8ia39u1j//dAIAAKYb/klUoKE7TmBHUOfBsmba2GdDlYOQKveXZW77Dhbhy58cAQAAAAAHTHgpUI8butH//RVPB0BOkx785G1yHjx7RADMkxwMzctWl84CAAAABjBVu2vbR1EiDJwA2u8HhY1UNyds/PKtIBYsY8tZL0plIYEAAAAAAA==",
+            "base64"
+          ],
+          "executable": false,
+          "lamports": 41635680,
+          "owner": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+          "rentEpoch": 18446744073709551615,
+          "space": 8068
+        }
+      ]
+    },
+    "id": 1
+  },
+  "decoded": {
+    "Global": {
+      "address": "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+      "fields": {
+        "initialized": true,
+        "authority": "FFWtrEQ4B4PKQoVuHYzZq8FabGkVatYzDpEVHsK5rrhF",
+        "fee_recipient": "62qc2CNXwrYqQScmEdiZFFAnJR262PxWEuNQtxfafNgV",
+        "initial_virtual_token_reserves": 1073000000000000,
+        "initial_virtual_sol_reserves": 30000000000,
+        "initial_real_token_reserves": 793100000000000,
+        "token_total_supply": 1000000000000000,
+        "fee_basis_points": 95,
+        "withdraw_authority": "39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg",
+        "enable_migrate": true,
+        "pool_migration_fee": 15000001,
+        "creator_fee_basis_points": 5,
+        "fee_recipients": [
+          "7VtfL8fvgNfhz17qKRMjzQEXgbdpnHHHQRh54R9jP2RJ",
+          "7hTckgnGnLQR6sdH7YkqFTAA7VwTfYFaZ6EhEsU3saCX",
+          "9rPYyANsfQZw3DnDmKE3YCQF5E8oD89UXoHn9JFEhJUz",
+          "AVmoTthdrX6tKt4nDjco2D775W2YK3sDhxPcMmzUAmTY",
+          "CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM",
+          "FWsW1xNtWscwNmKv6wVsU1iTzRN6wmmk3MjxRP5tT7hz",
+          "G5UZAVbAf46s7cKWoyKu8kYTip9DGTpbLZ2qa9Aq69dP"
+        ],
+        "set_creator_authority": "39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg",
+        "admin_set_creator_authority": "UqN2p5bAzBqYdHXcgB6WLtuVrdvmy9JSAtgqZb3CMKw",
+        "create_v2_enabled": true,
+        "whitelist_pda": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+        "reserved_fee_recipient": "GesfTA3X2arioaHp8bbKdjG9vJtskViWACZoYvxp4twS",
+        "mayhem_mode_enabled": true,
+        "reserved_fee_recipients": [
+          "4budycTjhs9fD6xw62VBducVTNgMgJJ5BgtKq7mAZwn6",
+          "8SBKzEQU4nLSzcwF4a74F2iaUDQyTfjGndn6qUWBnrpR",
+          "4UQeTP1T39KZ9Sfxzo3WR5skgsaP6NZa87BAkuazLEKH",
+          "8sNeir4QsLsJdYpc9RZacohhK1Y5FLU3nC5LXgYB4aa6",
+          "Fh9HmeLNUMVCvejxCtCL2DbYaRyBFVJ5xrWkLnMH6fdk",
+          "463MEnMeGyJekNZFQSTUABBEbLnvMTALbT6ZmsxAbAdq",
+          "6AUH3WEHucYZyC61hqpqYUWVto5qA5hjHuNQ32GNnNxA"
+        ],
+        "is_cashback_enabled": true,
+        "buyback_fee_recipients": [
+          "5YxQFdt3Tr9zJLvkFccqXVUwhdTWJQc1fFg2YPbxvxeD",
+          "9M4giFFMxmFGXtc3feFzRai56WbBqehoSeRE5GK7gf7",
+          "GXPFM2caqTtQYC2cJ5yJRi9VDkpsYZXzYdwYpGnLmtDL",
+          "3BpXnfJaUTiwXnJNe7Ej1rcbzqTTQUvLShZaWazebsVR",
+          "5cjcW9wExnJJiqgLjq7DEG75Pm6JBgE1hNv4B2vHXUW6",
+          "EHAAiTxcdDwQ3U4bU6YcMsQGaekdzLS3B5SmYo46kJtL",
+          "5eHhjP8JaYkz83CWwvGU2uMUXefd3AazWGx4gpcuEEYD",
+          "A7hAgCzFw14fejgCp387JUJRMNyz4j89JKnhtKU8piqW"
+        ],
+        "buyback_basis_points": 5000,
+        "initial_virtual_quote_reserves": 4292000000,
+        "whitelisted_quote_mints": [
+          "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        ],
+        "creator_fee_configurable": true,
+        "max_configurable_creator_fee_bps": 300,
+        "holder_reward_claim_authority": "HckQ93Xqjjo8mwt5pNPWvyCTZXQZ858rvzmm7ZRrZg9t",
+        "is_holder_reward_enabled": true
+      },
+      "bytes_consumed": 1087,
+      "account_size": 1087
+    },
+    "QuoteControl": {
+      "address": "6z6GDdfb2AjR9ZhJmAUQ5cipJCVxQvLJhB2H8mCwTFBP",
+      "fields": {
+        "admin": "2fAEoCqd6c4tX8s9sMoXTvGnmuzoczFyJsHr72Xq4YyQ",
+        "_reserved": [
+          121,
+          246,
+          110,
+          179,
+          35,
+          77,
+          137,
+          113,
+          18,
+          22,
+          82,
+          233,
+          69,
+          213,
+          25,
+          101,
+          190,
+          124,
+          199,
+          15,
+          92,
+          111,
+          86,
+          141,
+          123,
+          158,
+          221,
+          84,
+          204,
+          104,
+          246,
+          252,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "mints": [
+          {
+            "mint": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+            "initial_virtual_quote_reserves": 3823488
+          },
+          {
+            "mint": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+            "initial_virtual_quote_reserves": 122135265
+          },
+          {
+            "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+            "initial_virtual_quote_reserves": 3125008
+          },
+          {
+            "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+            "initial_virtual_quote_reserves": 422223243
+          },
+          {
+            "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+            "initial_virtual_quote_reserves": 3897532635
+          },
+          {
+            "mint": "SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3",
+            "initial_virtual_quote_reserves": 18040120
+          },
+          {
+            "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+            "initial_virtual_quote_reserves": 866089091
+          },
+          {
+            "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+            "initial_virtual_quote_reserves": 432432964
+          },
+          {
+            "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            "initial_virtual_quote_reserves": 1363939871
+          },
+          {
+            "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+            "initial_virtual_quote_reserves": 19062180
+          },
+          {
+            "mint": "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ",
+            "initial_virtual_quote_reserves": 1982761425
+          },
+          {
+            "mint": "Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu",
+            "initial_virtual_quote_reserves": 1772158315
+          },
+          {
+            "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+            "initial_virtual_quote_reserves": 864222871
+          },
+          {
+            "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+            "initial_virtual_quote_reserves": 2936286821
+          },
+          {
+            "mint": "XsfCC9VL4DamVGNgdJpfLXB3sBVa158Gbx8sh7NzmTk",
+            "initial_virtual_quote_reserves": 209600813785
+          },
+          {
+            "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            "initial_virtual_quote_reserves": 988392525
+          },
+          {
+            "mint": "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2",
+            "initial_virtual_quote_reserves": 1417108795
+          },
+          {
+            "mint": "NKEda5nHhNGgjrE9nDdMvaEmkmJ96qqxzBVZEcKmjSg",
+            "initial_virtual_quote_reserves": 96119421
+          },
+          {
+            "mint": "DRAMjSWR7HRfJKjRkvQWYL2bcaejaVhuxEcjf4pAY4Cw",
+            "initial_virtual_quote_reserves": 55004927
+          },
+          {
+            "mint": "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4",
+            "initial_virtual_quote_reserves": 1711506090
+          },
+          {
+            "mint": "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX",
+            "initial_virtual_quote_reserves": 615544905
+          },
+          {
+            "mint": "BoTx8y9ynfdxf5ZjWtCoBVkff52qKA82ysaLU8ZM6d8T",
+            "initial_virtual_quote_reserves": 106113412
+          },
+          {
+            "mint": "XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN",
+            "initial_virtual_quote_reserves": 942145141
+          },
+          {
+            "mint": "TTWofwAge91oFhZs7kpQdyrVRkmevgM88xijGvQFbKo",
+            "initial_virtual_quote_reserves": 16180841
+          },
+          {
+            "mint": "GPRR2u6NS5yBQHWGauoJ9HXgjrTH8dDsrBfTV5zAYvDH",
+            "initial_virtual_quote_reserves": 2475271561
+          },
+          {
+            "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+            "initial_virtual_quote_reserves": 440734451
+          },
+          {
+            "mint": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+            "initial_virtual_quote_reserves": 1281432866
+          },
+          {
+            "mint": "XsaBXg8dU5cPM6ehmVctMkVqoiRG2ZjMo1cyBJ3AykQ",
+            "initial_virtual_quote_reserves": 3787545767
+          },
+          {
+            "mint": "Xsf9mBktVB9BSU5kf4nHxPq5hCBJ2j2ui3ecFGxPRGc",
+            "initial_virtual_quote_reserves": 13297730846
+          },
+          {
+            "mint": "Xs6B6zawENwAbWVi7w92rjazLuAr5Az59qgWKcNb45x",
+            "initial_virtual_quote_reserves": 651463071
+          },
+          {
+            "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+            "initial_virtual_quote_reserves": 1970964
+          },
+          {
+            "mint": "AMC1qwR9KhiyrQBRPrxnfo4JfMeMZqEBvt5tgTytNNoc",
+            "initial_virtual_quote_reserves": 1116739238
+          },
+          {
+            "mint": "MRNAzXzhNcaEXJPibHEn8cd4vyekCDiivTyEwswLUCT",
+            "initial_virtual_quote_reserves": 17620756
+          },
+          {
+            "mint": "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo",
+            "initial_virtual_quote_reserves": 881713786
+          },
+          {
+            "mint": "LLYuwZ33keFihgwoxXsBawy31AiRFLFSva32TYq5TvD",
+            "initial_virtual_quote_reserves": 2826343
+          },
+          {
+            "mint": "iNTCy1qTsUEZQe3DSocLz1ZXXai34Gdw8THQh5rxFaF",
+            "initial_virtual_quote_reserves": 29049106
+          },
+          {
+            "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+            "initial_virtual_quote_reserves": 35693472062
+          },
+          {
+            "mint": "6UpQcMAb5xMzxc7ZfPaVMgx3KqsvKZdT5U718BzD5We2",
+            "initial_virtual_quote_reserves": 2091593368
+          },
+          {
+            "mint": "WXMRyRZhsa19ety5erZhHg4N3xj3EVN92u94422teJp",
+            "initial_virtual_quote_reserves": 5897916610130
+          },
+          {
+            "mint": "NBiSF3UaVUFtRzHwAfxyHsBCAZWGEKnMpewAE4oh7BG",
+            "initial_virtual_quote_reserves": 13056712
+          },
+          {
+            "mint": "MRVLSjkR2ceUBukujaD3xCyHP1H3B2SzpsNTZF546jo",
+            "initial_virtual_quote_reserves": 11506367
+          },
+          {
+            "mint": "BArimz1PcKZr8PcPh3tcZ2dg4S7FJLk3cw6R5F8GsHKg",
+            "initial_virtual_quote_reserves": 17268397
+          },
+          {
+            "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+            "initial_virtual_quote_reserves": 377716093
+          },
+          {
+            "mint": "HiMSSzzwkZkrXJ4PGVJRdtfLaANeAztjjcgk5Dxe7Lwx",
+            "initial_virtual_quote_reserves": 112142455
+          },
+          {
+            "mint": "BMKdM4yUxX12moFqVk195k7coMbaybd4RUKCUdm7D1Sk",
+            "initial_virtual_quote_reserves": 14840074
+          },
+          {
+            "mint": "JNJg1znKdF712Phe7L7z52AATAvEjEytBdN2w8Lnh1Y",
+            "initial_virtual_quote_reserves": 12942805
+          },
+          {
+            "mint": "LULUmT9VMttkfAJE236LXJcYJ2tTP7nunrSWR5G1BdS",
+            "initial_virtual_quote_reserves": 34893407
+          },
+          {
+            "mint": "MGMuubtUEirmkhfEQdmGUh4pr7HuUdMWcZXFtpPbVJD",
+            "initial_virtual_quote_reserves": 108252034
+          },
+          {
+            "mint": "PFER6ENqP8r8NF3CqVt4mFowxsin3V5MLidBNQFCC3x",
+            "initial_virtual_quote_reserves": 119382234
+          },
+          {
+            "mint": "QUBTAD8C9bMU9LvmMNgKPhrmBGbHvxpu6vfWQtThxxw",
+            "initial_virtual_quote_reserves": 417353254
+          },
+          {
+            "mint": "RDDTGbhHwVXfyCvQMXzzowKjf5qrYBZAnehoXW83ooh",
+            "initial_virtual_quote_reserves": 22055583
+          },
+          {
+            "mint": "RcZmt84VMJv9bDhKqmw1uWDahYrUT468VwAChTnfD8p",
+            "initial_virtual_quote_reserves": 227297583
+          },
+          {
+            "mint": "SH55hfaipFAbwT42nQYhRoM5o5t61QpkmJ6p62vXB3m",
+            "initial_virtual_quote_reserves": 19957311
+          },
+          {
+            "mint": "SNAPcESrvnH8yUdgeMF6xm1hym9b6hW6s8YeqeHdZFz",
+            "initial_virtual_quote_reserves": 564730941
+          },
+          {
+            "mint": "UPSqUeMHcWbkdg784XuBUEF9DtySSnW9ur5LAVdcuB9",
+            "initial_virtual_quote_reserves": 35327811
+          },
+          {
+            "mint": "EicWvteVi2fWepEzS3FYWsnuPoP6caZfjnKqNvydLjCH",
+            "initial_virtual_quote_reserves": 85309930481
+          },
+          {
+            "mint": "taoC6xyv2v8tDLcev4uaGUgV4vdQsWJrGft2kcBRrBY",
+            "initial_virtual_quote_reserves": 10761817091
+          },
+          {
+            "mint": "DoGEV7LASBkQbibMc5k5vKnTZoMg423GpJ5QtJEGfm7R",
+            "initial_virtual_quote_reserves": 3491481325767
+          },
+          {
+            "mint": "Morpho2VPeTr2E1Jx6monxCzF7mqwUnjz74RdwLXYyP",
+            "initial_virtual_quote_reserves": 123130357850
+          },
+          {
+            "mint": "SV151D5pjygAKA8aJJcKzm4wFnRX5G92Fye94jQJk7g",
+            "initial_virtual_quote_reserves": 10935614783
+          },
+          {
+            "mint": "PEAQjk7SRS6rXHVFFmpRr7zrC4g5ZuEebpwTxvaLr3b",
+            "initial_virtual_quote_reserves": 78665309052482
+          },
+          {
+            "mint": "5eyib4qghYGHNh7VvxSFGYLFJSanjq9hug9fR52kksnm",
+            "initial_virtual_quote_reserves": 7034787339998
+          },
+          {
+            "mint": "poNSfquKq512ApeYjVghwViSun4x1MhCqHVH2Paq4jN",
+            "initial_virtual_quote_reserves": 800076100705
+          },
+          {
+            "mint": "SLXdx4BUt2v9uJQNzWqSfzTJ9UKLUDsvxHFMEEdrfgq",
+            "initial_virtual_quote_reserves": 53760590461
+          },
+          {
+            "mint": "chipCAT7vi5CZtbZsn9z7iMPXvFwyAnKz3QFu8XVuHm",
+            "initial_virtual_quote_reserves": 62406497488236
+          },
+          {
+            "mint": "Bi11Je4MH3PpyCNiuTAepRbsA5U6DK3DJy79ZFthddX",
+            "initial_virtual_quote_reserves": 29992397476537
+          },
+          {
+            "mint": "CashcatZMRn4Jv8sPQZUSsbTLi2PcPe1ssqbHcnaJqSS",
+            "initial_virtual_quote_reserves": 2370417534068
+          },
+          {
+            "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+            "initial_virtual_quote_reserves": 527499534732
+          },
+          {
+            "mint": "BULL151gUXcFV5wXEUqu9Am2L7Qt4bTJRLRuAUjkcspC",
+            "initial_virtual_quote_reserves": 446333193
+          },
+          {
+            "mint": "CZEB3WNZuF2Yz1z2H81RcCk8T7fsw82KB33zqamASVsg",
+            "initial_virtual_quote_reserves": 3517544
+          },
+          {
+            "mint": "DELL2aRKQz7DMq5DrKLtkn47ZCnbxXPZXrSGbkmd13wy",
+            "initial_virtual_quote_reserves": 5748962
+          },
+          {
+            "mint": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump",
+            "initial_virtual_quote_reserves": 22591631729
+          },
+          {
+            "mint": "DKNGQFNGQmoBdXSRGKJ8tTu7uPDasw5JDcfMmWniNfow",
+            "initial_virtual_quote_reserves": 166805291
+          },
+          {
+            "mint": "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
+            "initial_virtual_quote_reserves": 2805610786757
+          },
+          {
+            "mint": "GRNDYDpqwpCm6jVxpbh4xT5AM4r3p391qYsKTHqgaET2",
+            "initial_virtual_quote_reserves": 237854991
+          },
+          {
+            "mint": "DNUTsCvKbKwu2RM72cUuW3TD9YpzArzACcqYQssjPLSk",
+            "initial_virtual_quote_reserves": 1085994328
+          },
+          {
+            "mint": "WENAZ2WyPbmgvUcKfQ8hyMDfBQP9bZ65hsZ5KTFrRGZ",
+            "initial_virtual_quote_reserves": 532621385
+          },
+          {
+            "mint": "HTZsLG4zqaNvWMwXSLHH3GG5KyJpKwpBRsKVdMG6hvzP",
+            "initial_virtual_quote_reserves": 1570804747
+          },
+          {
+            "mint": "SPHRp8cZaSQBTp1KMNP4V1X821SXhXWt4Q2yLdyHzju",
+            "initial_virtual_quote_reserves": 30211987
+          },
+          {
+            "mint": "CrAr4RRJMBVwRsZtT62pEhfA9H5utymC2mVx8e7FreP2",
+            "initial_virtual_quote_reserves": 11492868353250
+          },
+          {
+            "mint": "Xs2yquAgsHByNzx68WJC55WHjHBvG9JsMB7CWjTLyPy",
+            "initial_virtual_quote_reserves": 65222495229
+          },
+          {
+            "mint": "AavE1kKKnesPw4MuRJmJ9jZs9QzEE8CPxQ3ViczUDfc1",
+            "initial_virtual_quote_reserves": 1820374993
+          },
+          {
+            "mint": "2qEHjDLDLbuBgRYvsxhc5D6uDWAivNFZGan56P1tpump",
+            "initial_virtual_quote_reserves": 61213830983
+          },
+          {
+            "mint": "ED5nyyWEzpPPiWimP8vYm7sD7TD3LAt3Q3gRTWHzPJBY",
+            "initial_virtual_quote_reserves": 72134882975
+          },
+          {
+            "mint": "8x5VqbHA8D7NkD52uNuS5nnt3PwA8pLD34ymskeSo2Wn",
+            "initial_virtual_quote_reserves": 105474683678
+          },
+          {
+            "mint": "HNg5PYJmtqcmzXrv6S9zP1CDKk5BgDuyFBxbvNApump",
+            "initial_virtual_quote_reserves": 68496359184
+          },
+          {
+            "mint": "Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump",
+            "initial_virtual_quote_reserves": 83279860077
+          },
+          {
+            "mint": "Dfh5DzRgSvvCFDoYc2ciTkMrbDfRKybA4SoFbPmApump",
+            "initial_virtual_quote_reserves": 178537051323
+          },
+          {
+            "mint": "Eg2ymQ2aQqjMcibnmTt8erC6Tvk9PVpJZCxvVPJz2agu",
+            "initial_virtual_quote_reserves": 218980419642
+          },
+          {
+            "mint": "MukLDtJ8Cx9DxLbeyLRSWPSposTMWuwHANbuaudpump",
+            "initial_virtual_quote_reserves": 323626475956
+          },
+          {
+            "mint": "HgBRWfYxEfvPhtqkaeymCQtHCrKE46qQ43pKe8HCpump",
+            "initial_virtual_quote_reserves": 231409507180
+          },
+          {
+            "mint": "CzLSujWBLFsSjncfkh59rUFqvafWcY5tzedWJSuypump",
+            "initial_virtual_quote_reserves": 174832344018
+          },
+          {
+            "mint": "DtR4D9FtVoTX2569gaL837ZgrB6wNjj6tkmnX9Rdk9B2",
+            "initial_virtual_quote_reserves": 362669951578
+          },
+          {
+            "mint": "Df6yfrKC8kZE3KNkrHERKzAetSxbrWeniQfyJY4Jpump",
+            "initial_virtual_quote_reserves": 255574163178
+          },
+          {
+            "mint": "CTPoyCwkjMvoJwU4xvZZqoD8tiYk6yDchySiN5gGpump",
+            "initial_virtual_quote_reserves": 594223560756
+          },
+          {
+            "mint": "Cm6fNnMk7NfzStP9CZpsQA2v3jjzbcYGAxdJySmHpump",
+            "initial_virtual_quote_reserves": 387711720726
+          },
+          {
+            "mint": "GJAFwWjJ3vnTsrQVabjBVK2TYB1YtRCQXRDfDgUnpump",
+            "initial_virtual_quote_reserves": 301041278363
+          },
+          {
+            "mint": "J8PSdNP3QewKq2Z1JJJFDMaqF7KcaiJhR7gbr5KZpump",
+            "initial_virtual_quote_reserves": 470436769320
+          },
+          {
+            "mint": "6AJcP7wuLwmRYLBNbi825wgguaPsWzPBEHcHndpRpump",
+            "initial_virtual_quote_reserves": 409302468613
+          },
+          {
+            "mint": "6NwarBvDkXhByqVp2Qkq5i9XbtA2B3Bwe8SWGu9vpump",
+            "initial_virtual_quote_reserves": 454431863860
+          },
+          {
+            "mint": "he1iusmfkpAdwvxLNGV8Y1iSbj4rUy6yMhEA3fotn9A",
+            "initial_virtual_quote_reserves": 22868631252
+          },
+          {
+            "mint": "SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3",
+            "initial_virtual_quote_reserves": 191019839009
+          },
+          {
+            "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+            "initial_virtual_quote_reserves": 88764475198606
+          },
+          {
+            "mint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+            "initial_virtual_quote_reserves": 13345334224
+          },
+          {
+            "mint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+            "initial_virtual_quote_reserves": 1637772677
+          },
+          {
+            "mint": "METvsvVRapdj9cFLzq4Tr43xK4tAjQfwX76z3n6mWQL",
+            "initial_virtual_quote_reserves": 9899304856
+          },
+          {
+            "mint": "8XtRWb4uAAJFMP4QQhoYYCWR6XXb7ybcCdiqPwz9s5WS",
+            "initial_virtual_quote_reserves": 717833377933
+          },
+          {
+            "mint": "GkyPYa7NnCFbduLknCfBfP7p8564X1VZhwZYJ6CZpump",
+            "initial_virtual_quote_reserves": 2355205198023
+          },
+          {
+            "mint": "J3NKxxXZcnNiMjKw9hYb2K4LUxgwB6t1FtPtQVsv3KFr",
+            "initial_virtual_quote_reserves": 779662263708
+          },
+          {
+            "mint": "63LfDmNb3MQ8mw9MtZ2To9bEA2M71kZUUGq5tiJxcqj9",
+            "initial_virtual_quote_reserves": 151876493543
+          },
+          {
+            "mint": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+            "initial_virtual_quote_reserves": 357690783022
+          },
+          {
+            "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+            "initial_virtual_quote_reserves": 1501821714
+          },
+          {
+            "mint": "A13oRB9FFaiUjfi6LdCg6p9ka1u8SfGkUFs4SKvPpump",
+            "initial_virtual_quote_reserves": 1929225185543
+          },
+          {
+            "mint": "CB9dDufT3ZuQXqqSfa1c5kY935TEreyBw9XJXxHKpump",
+            "initial_virtual_quote_reserves": 880388349194
+          },
+          {
+            "mint": "H8xQ6poBjB9DTPMDTKWzWPrnxu4bDEhybxiouF8Ppump",
+            "initial_virtual_quote_reserves": 2233904882507
+          },
+          {
+            "mint": "9AvytnUKsLxPxFHFqS6VLxaxt5p6BhYNr53SD2Chpump",
+            "initial_virtual_quote_reserves": 1456219187457
+          },
+          {
+            "mint": "76EDL5qNcte2ZH29quTaFzagXjWAEY83CATEjyA6pump",
+            "initial_virtual_quote_reserves": 2439039719416
+          },
+          {
+            "mint": "Tqj8yFmagrg7oorpQkVGYR52r96RFTamvWfth9bpump",
+            "initial_virtual_quote_reserves": 4999723418099
+          },
+          {
+            "mint": "8PzFWyLpCVEmbZmVJcaRTU5r69XKJx1rd7YGpWvnpump",
+            "initial_virtual_quote_reserves": 1225977924388
+          },
+          {
+            "mint": "BcHEaaTCvycPwwsJ9yQTXdHP9X2gCLkznDbZ8VySpump",
+            "initial_virtual_quote_reserves": 2147113541399
+          },
+          {
+            "mint": "HcRLc9VDgjLeK154xDawfb1dmVJ98DoSqcwTHGqiDeJR",
+            "initial_virtual_quote_reserves": 50305193060383
+          },
+          {
+            "mint": "6GmAFSYs4gk3FDao5FzzySQpPZaWsa4rUJHacpMpUNgx",
+            "initial_virtual_quote_reserves": 16068266029890
+          },
+          {
+            "mint": "FLWSojG1gB5VStYR3Sb4nQFRt43UBYkqih1j2CpVLqgd",
+            "initial_virtual_quote_reserves": 1275842103
+          },
+          {
+            "mint": "LinkhB3afbBKb2EQQu7s7umdZceV3wcvAUJhQAfQ23L",
+            "initial_virtual_quote_reserves": 233771309878
+          },
+          {
+            "mint": "SCHHJ3jRdSjeFEVAaLrnYdx3Brphn92Ys7z1qkiCtPX",
+            "initial_virtual_quote_reserves": 149107725
+          },
+          {
+            "mint": "8wxkvAfEns76yBzu4MnbV7VnXWjg3iDPA9uwAQ6cpump",
+            "initial_virtual_quote_reserves": 3358893569871
+          },
+          {
+            "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+            "initial_virtual_quote_reserves": 350644522
+          },
+          {
+            "mint": "FLYRq3en8r2Z69gN3KyAnDrvnitEJNkwPYY7favinHeD",
+            "initial_virtual_quote_reserves": 143421962
+          },
+          {
+            "mint": "BRVaZKg6J9iF2BEsdpsxJ9NyvN9PPxPZuoQUX2v8qqkk",
+            "initial_virtual_quote_reserves": 84549776
+          },
+          {
+            "mint": "AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES",
+            "initial_virtual_quote_reserves": 5017288
+          },
+          {
+            "mint": "LUV9GB51PNZNRyzzyYK3rtqFfvDvWtRiXZ34wVq2HrX",
+            "initial_virtual_quote_reserves": 77690117
+          },
+          {
+            "mint": "WULFeyfrj1VJKD9HhRTcW8R4g5HefUA11HDEdBv2WxD",
+            "initial_virtual_quote_reserves": 222804278
+          },
+          {
+            "mint": "RUMsPfFZFnN1ZmGANwP7FNMJMjKH4m9RiMePrtVtLe7",
+            "initial_virtual_quote_reserves": 429997264
+          },
+          {
+            "mint": "98kfF7rmsg1QDUEoCqNE7g7M1FdrTt92TEp2CLzypump",
+            "initial_virtual_quote_reserves": 551073932132
+          },
+          {
+            "mint": "USNv3NkKA27Dh4nsHJDPhW4VoEcTQmjoZyJt2dqdwFu",
+            "initial_virtual_quote_reserves": 22733110
+          },
+          {
+            "mint": "PEPEqnuuCDbBC89p1u9vpnP1KQ2oj1xTcQBsjt9X55m",
+            "initial_virtual_quote_reserves": 7651795133951
+          },
+          {
+            "mint": "BBosJLw8ZzoATiEyywiifx7AgmrD2Cm3XjFWbhbRhChy",
+            "initial_virtual_quote_reserves": 344250916
+          },
+          {
+            "mint": "Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump",
+            "initial_virtual_quote_reserves": 50276490140
+          },
+          {
+            "mint": "GTBxUiw6wJdmmkCGZgRHLyYxqu1vG4KtRpeox6yDpump",
+            "initial_virtual_quote_reserves": 635748786370
+          },
+          {
+            "mint": "Hg5Ja55T5wESq4vyFoiVCMeHXtGyVA69X2UHq8hgpump",
+            "initial_virtual_quote_reserves": 378694902575
+          },
+          {
+            "mint": "DvdmEnztCmXwBnAbedD48XVGZJSxq31zNvnyftXdpump",
+            "initial_virtual_quote_reserves": 2070411294333
+          },
+          {
+            "mint": "69LjZUUzxj3Cb3Fxeo1X4QpYEQTboApkhXTysPpbpump",
+            "initial_virtual_quote_reserves": 418661167396
+          },
+          {
+            "mint": "3ZLekZYq2qkZiSpnSvabjit34tUkjSwD1JFuW9as9wBG",
+            "initial_virtual_quote_reserves": 636689038441
+          },
+          {
+            "mint": "BCdwQBAn8dYB5YjTsoB6TdHAWokxv28k2oZUodERpump",
+            "initial_virtual_quote_reserves": 304619090852
+          },
+          {
+            "mint": "1NJMqVM4PadjuzYmeB7zV7q7DV8oB3ExaQCd9x6KsLz",
+            "initial_virtual_quote_reserves": 407670667804
+          },
+          {
+            "mint": "AywAYdNJnSLSXwKWYxDciPjqGRnwp4iZdQptuuQTpump",
+            "initial_virtual_quote_reserves": 1050656916268
+          },
+          {
+            "mint": "BPxxfRCXkUVhig4HS1Lh7kZqV6SPJhzfEk4x6fVBjPCy",
+            "initial_virtual_quote_reserves": 2894460650168
+          },
+          {
+            "mint": "uniHfuPhEQSrtpzXpJZDCSq53yaejKKpNhFUiKoHKHV",
+            "initial_virtual_quote_reserves": 37787616066
+          },
+          {
+            "mint": "FWDtiB5fXHdVAewPqvHPL2dh4aBC1C6GacQbePoQXKjz",
+            "initial_virtual_quote_reserves": 404174352
+          },
+          {
+            "mint": "BABANGA4JE7Kkam4nTrALAwAVgsNJUuFJnnkF7S16BZp",
+            "initial_virtual_quote_reserves": 30325466
+          },
+          {
+            "mint": "4nV5gNwwP68zUDat26ySChREqVaQaLudfJBkSgEzpump",
+            "initial_virtual_quote_reserves": 551215801760
+          },
+          {
+            "mint": "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK",
+            "initial_virtual_quote_reserves": 1004778020
+          },
+          {
+            "mint": "ARBzQTYDCW2KnVEjs1Mc81LekB1ibVFZKbSVmorkoT9d",
+            "initial_virtual_quote_reserves": 1611987344870
+          },
+          {
+            "mint": "H74CYmXgMkYHYuSRsZt6RJb4NYp2u72Vw8BS5huApump",
+            "initial_virtual_quote_reserves": 1409439692108
+          },
+          {
+            "mint": "DNhQZ1CE9qZ2FNrVhsCXwQJ2vZG8ufZkcYakTS5Jpump",
+            "initial_virtual_quote_reserves": 2521767464052
+          },
+          {
+            "mint": "Ge87EtsjwRQbHaqQmKRno69RFTwh9bfSsm99XNxTpump",
+            "initial_virtual_quote_reserves": 860942744107
+          },
+          {
+            "mint": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
+            "initial_virtual_quote_reserves": 241038965
+          },
+          {
+            "mint": "LMT3i1BHgixFqPUgcyteJhnEz2dpy9i3cYy4pi9BoeV",
+            "initial_virtual_quote_reserves": 6490416
+          },
+          {
+            "mint": "CARDSccUMFKoPRZxt5vt3ksUbxEFEcnZ3H2pd3dKxYjp",
+            "initial_virtual_quote_reserves": 11417276561
+          },
+          {
+            "mint": "RBLXDGRD64AtRamHMFVcjqne3Ar7NLWtFtYNtsrf1cE",
+            "initial_virtual_quote_reserves": 72138735
+          },
+          {
+            "mint": "suifhC9gU1VbJAPYPTBkHJyyyStKGLLYPVDTmPoqbvA",
+            "initial_virtual_quote_reserves": 277811465899
+          },
+          {
+            "mint": "URARfsinxCRw4JpvQhuT4CxavdZXZEMjv9ZwWmWpwag",
+            "initial_virtual_quote_reserves": 77992233
+          },
+          {
+            "mint": "CzLTZppPdZtTjyq3WGpHLstoc3GLhu7zH5Zg6xUa6Gv5",
+            "initial_virtual_quote_reserves": 37939398
+          },
+          {
+            "mint": "NQ5hSuXQZrbnrwcDVk2qN73njjd3E3v3badYHnj5thF",
+            "initial_virtual_quote_reserves": 75496796
+          },
+          {
+            "mint": "C1MHyoTJpRTeS9AQCyspNVu2EWAYCZwmJ1jNkEArFP1f",
+            "initial_virtual_quote_reserves": 20868292918957
+          },
+          {
+            "mint": "ARMbSB1MBRQrY6PNMao1HdQ431VafC6JRJCsGZ2Yv3iJ",
+            "initial_virtual_quote_reserves": 10896839
+          },
+          {
+            "mint": "Dz9mQ9NzkBcCsuGPFJ3r1bS4wgqKMHBPiVuniW8Mbonk",
+            "initial_virtual_quote_reserves": 14851091881
+          },
+          {
+            "mint": "739dnZEG4yaBWFsY8L8ZwrfhGG6dhtCSercW8Umspump",
+            "initial_virtual_quote_reserves": 288095427641
+          },
+          {
+            "mint": "CbyTNf7UPzvewHh4Zp6umogM2RWahhmGRJWLJnPwpump",
+            "initial_virtual_quote_reserves": 3342378617928
+          },
+          {
+            "mint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+            "initial_virtual_quote_reserves": 19115835014
+          },
+          {
+            "mint": "5UUH9RTDiSpq6HKS6bp4NdU9PNJpXRXuiw6ShBTBhgH2",
+            "initial_virtual_quote_reserves": 76376838283
+          },
+          {
+            "mint": "CRWVJeR2yEZuDUKYfGuKCHvLz8ywn4LGvovHfy5WiFmi",
+            "initial_virtual_quote_reserves": 35640928
+          },
+          {
+            "mint": "4Zp52aF4hZi9fzH19xpbWKYKQvgLyCN67KFbrQDqeTKh",
+            "initial_virtual_quote_reserves": 39219874419089
+          },
+          {
+            "mint": "RENzhrJQgmAnfcLhU1U5XwAMc6TC15UA6jCbPBaasnj",
+            "initial_virtual_quote_reserves": 79692760
+          },
+          {
+            "mint": "SQQQAa3gUxgnqcEsdjPA4RQNQBgB97TnG2hJhk2WaGE",
+            "initial_virtual_quote_reserves": 103821661
+          },
+          {
+            "mint": "7GUnr7krtQhJwd6ASY2VUprd9t4c64zcgCsjdmZepump",
+            "initial_virtual_quote_reserves": 45093548878759
+          },
+          {
+            "mint": "cbLTC4T5NpzSUtQ7ekgEMZGaUPVJY1ko6BUikqa4gGf",
+            "initial_virtual_quote_reserves": 4756065838
+          },
+          {
+            "mint": "8J69rbLTzWWgUJziFY8jeu5tDwEPBwUz4pKBMr5rpump",
+            "initial_virtual_quote_reserves": 1901783634501
+          },
+          {
+            "mint": "CbcyNo7m1amFWqEQm2m4PLv1UNvpcL3C1Ujm6AkzpKoU",
+            "initial_virtual_quote_reserves": 447073459081
+          },
+          {
+            "mint": "Hh3oTaqDCKKfdBgsQEvxp9sUwyNf8x9qmKqEMLBWpump",
+            "initial_virtual_quote_reserves": 1769193331897
+          },
+          {
+            "mint": "EWY4owSJYMpwN33qGDu5gGxpkQkpMJu8ZUsQJaNZG5dv",
+            "initial_virtual_quote_reserves": 17501464
+          },
+          {
+            "mint": "N7Q5fYX7YRnDQksfdBKnoUb3awm92n7QNAD35X3Rq1X",
+            "initial_virtual_quote_reserves": 302949303
+          },
+          {
+            "mint": "cbADAmv9issuPfhFwyQG3xac4DGPd1LDSt1oz7vwJsg",
+            "initial_virtual_quote_reserves": 12119342831
+          },
+          {
+            "mint": "RKLBnAXGqv31iZomqsuAWkQm1aqC7JwwvbCfzGdqAhz",
+            "initial_virtual_quote_reserves": 44081480
+          },
+          {
+            "mint": "NFLX7qV57zuVxCoHy3s1jiGZyALraLNwttbxdvmYJLJ",
+            "initial_virtual_quote_reserves": 48289720
+          },
+          {
+            "mint": "BEBVfXZ8uCxRBuunEbW9wcq9r7W9ySNo14oJBJkDgpZx",
+            "initial_virtual_quote_reserves": 11121085
+          },
+          {
+            "mint": "qntUzPUsJ51abNP7VYNxkmsQ4RnvEZAhavUxsCxpxH4",
+            "initial_virtual_quote_reserves": 1254236864
+          },
+          {
+            "mint": "ondohH8Vssxiqcy5u6Efi4AYN17KZrzQtv2a91dnrgW",
+            "initial_virtual_quote_reserves": 663461586301
+          },
+          {
+            "mint": "PUSAG1stksTcAoK9MjinEHUwAYRJsbovywYCk37m6hy",
+            "initial_virtual_quote_reserves": 1139159563
+          },
+          {
+            "mint": "BLKKYfF41c6xRPrtX1rdYbxLE1xxEdZUnxQsB5hcZ8Nf",
+            "initial_virtual_quote_reserves": 3090093
+          },
+          {
+            "mint": "7VertkgF9KLhxxJXHX6uaWuoYZTP9LdGj2bWmVXVpump",
+            "initial_virtual_quote_reserves": 520060774229
+          },
+          {
+            "mint": "H7TuvDxEKygh27zGfGcjKG8JGWgrbyKpPtvJEpGosfas",
+            "initial_virtual_quote_reserves": 38114152547819
+          },
+          {
+            "mint": "shib5gSoVKPjwkXrxRk7SbQFzb2R9rQB3TgQWYX4RwW",
+            "initial_virtual_quote_reserves": 5674694797408
+          },
+          {
+            "mint": "EWZzCki1igp2y73UyUM4RCG4QUVMQAtnrQUVNaDHzDxJ",
+            "initial_virtual_quote_reserves": 77130498
+          },
+          {
+            "mint": "5tCju6YNxHq5zrA6tGndr6F7TK42mpUFmeE31cSFpump",
+            "initial_virtual_quote_reserves": 998238693012
+          },
+          {
+            "mint": "CscZaq5twomhUkvCY8Jdd1tge32L4Yj9FbkFFEZQpump",
+            "initial_virtual_quote_reserves": 2701521835630
+          },
+          {
+            "mint": "CBRSFBbQPpp77NpMcwbTN6fhBHmZM94oFLJvruytw4Fi",
+            "initial_virtual_quote_reserves": 18653131
+          },
+          {
+            "mint": "VVV4UdRywr7SLafPHzqXwRCw7myXkmgCtitXUvj8g8c",
+            "initial_virtual_quote_reserves": 12055959243
+          },
+          {
+            "mint": "RACEyWiM2ztEZcJx2AHXU2eWjhxU57x3vXn92b39dLD",
+            "initial_virtual_quote_reserves": 8462693
+          }
+        ]
+      },
+      "bytes_consumed": 8068,
+      "account_size": 8068
+    }
+  }
+}
