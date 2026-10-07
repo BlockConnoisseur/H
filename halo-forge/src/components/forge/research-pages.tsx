@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CoinImagePicker } from "./coin-image-picker";
@@ -389,6 +389,15 @@ export function Agents({ data }: PageProps) {
 export function Launch({ data, action, busy, connect }: PageProps) {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [deploying, setDeploying] = useState(false);
+  const stepHeading = useRef<HTMLDivElement>(null);
+  const previousStep = useRef(step);
+  useEffect(() => {
+    if (previousStep.current === step) return;
+    previousStep.current = step;
+    stepHeading.current?.focus({ preventScroll: true });
+    stepHeading.current?.scrollIntoView({ block: "start" });
+  }, [step]);
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [image, setImage] = useState<string | null>(null);
@@ -459,14 +468,17 @@ export function Launch({ data, action, busy, connect }: PageProps) {
     e.preventDefault();
     if (imageBusy) return;
     if (!valid()) return;
-    if (step === 0) {
-      setStep(1);
+    if (deploying) return;
+    if (step < 2) {
+      setStep(step + 1);
       return;
     }
     if (!data.actor) {
       connect();
       return;
     }
+    // Live deployment is handled only by the wallet's explicit Deploy action.
+    if (!data.actor.preview) return;
     const result = await action("launch", {
       name,
       symbol,
@@ -483,15 +495,35 @@ export function Launch({ data, action, busy, connect }: PageProps) {
         title="Give a good idea an agent."
         description="Choose its assignment, set its limits, and keep the evidence in view."
       />
-      <div className="launch-layout">
+      <div
+        className={`launch-layout ${step > 0 ? "launch-layout-compact" : ""}`}
+      >
         <form className="panel form-panel" onSubmit={submit}>
-          <div className="step-bar">
-            <span className={step === 0 ? "current" : ""}>
-              1 <span>Research setup</span>
+          <div
+            className="step-bar"
+            ref={stepHeading}
+            tabIndex={-1}
+            aria-label={`Step ${step + 1} of 3: ${["Setup", "Review", "Launch"][step]}`}
+          >
+            <span
+              className={step === 0 ? "current" : ""}
+              aria-current={step === 0 ? "step" : undefined}
+            >
+              1 <span>Setup</span>
             </span>
             <ChevronRight size={16} />
-            <span className={step === 1 ? "current" : ""}>
-              2 <span>Review & launch</span>
+            <span
+              className={step === 1 ? "current" : ""}
+              aria-current={step === 1 ? "step" : undefined}
+            >
+              2 <span>Review</span>
+            </span>
+            <ChevronRight size={16} />
+            <span
+              className={step === 2 ? "current" : ""}
+              aria-current={step === 2 ? "step" : undefined}
+            >
+              3 <span>Launch</span>
             </span>
           </div>
           {step === 0 ? (
@@ -666,7 +698,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 </p>
               )}
             </>
-          ) : (
+          ) : step === 1 ? (
             <>
               <h2>Review {name}</h2>
               <div className="coin-review-identity">
@@ -698,7 +730,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   <dd>{proposedMethod?.name || "No open experiment"}</dd>
                 </div>
                 <div>
-                  <dt>Development focus</dt>
+                  <dt>Experiment focus</dt>
                   <dd>
                     {proposed
                       ? `${proposed.actions} Actions / ${proposed.threads} threads`
@@ -745,6 +777,17 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   </p>
                 </div>
               </div>
+            </>
+          ) : (
+            <>
+              <h2>Launch {name}</h2>
+              <div className="coin-review-identity">
+                <AgentMark track={proposed?.track || "S1"} image={image} />
+                <div>
+                  <strong>{name}</strong>
+                  <p className="field-hint">${symbol} / ZEC</p>
+                </div>
+              </div>
               {data.actor?.preview ? (
                 <PreviewNote>
                   This registers a local research agent. It does not deploy a
@@ -755,6 +798,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 <PumpLaunch
                   actor={data.actor}
                   input={{ name, symbol, image, description, track }}
+                  onBusyChange={setDeploying}
                 />
               ) : (
                 <p>
@@ -770,19 +814,24 @@ export function Launch({ data, action, busy, connect }: PageProps) {
             </p>
           )}
           <div className="form-actions">
-            {step === 1 && (
-              <Button type="button" variant="ghost" onClick={() => setStep(0)}>
-                Back to setup
+            {step > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={deploying || busy}
+                onClick={() => setStep(step - 1)}
+              >
+                {step === 1 ? "Back to setup" : "Back to review"}
               </Button>
             )}
-            {(step === 0 || !data.actor || data.actor.preview) && (
+            {(step < 2 || !data.actor || data.actor.preview) && (
               <Submit
                 busy={busy || imageBusy}
-                disabled={!proposed || imageBusy}
+                disabled={(step === 0 && !proposed) || imageBusy}
               >
-                {step === 0 ? (
+                {step < 2 ? (
                   <>
-                    Review setup
+                    {step === 0 ? "Next: review" : "Next: launch"}
                     <ArrowRight size={16} />
                   </>
                 ) : data.actor ? (
@@ -794,53 +843,56 @@ export function Launch({ data, action, busy, connect }: PageProps) {
             )}
           </div>
         </form>
-        <aside className="launch-aside">
-          <Panel title="A focused research worker">
-            <div className="aside-content">
-              <p>
-                Funded agents investigate pinned Halo2 source. Follow their
-                recorded work in the live lab.
-              </p>
-              <ul className="check-list">
-                <li>
-                  <Check size={15} />
-                  Pinned code and challenge rules
-                </li>
-                <li>
-                  <Check size={15} />
-                  Up to 12 model calls per experiment
-                </li>
-                <li>
-                  <Check size={15} />
-                  Four vCPUs and 8 GiB memory limit
-                </li>
-                <li>
-                  <Check size={15} />
-                  Recorded patches, tests and timings
-                </li>
-              </ul>
-              <div className="aside-rule" />
-              <h3>Built around ZEC</h3>
-              <p>
-                Agent token creator fees are allocated to compute. Approved ZEC
-                rewards are reviewed and paid manually to the original deployer.
-              </p>
-              <div className="fee-row">
-                <span>Current bonding-curve trade fee</span>
-                <strong>3%</strong>
+        {step === 0 && (
+          <aside className="launch-aside">
+            <Panel title="A focused research worker">
+              <div className="aside-content">
+                <p>
+                  Funded agents investigate pinned Halo2 source. Follow their
+                  recorded work in the live lab.
+                </p>
+                <ul className="check-list">
+                  <li>
+                    <Check size={15} />
+                    Pinned code and challenge rules
+                  </li>
+                  <li>
+                    <Check size={15} />
+                    Up to 12 model calls per experiment
+                  </li>
+                  <li>
+                    <Check size={15} />
+                    Four vCPUs and 8 GiB memory limit
+                  </li>
+                  <li>
+                    <Check size={15} />
+                    Recorded patches, tests and timings
+                  </li>
+                </ul>
+                <div className="aside-rule" />
+                <h3>Built around ZEC</h3>
+                <p>
+                  Agent token creator fees are allocated to compute. Approved
+                  ZEC rewards are reviewed and paid manually to the original
+                  deployer.
+                </p>
+                <div className="fee-row">
+                  <span>Current bonding-curve trade fee</span>
+                  <strong>3%</strong>
+                </div>
+                <div className="fee-row">
+                  <span>Shared compute share</span>
+                  <strong>1 point</strong>
+                </div>
+                <p className="field-hint">
+                  0.95% Pump protocol + 1% shared compute + 1.05% agent compute.
+                  Launch charge: 0.3 SOL, plus network fees and account rent.
+                </p>
               </div>
-              <div className="fee-row">
-                <span>Shared compute share</span>
-                <strong>1 point</strong>
-              </div>
-              <p className="field-hint">
-                0.95% Pump protocol + 1% shared compute + 1.05% agent compute.
-                Launch charge: 0.3 SOL, plus network fees and account rent.
-              </p>
-            </div>
-          </Panel>
-          <TextLink href="/guide">Understand the research loop</TextLink>
-        </aside>
+            </Panel>
+            <TextLink href="/guide">Understand the research loop</TextLink>
+          </aside>
+        )}
       </div>
     </>
   );

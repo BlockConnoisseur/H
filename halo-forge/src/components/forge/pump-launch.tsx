@@ -14,6 +14,7 @@ const WalletConnection = dynamic(() => import("./wallet-connection"), {
 
 type Props = {
   actor: Actor;
+  onBusyChange?: (busy: boolean) => void;
   input: {
     name: string;
     symbol: string;
@@ -22,7 +23,7 @@ type Props = {
     track: string;
   };
 };
-export function PumpLaunch({ actor, input }: Props) {
+export function PumpLaunch({ actor, input, onBusyChange }: Props) {
   const mounted = useRef(true);
   const [launch, setLaunch] = useState<PumpDraft | null>(null);
   const [busy, setBusy] = useState(false);
@@ -52,6 +53,7 @@ export function PumpLaunch({ actor, input }: Props) {
 
   async function deploy(sign: SignLaunchTransaction) {
     setBusy(true);
+    onBusyChange?.(true);
     setError("");
     try {
       await deployPumpAgent({
@@ -87,6 +89,7 @@ export function PumpLaunch({ actor, input }: Props) {
       throw e; // WalletConnection displays wallet and server errors together.
     } finally {
       setBusy(false);
+      onBusyChange?.(false);
     }
   }
   return (

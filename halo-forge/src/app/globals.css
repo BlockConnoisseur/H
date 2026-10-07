@@ -991,6 +991,10 @@ thead {
   gap: 28px;
   align-items: start;
 }
+.launch-layout.launch-layout-compact {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 800px;
+}
 .form-panel {
   padding: 26px;
   max-width: 800px;
@@ -1081,6 +1085,7 @@ thead {
   border-left: 2px solid var(--primary);
 }
 .step-bar {
+  scroll-margin-top: 90px;
   display: flex;
   gap: 18px;
   align-items: center;
