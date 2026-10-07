@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { NextRequest } from "next/server";
 const dir = mkdtempSync(join(tmpdir(), "halo-api-test-"));
+process.env.HALO_DATABASE_DRIVER = "sqlite";
 process.env.HALO_DATABASE_PATH = join(dir, "test.sqlite");
 process.env.HALO_APP_ORIGIN = "http://127.0.0.1:3210";
 process.env.HALO_LOCAL_PREVIEW = "true";
@@ -15,8 +16,8 @@ before(async () => {
   route = await import("../src/app/api/[...path]/route");
   database = await import("../src/lib/store");
 });
-after(() => {
-  database.db.close();
+after(async () => {
+  await database.closeStore();
   rmSync(dir, { recursive: true, force: true });
 });
 const req = (
@@ -168,7 +169,7 @@ test("CSV export requires identity and contains only the owner's ledger", async 
       cookie,
     ),
   );
-  database.transact((s) => {
+  await database.transact((s) => {
     s.ledger.unshift({
       id: "foreign",
       agentId: "another-agent",

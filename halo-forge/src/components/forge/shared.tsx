@@ -39,6 +39,7 @@ export type Data = {
   zecMint: string;
   previewAvailable: boolean;
   mode: string;
+  storage: "sqlite" | "postgres";
   liveReady: boolean;
   prizeActual: string;
   prizeExample: string;

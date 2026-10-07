@@ -45,3 +45,10 @@ Validation: production build passes; lint passes; 25 tests pass. Browser checked
 Replaced the Z-style mark with the three-part Forge mark in the desktop/mobile header, footer and icon.svg; removed default Next favicon. Added a shadcn-tab research explorer with three conceptual diagrams, clear method/agent links and no invented measurements. Increased type hierarchy and method-specific agent graphics. Simplified the mobile header. Existing APIs and accounting untouched.
 
 Production build and lint pass. Browser: all three method tabs switch to the matching content/link; mobile launch remains readable; no horizontal overflow (clientWidth=scrollWidth). Fresh Impeccable reviewer disposition: ship, no material findings in the scoped visual refinement. Final screenshots forge-desktop.jpg, forge-mobile.jpg, forge-launch-mobile.jpg. Updated mobile image uploaded to Google Drive and metadata verified. Live research/token/payout integrations remain disabled.
+
+
+## Supabase connection, October 6, 2026
+
+Added a Postgres adapter while retaining explicit SQLite development mode. Asynchronous wallet authentication and API calls preserve ownership checks. Supabase uses a private schema, RLS, a restricted runtime role, verified TLS, bounded pooling and row locks. The administrator password is not stored. The committed certificate is public; runtime credentials are ignored.
+
+Validation: 26 local tests, four live Postgres integration tests, TypeScript, lint and production build pass. Concurrent update and nonce replay tests pass; test fixtures were removed. Supabase security advisors return no findings. Performance advisories are informational and documented in SUPABASE.md. The connected site runs from H/halo-forge; original SQLite records remain untouched. Funded launchpad integrations remain disabled.

@@ -1,17 +1,15 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import bs58 from "bs58";
 import nacl from "tweetnacl";
-import { db } from "./store";
+import { query } from "./store";
 import { DomainError, hash, type Actor } from "./domain";
 export const COOKIE = "halo_session";
-export function actorFor(token?: string): Actor | null {
+export async function actorFor(token?: string): Promise<Actor | null> {
   if (!token) return null;
-  const row = db
-    .prepare(
-      "SELECT wallet,preview FROM sessions WHERE token_hash=? AND expires>?",
-    )
-    .get(hash(token), Date.now()) as
-    { wallet: string; preview: number } | undefined;
+  const [row] = await query<{ wallet: string; preview: number }>(
+    "SELECT wallet,preview FROM halo_private.sessions WHERE token_hash=$1 AND expires>$2",
+    [hash(token), Date.now()],
+  );
   if (!row) return null;
   return {
     wallet: row.wallet,
@@ -21,17 +19,15 @@ export function actorFor(token?: string): Actor | null {
       .includes(row.wallet),
   };
 }
-export function createSession(wallet: string, preview: boolean) {
+export async function createSession(wallet: string, preview: boolean) {
   const token = randomBytes(32).toString("hex");
-  db.prepare("INSERT INTO sessions VALUES(?,?,?,?)").run(
-    hash(token),
-    wallet,
-    preview ? 1 : 0,
-    Date.now() + 86400000,
+  await query(
+    "INSERT INTO halo_private.sessions(token_hash,wallet,preview,expires) VALUES($1,$2,$3,$4)",
+    [hash(token), wallet, preview ? 1 : 0, Date.now() + 86400000],
   );
   return token;
 }
-export function challenge(wallet: string, origin: string) {
+export async function challenge(wallet: string, origin: string) {
   try {
     if (bs58.decode(wallet).length !== 32) throw new Error();
   } catch {
@@ -40,19 +36,18 @@ export function challenge(wallet: string, origin: string) {
   const id = randomUUID();
   const expires = Date.now() + 300000;
   const message = `Halo Forge wallet sign-in\nOrigin: ${origin}\nWallet: ${wallet}\nNonce: ${id}\nExpires: ${new Date(expires).toISOString()}\nThis signature signs you in. It does not authorize a transaction.`;
-  db.prepare("DELETE FROM nonces WHERE expires<?").run(Date.now());
-  db.prepare("INSERT INTO nonces VALUES(?,?,?,?)").run(
-    id,
-    message,
-    wallet,
-    expires,
+  await query("DELETE FROM halo_private.nonces WHERE expires<$1", [Date.now()]);
+  await query(
+    "INSERT INTO halo_private.nonces(id,message,wallet,expires) VALUES($1,$2,$3,$4)",
+    [id, message, wallet, expires],
   );
   return { id, message };
 }
-export function verifyChallenge(id: string, signature: string) {
-  const row = db
-    .prepare("SELECT * FROM nonces WHERE id=? AND expires>?")
-    .get(id, Date.now()) as { wallet: string; message: string } | undefined;
+export async function verifyChallenge(id: string, signature: string) {
+  const [row] = await query<{ wallet: string; message: string }>(
+    "SELECT wallet,message FROM halo_private.nonces WHERE id=$1 AND expires>$2",
+    [id, Date.now()],
+  );
   if (!row)
     throw new DomainError(
       "This sign-in request expired or was already used.",
@@ -68,17 +63,29 @@ export function verifyChallenge(id: string, signature: string) {
   } catch {}
   if (!valid)
     throw new DomainError("The wallet signature could not be verified.", 401);
-  if (db.prepare("DELETE FROM nonces WHERE id=?").run(id).changes !== 1)
+  if (
+    (
+      await query(
+        "DELETE FROM halo_private.nonces WHERE id=$1 AND expires>$2 RETURNING id",
+        [id, Date.now()],
+      )
+    ).length !== 1
+  )
     throw new DomainError("Sign-in request already used.", 409);
   return createSession(row.wallet, false);
 }
-export function rateLimit(key: string, limit = 60) {
+export async function rateLimit(key: string, limit = 60) {
   const t = Date.now();
-  const row = db
-    .prepare(
-      "INSERT INTO rate_limits(key,count,reset) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN reset<? THEN 1 ELSE count+1 END, reset=CASE WHEN reset<? THEN ? ELSE reset END RETURNING count",
-    )
-    .get(key, t + 60000, t, t, t + 60000) as { count: number };
+  const [row] = await query<{ count: number }>(
+    "INSERT INTO halo_private.rate_limits(key,count,reset) VALUES($1,1,$2) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN rate_limits.reset<$3 THEN 1 ELSE rate_limits.count+1 END, reset=CASE WHEN rate_limits.reset<$3 THEN $2 ELSE rate_limits.reset END RETURNING count",
+    [key, t + 60000, t],
+  );
   if (row.count > limit)
     throw new DomainError("Too many requests. Try again in a minute.", 429);
+}
+
+export async function deleteSession(token: string) {
+  await query("DELETE FROM halo_private.sessions WHERE token_hash=$1", [
+    hash(token),
+  ]);
 }

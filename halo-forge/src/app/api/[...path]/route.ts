@@ -7,6 +7,7 @@ import {
   challenge,
   COOKIE,
   createSession,
+  deleteSession,
   rateLimit,
   verifyChallenge,
 } from "@/lib/auth";
@@ -18,7 +19,7 @@ import {
   tracks,
   ZEC_MINT,
 } from "@/lib/domain";
-import { db, readState, transact } from "@/lib/store";
+import { readState, transact, storageDriver } from "@/lib/store";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 function fail(error: unknown) {
@@ -56,8 +57,8 @@ export async function GET(req: NextRequest) {
       .join("/");
     if (path !== "state" && path !== "ledger.csv")
       throw new DomainError("Not found.", 404);
-    const actor = actorFor(req.cookies.get(COOKIE)?.value);
-    const s = readState();
+    const actor = await actorFor(req.cookies.get(COOKIE)?.value);
+    const s = await readState();
     // Audit, billing and raw artifacts are visible only to their owners/reviewers.
     const owned = new Set(
       s.agents.filter((a) => a.deployer === actor?.wallet).map((a) => a.id),
@@ -118,6 +119,7 @@ export async function GET(req: NextRequest) {
         zecMint: ZEC_MINT,
         previewAvailable: localPreview(req),
         mode: "preview",
+        storage: storageDriver,
         liveReady: false,
         prizeActual: "0",
         prizeExample: "10",
@@ -151,36 +153,35 @@ export async function POST(req: NextRequest) {
       .slice(1)
       .join("/");
     const token = req.cookies.get(COOKIE)?.value;
-    rateLimit(token ? hash(token) : "anonymous", 60);
+    await rateLimit(token ? hash(token) : "anonymous", 60);
     let newToken: string | undefined;
     if (path === "auth/challenge") {
       const p = z
         .object({ wallet: z.string().max(50) })
         .strict()
         .parse(body);
-      return NextResponse.json(challenge(p.wallet, expectedOrigin));
+      return NextResponse.json(await challenge(p.wallet, expectedOrigin));
     }
     if (path === "auth/verify") {
       const p = z
         .object({ id: z.string().uuid(), signature: z.string().max(100) })
         .strict()
         .parse(body);
-      newToken = verifyChallenge(p.id, p.signature);
+      newToken = await verifyChallenge(p.id, p.signature);
     } else if (path === "auth/preview") {
       if (!localPreview(req))
         throw new DomainError(
           "Preview sign-in is available only on the local development host.",
           403,
         );
-      newToken = createSession(bs58.encode(randomBytes(32)), true);
+      newToken = await createSession(bs58.encode(randomBytes(32)), true);
     } else if (path === "auth/logout") {
-      if (token)
-        db.prepare("DELETE FROM sessions WHERE token_hash=?").run(hash(token));
+      if (token) await deleteSession(token);
       const res = NextResponse.json({ ok: true });
       res.cookies.delete(COOKIE);
       return res;
     } else if (path === "actions") {
-      const actor = actorFor(token);
+      const actor = await actorFor(token);
       if (!actor)
         throw new DomainError(
           "Connect your wallet or start a local preview first.",
@@ -195,7 +196,9 @@ export async function POST(req: NextRequest) {
         .strict()
         .parse(body);
       return NextResponse.json({
-        result: transact((s) => execute(s, actor, p.action, p.input, p.key)),
+        result: await transact((s) =>
+          execute(s, actor, p.action, p.input, p.key),
+        ),
       });
     } else if (!newToken) throw new DomainError("Not found.", 404);
     const res = NextResponse.json({ ok: true });

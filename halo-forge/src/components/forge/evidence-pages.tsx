@@ -1063,13 +1063,22 @@ export function Settings({ data, connect }: PageProps) {
         <div className="readiness-list">
           {[
             [
+              "Research database",
+              data.storage === "postgres"
+                ? "Supabase connected"
+                : "Local SQLite",
+              data.storage === "postgres"
+                ? "Research records and wallet sessions persist in Postgres through a restricted server account."
+                : "Research records and wallet sessions are stored on this local server.",
+            ],
+            [
               "Wallet identity",
               "Implemented",
               "Nonce-based sign-in and server-verified Solana signatures.",
             ],
             [
               "Agent budgets",
-              "Local implementation",
+              "Preview accounting",
               "Transactional reservations, refunds and owner-scoped controls.",
             ],
             [
