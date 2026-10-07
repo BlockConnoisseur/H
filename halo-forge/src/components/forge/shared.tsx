@@ -95,7 +95,7 @@ export function Status({ value }: { value: string }) {
   return (
     <Badge variant="outline" className={`status ${good ? "status-good" : ""}`}>
       <span className="status-dot" />
-      {value === "running" ? "Awaiting worker" : value.replaceAll("_", " ")}
+      {value === "running" ? "Experiment active" : value.replaceAll("_", " ")}
     </Badge>
   );
 }

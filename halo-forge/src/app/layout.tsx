@@ -4,6 +4,7 @@ import "@fontsource-variable/geist-mono";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 import "./research-identity.css";
+import "./lab.css";
 
 export const metadata: Metadata = {
   title: "Halo Forge · Cryptography research",

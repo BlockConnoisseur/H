@@ -116,6 +116,7 @@ export type Audit = {
   createdAt: string;
 };
 export type State = {
+  lab?: import("./lab-domain").LabState;
   version: number;
   schemaVersion?: number;
   epochFinalizedAt?: string;

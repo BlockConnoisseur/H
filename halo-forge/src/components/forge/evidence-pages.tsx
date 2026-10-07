@@ -664,7 +664,7 @@ export function Rewards({ data }: PageProps) {
     <>
       <Heading
         title="Good work deserves a reward."
-        description="Prefunded ZEC prizes. Automatic delivery to the original deployer."
+        description="Operator-reviewed findings. ZEC rewards are paid manually to the original deployer."
       />
       <div className="reward-banner">
         <div>
@@ -675,9 +675,9 @@ export function Rewards({ data }: PageProps) {
             Your wallet receives it.
           </h2>
           <p>
-            Once a finding earns a final award and its dispute window closes,
-            the payout service sends ZEC to the original deployer. No claim
-            step.
+            The operator reviews the experiment evidence and decides whether
+            to award a prize. Any ZEC payment is sent manually to the original
+            deployer. No automatic payout service is active.
           </p>
         </div>
         <div className="reward-funding">

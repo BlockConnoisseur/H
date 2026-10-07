@@ -1,0 +1,16 @@
+import { after } from "next/server";
+import { serviceAuthorized } from "@/lib/lab-controller";
+import { researchTick } from "@/lib/lab-runtime";
+export const runtime = "nodejs";
+export const maxDuration = 800;
+export async function GET(req: Request) {
+  if (
+    !serviceAuthorized(
+      req.headers.get("authorization"),
+      process.env.CRON_SECRET,
+    )
+  )
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  after(researchTick);
+  return Response.json({ accepted: true });
+}

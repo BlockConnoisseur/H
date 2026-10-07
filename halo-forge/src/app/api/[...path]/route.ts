@@ -21,6 +21,9 @@ import {
 } from "@/lib/domain";
 import { readState, transact, storageDriver } from "@/lib/store";
 import { normalizeCoinImage } from "@/lib/coin-image";
+import { after } from "next/server";
+import { publicLab, labState, queueResearch, reviewResearch } from "@/lib/lab-domain";
+import { dispatchResearch } from "@/lib/lab-runtime";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 function fail(error: unknown) {
@@ -56,10 +59,11 @@ export async function GET(req: NextRequest) {
       .filter(Boolean)
       .slice(1)
       .join("/");
-    if (path !== "state" && path !== "ledger.csv")
+    if (path !== "state" && path !== "ledger.csv" && path !== "lab")
       throw new DomainError("Not found.", 404);
     const actor = await actorFor(req.cookies.get(COOKIE)?.value);
     const s = await readState();
+    if(path === "lab") return NextResponse.json(publicLab(s,actor),{headers:{"Cache-Control":"no-store"}});
     // Audit, billing and raw artifacts are visible only to their owners/reviewers.
     const owned = new Set(
       s.agents.filter((a) => a.deployer === actor?.wallet).map((a) => a.id),
@@ -181,6 +185,22 @@ export async function POST(req: NextRequest) {
       const res = NextResponse.json({ ok: true });
       res.cookies.delete(COOKIE);
       return res;
+    } else if (path === "lab/actions") {
+      const actor=await actorFor(token);
+      if(!actor || actor.preview) throw new DomainError("Connect and sign with your wallet first.",401);
+      const p=z.discriminatedUnion("action",[
+        z.object({action:z.literal("queue"),agentId:z.string()}).strict(),
+        z.object({action:z.literal("review"),jobId:z.string().uuid(),decision:z.enum(["accepted","rejected"]),note:z.string().min(15).max(2000)}).strict(),
+        z.object({action:z.literal("pause"),paused:z.boolean()}).strict(),
+      ]).parse(body);
+      const result=await transact(s=>{
+        if(p.action==="queue") return {id:queueResearch(s,p.agentId,actor).id};
+        if(p.action==="review") {reviewResearch(s,actor,p.jobId,p.decision,p.note);return {id:p.jobId};}
+        if(!actor.reviewer) throw new DomainError("Operator access required.",403);
+        labState(s).enabled=!p.paused;return {enabled:!p.paused};
+      });
+      if(p.action==="queue") after(dispatchResearch);
+      return NextResponse.json({result});
     } else if (path === "actions") {
       const actor = await actorFor(token);
       if (!actor)

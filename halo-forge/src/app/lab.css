@@ -1,0 +1,317 @@
+.lab-signal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-bottom: 2rem;
+}
+.lab-signal > div {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+.lab-signal strong {
+  color: var(--foreground);
+  font-weight: 500;
+}
+.lab-beacon {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+}
+.lab-beacon.is-active {
+  background: #c3af7e;
+}
+.lab-team {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+.lab-station {
+  min-width: 0;
+  padding: 1.5rem;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.lab-station:last-child {
+  border: 0;
+}
+.lab-station-top,
+.lab-station-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.lab-index {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: #b4a27a;
+}
+.lab-station h2 {
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+.lab-station p {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  flex: 1;
+}
+.lab-station-bottom {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  padding-top: 1rem;
+}
+.lab-workbench {
+  display: grid;
+  grid-template-columns: minmax(230px, 30%) minmax(0, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+.lab-register {
+  min-width: 0;
+}
+.lab-job {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+  width: 100%;
+  padding: 1.1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  transition: background 0.15s;
+}
+.lab-job:hover,
+.lab-job.selected {
+  background: rgba(255, 255, 255, 0.04);
+}
+.lab-job.selected {
+  border-left: 2px solid #b4a27a;
+}
+.lab-job:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+.lab-job-heading {
+  display: flex;
+  justify-content: space-between;
+  color: var(--foreground);
+  gap: 1rem;
+}
+.lab-job-heading strong {
+  font-weight: 500;
+}
+.lab-job-date {
+  font-size: 0.65rem;
+}
+.lab-evidence {
+  min-width: 0;
+  border: 1px solid var(--border);
+  padding: 1.75rem;
+}
+.lab-evidence-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.lab-evidence h2 {
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+  margin: 0.4rem 0 1.5rem;
+}
+.lab-receipts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+.lab-receipts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.lab-receipts span {
+  font-size: 0.65rem;
+  color: var(--muted-foreground);
+}
+.lab-receipts strong {
+  font-weight: 450;
+  font-size: 1.2rem;
+}
+.lab-timeline {
+  margin: 2rem 0;
+  list-style: none;
+  padding: 0;
+}
+.lab-timeline li {
+  display: grid;
+  grid-template-columns: 85px minmax(0, 1fr);
+  gap: 1rem;
+  position: relative;
+  padding: 0 0 1.4rem;
+}
+.lab-timeline time {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted-foreground);
+  padding-top: 0.2rem;
+}
+.lab-timeline li > div {
+  border-left: 1px solid var(--border);
+  padding-left: 1rem;
+}
+.lab-timeline li > div > span {
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: #b4a27a;
+}
+.lab-timeline p {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+}
+.lab-artifact {
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.lab-artifact h3 {
+  font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+.lab-artifact p {
+  font-size: 0.8rem;
+  line-height: 1.75;
+  margin: 0.7rem 0;
+}
+.lab-artifact code {
+  display: block;
+  font-size: 0.6rem;
+  overflow-wrap: anywhere;
+  color: var(--muted-foreground);
+  margin: 1rem 0;
+}
+.lab-artifact details {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  padding: 0.8rem;
+}
+.lab-artifact summary {
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.lab-artifact pre {
+  overflow: auto;
+  max-height: 420px;
+  font-size: 0.65rem;
+  line-height: 1.65;
+  white-space: pre;
+  margin-top: 1rem;
+}
+.lab-artifact .lab-measurement {
+  font-size: 2rem;
+  font-weight: 450;
+  letter-spacing: -0.04em;
+}
+.lab-measurement span {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  color: var(--muted-foreground);
+}
+.lab-review-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+.lab-idle {
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+.lab-idle h2 {
+  margin: 1.3rem 0 0.7rem;
+  color: var(--foreground);
+}
+.lab-idle p {
+  font-size: 0.8rem;
+}
+.lab-evidence .field-hint {
+  font-size: 0.7rem;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+}
+@media (max-width: 900px) {
+  .lab-team {
+    grid-template-columns: 1fr;
+  }
+  .lab-station {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .lab-workbench {
+    grid-template-columns: 1fr;
+  }
+  .lab-register {
+    max-height: 320px;
+    overflow: auto;
+  }
+  .lab-evidence {
+    padding: 1.2rem;
+  }
+  .lab-signal {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .lab-timeline li {
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+  .lab-receipts strong {
+    font-size: 1rem;
+  }
+  .lab-evidence-heading {
+    align-items: flex-start;
+  }
+  .lab-evidence h2 {
+    font-size: 1.4rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-job {
+    transition: none;
+  }
+}

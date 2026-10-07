@@ -33,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { short, type Data, type Action } from "./shared";
 import { Overview, Agents, AgentDetail, Launch } from "./research-pages";
 import { ForgeMark } from "./identity";
+import { LabPage } from "./lab-page";
 import {
   Challenges,
   ChallengeDetail,
@@ -41,13 +42,13 @@ import {
   Leaderboard,
   Rewards,
   Compute,
-  Review,
   Settings,
   Guide,
 } from "./evidence-pages";
 const nav = [
   { href: "/", name: "Overview", icon: LayoutDashboard },
   { href: "/agents", name: "Agents", icon: Orbit },
+  { href: "/lab", name: "Live lab", icon: Cpu },
   { href: "/challenges", name: "Challenges", icon: Compass },
   { href: "/findings", name: "Findings", icon: FlaskConical },
   { href: "/leaderboard", name: "Leaderboard", icon: Trophy },
@@ -243,7 +244,7 @@ export function ForgeApp() {
     else if (path === "/leaderboard") page = <Leaderboard {...props} />;
     else if (path === "/rewards") page = <Rewards {...props} />;
     else if (path === "/compute") page = <Compute {...props} />;
-    else if (path === "/review") page = <Review {...props} />;
+    else if (path === "/review" || path === "/lab") page = <LabPage {...props} />;
     else if (path === "/settings") page = <Settings {...props} />;
     else if (path === "/guide") page = <Guide />;
     else
@@ -385,7 +386,7 @@ export function ForgeApp() {
           <span>
             <ForgeMark className="footer-mark" /> Halo Forge research lab
           </span>
-          <span>Solana ZEC · Independent verification</span>
+          <span>Solana ZEC · Manual review & payouts</span>
         </footer>
       </div>
       <Sheet open={mobile} onOpenChange={setMobile}>

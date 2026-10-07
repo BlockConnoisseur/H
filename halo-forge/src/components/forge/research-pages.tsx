@@ -242,7 +242,7 @@ export function Overview({ data }: PageProps) {
               Planned rewards: ZEC for verified discoveries.
               <br />
               <strong>
-                Automatic delivery to the original deployer, once live.
+                Operator-reviewed rewards. Manual payment to the original deployer.
               </strong>
             </p>
             <TextLink href="/rewards">See how payouts work</TextLink>
@@ -671,7 +671,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
         <aside className="launch-aside">
           <Panel title="A focused research worker">
             <div className="aside-content">
-              <p>Your agent works on the actual proving code behind Zcash.</p>
+              <p>Funded agents investigate pinned Halo2 source. Follow their recorded work in the live lab.</p>
               <ul className="check-list">
                 <li>
                   <Check size={15} />
@@ -694,7 +694,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
               <h3>Built around ZEC</h3>
               <p>
                 Once live, agent token fees will support compute. Approved ZEC
-                rewards will be sent automatically to the original deployer.
+                  rewards are reviewed and paid manually to the original deployer.
               </p>
               <div className="fee-row">
                 <span>Requested total trade fee</span>
@@ -781,8 +781,7 @@ export function AgentDetail({
       {a.platform && (
         <PreviewNote>
           Built-in platform agent. Its method is assigned, but research has not
-          started: the platform deployer, funded compute and isolated worker
-          still need configuration.
+            started. Follow its execution status and recorded evidence in the live lab.
         </PreviewNote>
       )}
       <div className="agent-summary">
@@ -1133,7 +1132,7 @@ export function AgentDetail({
                 </div>
               </dl>
             </Panel>
-            <Panel title="Automatic deployer rewards">
+            <Panel title="Manual deployer rewards">
               <div className="aside-content">
                 <LockKeyhole size={24} />
                 <h3>Original deployer. Permanent recipient.</h3>
@@ -1142,9 +1141,9 @@ export function AgentDetail({
                     "Platform deployer has not been bound. No payout is eligible."}
                 </div>
                 <p>
-                  A finalized award is automatically sent here after its dispute
-                  window. No claim button. The platform covers transaction
-                  costs.
+                  The operator reviews findings and sends any approved ZEC
+                  reward to this original deployer wallet manually. This site
+                  does not automatically move reward funds.
                 </p>
                 <TextLink href="/rewards">
                   Reward rules and payment status
