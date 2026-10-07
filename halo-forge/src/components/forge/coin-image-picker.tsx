@@ -98,7 +98,7 @@ export function CoinImagePicker({
           ref={input}
           id="coin-image"
           type="file"
-          className="sr-only"
+          className="coin-image-input"
           aria-label="Upload coin image"
           aria-describedby="coin-image-hint"
           accept="image/png,image/jpeg,image/webp"

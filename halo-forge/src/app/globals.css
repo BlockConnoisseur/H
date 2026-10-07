@@ -723,6 +723,9 @@ main {
 .coin-image-controls {
   min-width: 0;
 }
+.coin-image-controls .coin-image-input {
+  display: none;
+}
 .coin-image-controls > strong {
   font-size: 0.875rem;
 }
