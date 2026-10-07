@@ -7,6 +7,7 @@ import {
   Check,
   CircleHelp,
   Compass,
+  Copy,
   Cpu,
   FlaskConical,
   LayoutDashboard,
@@ -45,6 +46,37 @@ import {
   Settings,
   Guide,
 } from "./evidence-pages";
+const MAIN_TOKEN_CA = "FQ5THu5YALHmejeuWQFViiQ5BvpC8x8DFL6dnU5epump";
+
+function FooterContractAddress() {
+  const [copyStatus, setCopyStatus] = useState("");
+  async function copyAddress() {
+    try {
+      await navigator.clipboard.writeText(MAIN_TOKEN_CA);
+      setCopyStatus("Copied");
+    } catch {
+      setCopyStatus("Select the address to copy it");
+    }
+  }
+  return (
+    <div className="footer-contract">
+      <span>CA</span>
+      <code>{MAIN_TOKEN_CA}</code>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Copy contract address"
+        onClick={copyAddress}
+      >
+        {copyStatus === "Copied" ? <Check size={14} /> : <Copy size={14} />}
+      </Button>
+      <span className="footer-copy-status" role="status">
+        {copyStatus}
+      </span>
+    </div>
+  );
+}
+
 const nav = [
   { href: "/", name: "Overview", icon: LayoutDashboard },
   { href: "/agents", name: "Agents", icon: Orbit },
@@ -387,6 +419,7 @@ export function ForgeApp() {
             <ForgeMark className="footer-mark" /> Halo Forge research lab
           </span>
           <span>Solana ZEC · Manual review & payouts</span>
+          <FooterContractAddress />
         </footer>
       </div>
       <Sheet open={mobile} onOpenChange={setMobile}>

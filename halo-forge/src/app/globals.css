@@ -878,6 +878,29 @@ main {
   gap: 7px;
   align-items: center;
 }
+.app-footer {
+  flex-wrap: wrap;
+}
+.footer-contract {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.footer-contract code {
+  font-size: 0.6875rem;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: calc(100% - 4.5rem);
+  user-select: all;
+  color: var(--foreground);
+}
+.footer-copy-status {
+  font-size: 0.6875rem;
+}
 .inline-note {
   display: flex;
   align-items: flex-start;
