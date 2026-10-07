@@ -61,6 +61,7 @@ export type LabJob = {
     createdAt: string;
   }[];
   evaluation?: Evaluation;
+  evaluationHistory?: Evaluation[];
   evaluationClaimedAt?: string;
   review?: {
     decision: "accepted" | "rejected";
@@ -117,16 +118,43 @@ export function queueResearch(
   if (agent.status === "paused")
     throw new DomainError("This agent is paused.", 409);
   if (
+    !agent.platform &&
+    (agent.preview || !agent.tokenMint || agent.budget < 300)
+  )
+    throw new DomainError(
+      "This agent needs a verified token and a funded $3 experiment allowance.",
+      409,
+    );
+  if (
     lab.jobs.some(
       (j) => j.agentId === agentId && activeStatuses.includes(j.status),
     )
   )
     throw new DomainError("This agent already has an active experiment.", 409);
   const today = new Date().toISOString().slice(0, 10);
+  if (
+    !agent.platform &&
+    lab.jobs
+      .filter((j) => j.agentId === agent.id && j.createdAt.startsWith(today))
+      .reduce((n, j) => n + j.reservationCents, 0) +
+      300 >
+      agent.dailyCap
+  )
+    throw new DomainError(
+      "This agent has reached its daily compute limit.",
+      409,
+    );
   const daily = lab.jobs
     .filter((j) => j.createdAt.startsWith(today))
     .reduce((n, j) => n + j.reservationCents, 0);
-  const reserved = lab.jobs.reduce((n, j) => n + j.reservationCents, 0);
+  const reserved =
+    lab.jobs.reduce((n, j) => n + j.reservationCents, 0) +
+    (s.pumpLaunches ?? []).filter((d) => !d.abandoned && !d.agentId).length *
+      300 +
+    s.agents
+      .filter((a) => !a.platform && !a.preview)
+      .reduce((n, a) => n + a.budget, 0) -
+    (agent.platform ? 0 : 300);
   if (daily + 300 > lab.dailyCapCents || reserved + 300 > lab.allocatedCents)
     throw new DomainError(
       "The operator-funded research allowance is exhausted. No model call was made.",
@@ -155,6 +183,10 @@ export function queueResearch(
     "Experiment queued with a $3 maximum allocation. Review and payouts are manual.",
   );
   lab.jobs.push(job);
+  if (!agent.platform) {
+    agent.budget -= 300;
+    agent.reserved += 300;
+  }
   agent.status = "running";
   return job;
 }
@@ -215,6 +247,13 @@ export function publicLab(s: State, actor: Actor | null) {
     allocatedCents: lab.allocatedCents,
     dailyCapCents: lab.dailyCapCents,
     committedCents: lab.jobs.reduce((n, j) => n + j.reservationCents, 0),
+    feeReceipts: (s.feeReceipts ?? []).filter(
+      (r) =>
+        actor?.reviewer ||
+        s.agents.some(
+          (a) => a.id === r.agentId && a.deployer === actor?.wallet,
+        ),
+    ),
     jobs: lab.jobs
       .slice(-150)
       .reverse()

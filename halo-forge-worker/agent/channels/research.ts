@@ -10,7 +10,7 @@ export default defineChannel({
     if(typeof body.runId!=="string" || !/^[a-f0-9-]{36}$/.test(body.runId)) return Response.json({error:"Invalid run"},{status:400});
     const existing=await resolveSession(body.runId);
     if(existing) return Response.json({sessionId:existing.id});
-    const session=await from(body.runId).send("Read your assigned experiment and pinned source. Produce one new, small, exact unified diff for that method. Request the fixed development evaluation, then stop for the operator's manual review. Do not claim an improvement before measurement.",{auth:{authenticator:"halo-dispatcher",principalId:"halo-controller",principalType:"service",attributes:{runId:body.runId}}});
+    const session=await from(body.runId).send("Read your assigned experiment and pinned source. Propose one new, small change for that method using exact oldText/newText replacements. A successful proposal automatically queues development evaluation and ends the turn. Do not claim an improvement before measurement.",{auth:{authenticator:"halo-dispatcher",principalId:"halo-controller",principalType:"service",attributes:{runId:body.runId}}});
     return Response.json({sessionId:session.id},{status:202});
   })],
   events:{

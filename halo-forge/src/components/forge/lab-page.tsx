@@ -17,6 +17,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Heading, Panel, Empty, money, short } from "./shared";
 import type { PageProps } from "./app";
 import type { PublicLab } from "@/lib/lab-domain";
+import type { FeeClaim } from "@/lib/pump-fees";
+import { formatZec } from "@/lib/pump-policy";
+import dynamic from "next/dynamic";
+const WalletConnection = dynamic(() => import("./wallet-connection"), {
+  ssr: false,
+});
 
 const active = ["dispatching", "researching", "evaluating"];
 const labels: Record<string, string> = {
@@ -35,6 +41,32 @@ export function LabPage({ data, connect }: PageProps) {
     [busy, setBusy] = useState(false),
     [selected, setSelected] = useState(""),
     [note, setNote] = useState("");
+  const [claim, setClaim] = useState<FeeClaim | null>(null),
+    [feeNotice, setFeeNotice] = useState("");
+  const collect = async (body: Record<string, unknown>) => {
+    setBusy(true);
+    setError("");
+    try {
+      const r = await fetch("/api/pump/actions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }),
+        d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      if (d.claim) setClaim(d.claim);
+      else {
+        setClaim(null);
+        setFeeNotice(
+          `Collection submitted: ${d.signature}. The ledger updates after finalization.`,
+        );
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Collection failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
   const load = useCallback(async () => {
     try {
       const r = await fetch("/api/lab", { cache: "no-store" });
@@ -127,7 +159,7 @@ export function LabPage({ data, connect }: PageProps) {
       </div>
       <div className="lab-team">
         {data.agents
-          .filter((a) => a.platform)
+          .filter((a) => !a.preview && !a.example)
           .map((a, i) => {
             const latest = lab?.jobs.find((j) => j.agentId === a.id);
             return (
@@ -172,11 +204,96 @@ export function LabPage({ data, connect }: PageProps) {
                       Run experiment
                     </Button>
                   )}
+                  {data.actor?.reviewer && a.tokenMint && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() =>
+                        void collect({
+                          action: "collect_prepare",
+                          agentId: a.id,
+                        })
+                      }
+                    >
+                      Collect ZEC fees
+                    </Button>
+                  )}
                 </div>
               </section>
             );
           })}
       </div>
+      {claim && data.actor && (
+        <Panel
+          title={`Collect fees · ${data.agents.find((a) => a.id === claim.agentId)?.name ?? "Agent"}`}
+        >
+          <div className="aside-content">
+            <p>
+              Send this coin’s accrued ZEC creator fees to the configured
+              compute wallet. Your wallet pays network fees and any required
+              account rent.
+            </p>
+            <WalletConnection
+              actor={data.actor}
+              previewAvailable={false}
+              onChanged={async () => {}}
+              transaction={{
+                wire: claim.tx.wire,
+                label: "Sign fee collection",
+                onSigned: async (signed) => {
+                  await collect({
+                    action: "collect_submit",
+                    id: claim.id,
+                    signed,
+                  });
+                },
+              }}
+            />
+            <Button variant="ghost" onClick={() => setClaim(null)}>
+              Close
+            </Button>
+          </div>
+        </Panel>
+      )}
+      {feeNotice && (
+        <p role="status" className="field-hint break-all">
+          {feeNotice}
+        </p>
+      )}
+      {!!lab?.feeReceipts.length && (
+        <Panel title="Confirmed ZEC compute receipts">
+          <div className="aside-content">
+            <p>
+              Shared and agent allocations are records of ZEC received. They are
+              not USD compute credits.
+            </p>
+            {lab.feeReceipts
+              .slice(-30)
+              .reverse()
+              .map((r) => (
+                <div className="fee-row" key={r.id}>
+                  <span>
+                    {data.agents.find((a) => a.id === r.agentId)?.name}
+                    <br />
+                    <a
+                      href={`https://solscan.io/tx/${r.signature}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Transaction ↗
+                    </a>
+                  </span>
+                  <span>
+                    {formatZec(r.sharedRaw)} shared
+                    <br />
+                    {formatZec(r.agentRaw)} agent ZEC
+                  </span>
+                </div>
+              ))}
+          </div>
+        </Panel>
+      )}
       <div className="lab-workbench">
         <section className="lab-register" aria-label="Experiment history">
           <div className="section-title">

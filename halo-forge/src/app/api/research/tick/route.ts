@@ -1,6 +1,7 @@
 import { after } from "next/server";
 import { serviceAuthorized } from "@/lib/lab-controller";
 import { researchTick } from "@/lib/lab-runtime";
+import { syncPumpFees } from "@/lib/pump-fees";
 export const runtime = "nodejs";
 export const maxDuration = 800;
 export async function GET(req: Request) {
@@ -12,5 +13,6 @@ export async function GET(req: Request) {
   )
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   after(researchTick);
+  after(syncPumpFees);
   return Response.json({ accepted: true });
 }

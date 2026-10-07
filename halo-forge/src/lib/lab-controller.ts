@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import { applyPatch, parsePatch } from "diff";
+import { applyPatch, parsePatch, createTwoFilesPatch } from "diff";
 import { z } from "zod";
 import source from "./research-source.json";
 import { DomainError, hash } from "./domain";
@@ -17,6 +17,26 @@ export function serviceAuthorized(
   return timingSafeEqual(a, b);
 }
 const sourcePath = "halo2_proofs/src/arithmetic.rs";
+export function replacementPatch(
+  replacements: { oldText: string; newText: string }[],
+) {
+  let candidate = source[sourcePath];
+  for (const { oldText, newText } of replacements) {
+    if (!oldText || candidate.split(oldText).length !== 2)
+      throw new DomainError(
+        "Each oldText must match exactly once. Read the source again and include enough surrounding text.",
+      );
+    candidate = candidate.replace(oldText, () => newText);
+  }
+  const diff = createTwoFilesPatch(
+    `a/${sourcePath}`,
+    `b/${sourcePath}`,
+    source[sourcePath],
+    candidate,
+  );
+  validatePatch(diff);
+  return diff;
+}
 export function validatePatch(diff: string) {
   if (diff.length > 24000 || /\r|\0/.test(diff))
     throw new DomainError(
@@ -207,14 +227,29 @@ export async function controllerOperation(body: unknown, key: string) {
       const input = z
         .object({
           hypothesis: z.string().min(30).max(4000),
-          diff: z.string().min(20).max(24000),
+          diff: z.string().min(20).max(24000).optional(),
+          replacements: z
+            .array(
+              z
+                .object({
+                  oldText: z.string().min(1).max(12000),
+                  newText: z.string().max(12000),
+                })
+                .strict(),
+            )
+            .min(1)
+            .max(6)
+            .optional(),
           expectedTradeoff: z.string().min(15).max(2000),
         })
         .strict()
         .parse(p.input);
       if (job.patches.length >= 2 || job.status !== "researching")
         throw new DomainError("Patch allowance exhausted.", 409);
-      const { digest } = validatePatch(input.diff);
+      if (!!input.diff === !!input.replacements)
+        throw new DomainError("Supply either a diff or exact replacements.");
+      const diff = input.diff ?? replacementPatch(input.replacements!);
+      const { digest } = validatePatch(diff);
       if (
         labState(s).jobs.some((j) => j.patches.some((p) => p.digest === digest))
       )
@@ -223,7 +258,9 @@ export async function controllerOperation(body: unknown, key: string) {
           409,
         );
       job.patches.push({
-        ...input,
+        hypothesis: input.hypothesis,
+        expectedTradeoff: input.expectedTradeoff,
+        diff,
         digest,
         createdAt: new Date().toISOString(),
       });
@@ -232,7 +269,18 @@ export async function controllerOperation(body: unknown, key: string) {
         "patch",
         "Candidate patch frozen with a SHA-256 digest. No performance claim has been verified.",
       );
-      result = { artifactDigest: digest, acceptedForEvaluation: true };
+      job.status = "evaluating";
+      event(
+        job,
+        "evaluating",
+        "Frozen candidate queued for isolated correctness tests and development benchmarks.",
+      );
+      result = {
+        artifactDigest: digest,
+        acceptedForEvaluation: true,
+        jobId: job.id,
+        status: "evaluating",
+      };
     } else if (p.operation === "request_evaluation") {
       const input = z
         .object({ artifactDigest: z.string().regex(/^[a-f0-9]{64}$/) })

@@ -116,6 +116,11 @@ export type Audit = {
   createdAt: string;
 };
 export type State = {
+  pumpLaunches?: import("./pump-launch").PumpDraft[];
+  feeClaims?: import("./pump-fees").FeeClaim[];
+  feeReceipts?: import("./pump-fees").FeeReceipt[];
+  feeCursors?: Record<string, string>;
+  feeScans?: Record<string, { head: string; before: string; until?: string }>;
   lab?: import("./lab-domain").LabState;
   version: number;
   schemaVersion?: number;

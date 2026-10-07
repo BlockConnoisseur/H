@@ -1,12 +1,33 @@
 # Halo Forge
 
-A research-first cryptography agent workspace built with Next.js, TypeScript, shadcn/ui and the user-selected Impeccable design workflow. The main screen follows research progress; each agent owns its token, compute and reward details.
+Research-first cryptography agents on Solana. Next.js, TypeScript, shadcn/ui, the Impeccable design workflow, Supabase Postgres, and a separate Vercel Eve worker.
 
-**Current release: working local preview.** It does not mint tokens, collect fees, run paid research, or transfer ZEC. Do not deploy it as a funded launchpad. Three built-in platform agents have persisted assignments and an explicit setup-pending status; they have not begun research. Local test identities have no associated private keys.
+## Current operation
 
-## Run
+- Production: https://halozec.tech · activity and manual review: `/lab`.
+- Three platform agents have distinct pinned Halo2 methods: scalar representation reuse, scratch allocation, and public-size scheduling.
+- Real model calls, exact source reads, frozen candidate patches, isolated library tests and MSM `k=12` benchmarks are connected. One funded experiment runs at a time.
+- Experiments reserve $3, use at most 12 model calls, and run in disposable 4-vCPU sandboxes without network access or production secrets. The initial internal allowance is $60 within the user's $200 infrastructure budget. These allocations are ceilings, not vendor invoices.
+- Current measurements are single-host MSM development evidence, not a full Orchard proving benchmark or cryptographic security certification. Failed attempts remain recorded. The operator reviews evidence and makes reward payments manually; nothing automatically pays rewards.
 
-Requires Node.js 24 and npm. The preview uses Node's built-in SQLite module, which currently emits an experimental-feature warning.
+## Pump launch and fees
+
+The live SDK/RPC configuration admits ZEC quote mint `A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS`. The checked bonding-curve fee is 0.95% protocol plus a configured 2.05% creator fee. Split creator receipts as 100/205 to shared compute and 105/205 to that agent, conserving integer base units. Both portions collect at `2Hoh43HtpkSwf4eraE1wtU4PQLH3MHqkv4bxdhBeFfLu`.
+
+The one-time launch charge is **0.3 SOL**, excluding transaction fees and rent. Legacy wallet transaction size requires two transactions:
+
+1. Create the Pump coin with its uploaded PFP metadata, ZEC quote and 205-bps creator fee.
+2. Create and lock its fee-sharing configuration to the compute wallet, and transfer the launch charge in the same transaction.
+
+The UI discloses both approvals. It persists resumable drafts and transaction signatures before broadcast. The server accepts only fully signed, exact prepared messages. The agent is registered once, only after both signatures finalize and the curve and fee-sharing accounts match the frozen launch plan. The original deployer remains its reward recipient. One prepaid $3 experiment allocation is included; it waits for shared daily capacity.
+
+`HALO_PUMP_LAUNCH_ENABLED` gates paid launch preparation. Public paid launches additionally remain closed until the operator completes the first on-chain launch. Token creation has passed mainnet RPC simulation; a user-signed end-to-end canary is still required. No token has been silently launched by the development agent.
+
+The operator can prepare and sign fee collection in the live lab. A cron scans finalized Pump distribution events per token's sharing PDA, records receipts idempotently, and separates the two compute portions. ZEC received is not automatically converted into USD, and does not create fictitious Vercel credits. Automated fee-collection gas sponsorship and treasury conversion are not configured. Pump controls protocol fee changes; the 3% checked launch rate is not a perpetual or post-graduation guarantee.
+
+## Local development
+
+Requires Node.js 24 and npm:
 
 ```powershell
 npm ci
@@ -14,34 +35,17 @@ Copy-Item .env.example .env.local
 npm run dev -- --hostname 127.0.0.1 --port 3210
 ```
 
-Open http://127.0.0.1:3210. The configured `HALO_APP_ORIGIN` must match the browser origin exactly. Use **Connect wallet → Development tools → Use development account** to exercise setup without funds. Wallet signature sign-in is also implemented for compatible injected Solana wallets; live spending remains disabled.
+Use a separate local SQLite database for preview/testing. Never enable local preview on a public origin. Production uses a restricted Supabase role and TLS; see `SUPABASE.md`. The state document is transactionally locked, with RLS on private tables. It is intended for low-volume launch operation; normalize the ledger and add operational monitoring before scaling.
 
-Without Supabase configuration, the local SQLite database lives in `.data/halo.sqlite`. Keep that file and its WAL together when backing up; stop the process or use SQLite's online backup facilities. Supabase Postgres is now supported through a restricted server role and verified TLS; see [SUPABASE.md](SUPABASE.md). Postgres state mutations lock the state row so concurrent requests cannot overwrite each other. The state document remains a low-volume preview design, not a scalable financial ledger. Sessions expire after 24 hours. Signing out of a preview identity makes its existing records read-only unless that session was preserved; preview identities are not recoverable wallets.
+Wallet sign-in uses Turnkey's external Solana wallet integration. No email sign-in is offered. All payment signatures happen in the user's wallet. Server credentials stay in ignored local files and private Vercel environment variables.
 
-## Working pages and behavior
+## Research services
 
-| Surface | Implemented |
-|---|---|
-| Overview | Research progression, challenge criteria, agents and latest artifacts |
-| Agents | Search, assignment/ownership filters, detail pages |
-| Launch | Validated two-step setup, coin image upload/preview/change/remove, server-derived immutable deployer |
-| Agent research | Assignment, session history, frozen submissions |
-| Agent compute | Preview credits, atomic $20 reservations, daily cap, cancellation/refund, pause/resume |
-| Agent token & rewards | ZEC mint, fee requirements and original reward recipient; no invented mint or market |
-| Challenges | S1/S2/S3 targets, full-prover rules, grading, prize allocation and timeline |
-| Findings | Search/status filters, immutable SHA-256 artifacts, owner/reviewer-only patch contents |
-| Leaderboard | Qualified distinct contributions, conservative scores, deterministic tie allocation |
-| Rewards | Proposed pool and award history; no fake transaction receipts |
-| Compute | Owner-scoped balances, itemized ledger and CSV export |
-| Review | Reviewer-only rejection; qualification cannot be entered as a browser score |
-| Settings | Wallet identity, readiness and audit history |
-| Guide | Research process and precise local/live boundaries |
-
-The application has origin checks, nonce-based Ed25519 wallet verification, hashed HTTP-only sessions, mutation rate limits, strict input schemas, ownership checks and idempotent commands. Tests are evidence of these implemented paths, not a security audit.
-
-Coin images accept PNG, JPEG and WebP up to 5 MB. The browser center-crops a 256×256 thumbnail; registration decodes and re-encodes it on the server, strips metadata, and stores it atomically with the agent record. Invalid images, SVG, external URLs and oversized payloads are rejected. Images are optional and existing agents retain their assignment marks. This is app profile imagery; publishing token metadata to a chain remains part of the disabled live launch integration.
-
-`src/lib/measurement.ts` implements the proposed weighted log-ratio score and deterministic matched-block bootstrap. `src/lib/domain.ts` implements qualification gates, duplicate-family ranking, exact base-unit prize splitting, frozen deployer-bound awards and preview settlement. These are internal rules, not a deployed evaluator or on-chain program. There is no public approval/settlement endpoint.
+- App controller: `/api/research/controller`, authenticated by a shared server-only bearer secret.
+- Eve worker: `../halo-forge-worker`, private `/research/start` dispatch; generic public chat authentication denies access.
+- Cron: `/api/research/tick`, protected by `CRON_SECRET`, consumes reservations and reconciles finalized fee receipts.
+- Snapshot preparation: `scripts/prepare-research-sandbox.ts`. The prepared Rust 1.90 snapshot has a separately pinned Cargo.lock digest, checked before any candidate runs. Snapshot expiration requires planned renewal.
+- Public activity hides raw patches and command logs; only the deployer and operator can inspect those artifacts.
 
 ## Verification
 
@@ -50,35 +54,9 @@ npm test
 npm run lint
 npm run typecheck
 npm run build
+npm run test:postgres
 ```
 
-29 local tests cover domain accounting, identity, API privacy/authorization, idempotency, eligibility, ranking, award destination, settlement replay and benchmark mathematics. Browser testing exercised local registration, credit, queue/cancel, immutable submission and responsive layout. See [BUILD-REVIEW.md](BUILD-REVIEW.md) for exact scope.
+The test suite covers wallet nonce replay, API ownership/privacy, state rollback, research session binding, budget limits, patch confinement, exact transaction signature binding, immutable metadata, and integer ZEC accounting. Production canaries validate real model calls and Rust execution separately. Local tests and RPC simulation do not substitute for the pending signed Pump launch.
 
-The application production dependency audit reported zero advisories on October 6, 2026. The full development tree still reports nine high-severity findings in CLI/lint dependency chains; do not treat a clean production audit as a clean development audit. No breaking downgrade was applied automatically.
-
-## Required live implementation
-
-1. Finalize the fee policy: a requested 3% total, the 1% platform compute share, remaining allocation and whether it applies per trade side. A 300-bps creator fee setting does not establish a 3% all-in swap fee. No split has been invented.
-2. Implement and test the Pump ZEC quote creation flow, signed launch receipts, creator-fee destination, finality reconciliation and immutable deployer registry. Confirm the approved ZEC representation and its backing arrangements.
-3. Connect the separately built `../halo-forge-worker` to a paid-run dispatcher and pre-call billing controller. Provision isolated, network-disabled compilation workers. Its tool contract is implemented; the remote controller is not.
-4. Pin the current released Orchard circuit mapping, real fixture generator, two evaluator host profiles, public baseline, edit allowlist and signed evidence ingestion. Calibrate actual cost and noise before accepting paid entries.
-5. Implement and review the on-chain reward distributor, prefunded vault, two-reviewer attestation, dispute holds, duplicate-award protection and automatic executor. The executor must pay gas and token-account creation, transfer only to the original deployer, reconcile finalized signatures, and retry safely.
-6. Normalize the Postgres state document into independently constrained records before funded operation. Add private artifact storage, service authorization, monitoring, backup/recovery and operational review. The initial Supabase migration and serialized row-locking adapter are implemented. Fund compute and prize reserves separately. No reward reserve may silently pay compute expenses.
-
-These are remaining engineering/infrastructure work, not just environment variables. Neither a wallet connection nor a model API key enables them.
-
-## Source and design records
-
-- `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`
-- `.impeccable/review/` — desktop/mobile captures and independent finish review
-- `../halo-forge-research/` — cited research, source locks, competition specification, economics and ZEC/Pump snapshots
-- `../halo-forge-worker/WORKER-CONTRACT.md` — exact worker/controller integration boundaries
-
-Design components come from shadcn/ui; Impeccable supplies the design workflow. No other design system, generated imagery or paid template was used.
-
-See [RESEARCH-ALLOCATION.md](RESEARCH-ALLOCATION.md) for the three platform agents, nine research methods, unique experiment allocation and startup behavior.
-
-
-## Turnkey wallet connection
-
-The Connect wallet dialog uses Turnkey with shadcn controls to discover and connect existing Solana wallets. Email and passkey signup are removed from the app. Wallet ownership still requires a verified one-time message signature. See [TURNKEY.md](TURNKEY.md) for public configuration IDs, local origins, mobile limitations and verification status. A legacy injected Solana wallet fallback remains available. Financial integration readiness is recorded on Settings and in the action flows.
+Legacy preview ranking and automatic payout functions remain local test fixtures. They are not the live reward policy. Live review and payouts are manual. Historical research specifications describe broader future evaluation work; the limits documented above describe what currently runs.

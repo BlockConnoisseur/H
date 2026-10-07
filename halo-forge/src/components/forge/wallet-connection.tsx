@@ -24,6 +24,11 @@ type Props = {
   actor: Actor | null;
   previewAvailable: boolean;
   onChanged: (message: string) => Promise<void>;
+  transaction?: {
+    wire: string;
+    label: string;
+    onSigned: (signed: string) => Promise<void>;
+  };
 };
 type Kit = ReturnType<typeof useTurnkey>;
 const organizationId = process.env.NEXT_PUBLIC_TURNKEY_ORGANIZATION_ID?.trim();
@@ -62,6 +67,7 @@ function WalletChoices({
   previewAvailable,
   onChanged,
   kit,
+  transaction,
 }: Props & { kit?: Kit }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -95,6 +101,31 @@ function WalletChoices({
       throw new Error(
         "Your wallet did not return a Solana account. Unlock it and try again.",
       );
+    if (transaction) {
+      if (account.address !== actor?.wallet)
+        throw new Error("Select the original deployer wallet before signing.");
+      const hex = Array.from(
+        Uint8Array.from(atob(transaction.wire), (c) => c.charCodeAt(0)),
+        (b) => b.toString(16).padStart(2, "0"),
+      ).join("");
+      const signed = await kit!.signTransaction({
+        walletAccount: account,
+        unsignedTransaction: hex,
+        transactionType: "TRANSACTION_TYPE_SOLANA",
+      });
+      if (!/^(?:[a-fA-F0-9]{2})+$/.test(signed))
+        throw new Error(
+          "The wallet returned an unsupported transaction encoding.",
+        );
+      await transaction.onSigned(
+        btoa(
+          String.fromCharCode(
+            ...Uint8Array.from(signed.match(/../g)!, (b) => parseInt(b, 16)),
+          ),
+        ),
+      );
+      return;
+    }
     await establishWalletSession(account.address, async ({ message }) =>
       turnkeySignature(
         await kit!.signMessage({
@@ -117,6 +148,9 @@ function WalletChoices({
             message: Uint8Array,
             encoding?: string,
           ): Promise<{ signature: Uint8Array }>;
+          signTransaction(
+            tx: import("@solana/web3.js").Transaction,
+          ): Promise<import("@solana/web3.js").Transaction>;
         };
       }
     ).solana;
@@ -125,6 +159,20 @@ function WalletChoices({
         "No Solana wallet was found. Open Halo Forge in your wallet’s browser, or enable a Solana wallet extension and reload.",
       );
     const { publicKey } = await provider.connect();
+    if (transaction) {
+      if (publicKey.toString() !== actor?.wallet)
+        throw new Error("Select the original deployer wallet before signing.");
+      const { Transaction } = await import("@solana/web3.js");
+      const signed = await provider.signTransaction(
+        Transaction.from(
+          Uint8Array.from(atob(transaction.wire), (c) => c.charCodeAt(0)),
+        ),
+      );
+      await transaction.onSigned(
+        btoa(String.fromCharCode(...signed.serialize())),
+      );
+      return;
+    }
     await establishWalletSession(
       publicKey.toString(),
       async ({ message }) =>
@@ -158,7 +206,45 @@ function WalletChoices({
           <AlertDescription role="alert">{error}</AlertDescription>
         </Alert>
       )}
-      {actor ? (
+      {transaction && actor ? (
+        <>
+          <p className="field-hint">
+            Review the transaction in your wallet. Only{" "}
+            {actor.wallet.slice(0, 6)}…{actor.wallet.slice(-4)} can sign this
+            launch.
+          </p>
+          {ready && providers.length > 0 ? (
+            providers.map((provider) => (
+              <Button
+                type="button"
+                key={provider.info.uuid || provider.info.name}
+                disabled={busy}
+                onClick={() => run(() => connectProvider(provider))}
+              >
+                {busy ? (
+                  <LoaderCircle className="animate-spin" size={16} />
+                ) : (
+                  <Wallet size={16} />
+                )}{" "}
+                {transaction.label} · {provider.info.name}
+              </Button>
+            ))
+          ) : (
+            <Button
+              type="button"
+              disabled={busy}
+              onClick={() => run(connectInjected)}
+            >
+              {busy ? (
+                <LoaderCircle className="animate-spin" size={16} />
+              ) : (
+                <Wallet size={16} />
+              )}{" "}
+              {transaction.label}
+            </Button>
+          )}
+        </>
+      ) : actor ? (
         <>
           <div className="address-block">{actor.wallet}</div>
           <p className="muted">

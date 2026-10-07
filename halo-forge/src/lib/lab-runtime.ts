@@ -114,13 +114,13 @@ export async function evaluateResearch(id: string) {
     };
     await run(
       "Check immutable baseline revision",
-      `bash -c 'test "$(git rev-parse HEAD)" = "${SOURCE_REVISION}" && git diff --exit-code'`,
+      `bash -c 'test "$(git rev-parse HEAD)" = "${SOURCE_REVISION}" && test "$(sha256sum Cargo.lock | cut -d " " -f 1)" = "d6847ff5d820cf9a1d0caef959b7a2bf18ab26b8b129d1b6e9faf0a700322451" && git diff --exit-code -- . ":(exclude)Cargo.lock"'`,
     );
     const bench =
       "cargo bench --offline --locked -p halo2_proofs --bench msm -- 'msm/k/12$' --warm-up-time 1 --measurement-time 2 --sample-size 10 --noplot";
     const measurement = async () => {
       const file = await vm.readFileToBuffer({
-        path: "/vercel/sandbox/halo2/target/criterion/msm/k/12/new/estimates.json",
+        path: "/vercel/sandbox/halo2/halo2_proofs/target/criterion/msm/k/12/new/estimates.json",
       });
       const value = file
         ? JSON.parse(file.toString()).mean.point_estimate
@@ -220,7 +220,10 @@ export async function researchTick() {
     if (!lab.enabled) return;
     const today = new Date().toISOString().slice(0, 10);
     for (const agent of s.agents.filter(
-      (a) => a.platform && a.autoRun && a.status !== "paused",
+      (a) =>
+        a.autoRun &&
+        a.status !== "paused" &&
+        (a.platform || (!a.preview && a.budget >= 300)),
     )) {
       if (
         lab.jobs.some(

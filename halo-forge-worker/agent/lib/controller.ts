@@ -17,7 +17,10 @@ export async function controller(sessionId: string, operation: string, input: un
       "Idempotency-Key": createHash("sha256").update(body).digest("hex") },
     body,
   });
-  if (!response.ok) throw new Error(`Controller rejected ${operation} (${response.status}).`);
+  if (!response.ok) {
+    const detail=await response.json().catch(()=>null) as {error?:unknown}|null;
+    throw new Error(`Controller rejected ${operation} (${response.status}): ${typeof detail?.error==="string"?detail.error.slice(0,500):"Operation was not accepted."}`);
+  }
   const text = await response.text();
   if (text.length > 128_000) throw new Error("Controller response exceeds tool output limit.");
   return JSON.parse(text) as unknown;

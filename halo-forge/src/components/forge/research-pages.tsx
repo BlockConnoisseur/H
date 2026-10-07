@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CoinImagePicker } from "./coin-image-picker";
+import { PumpLaunch } from "./pump-launch";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -119,7 +120,7 @@ export function Overview({ data }: PageProps) {
         <div>
           <span>Verified discoveries</span>
           <strong>{stages[3].count.toString().padStart(2, "0")}</strong>
-          <p>Evidence must pass independent review</p>
+          <p>Evidence awaits the operator’s manual review</p>
         </div>
         <div>
           <span>Funded reward pool</span>
@@ -242,7 +243,8 @@ export function Overview({ data }: PageProps) {
               Planned rewards: ZEC for verified discoveries.
               <br />
               <strong>
-                Operator-reviewed rewards. Manual payment to the original deployer.
+                Operator-reviewed rewards. Manual payment to the original
+                deployer.
               </strong>
             </p>
             <TextLink href="/rewards">See how payouts work</TextLink>
@@ -458,7 +460,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
             </span>
             <ChevronRight size={16} />
             <span className={step === 1 ? "current" : ""}>
-              2 <span>Review & register</span>
+              2 <span>Review & launch</span>
             </span>
           </div>
           {step === 0 ? (
@@ -551,28 +553,39 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   </strong>
                   <p>
                     {proposed
-                      ? `Proposed focus: ${proposed.actions}-Action proofs, ${proposed.threads} threads. The server reserves an unoccupied method and workload combination when you register. Final judging still covers every workload.`
+                      ? `Proposed focus: ${proposed.actions}-Action proofs, ${proposed.threads} threads. Your method and workload are reserved before signing. Current automated evaluation covers library tests and MSM timing; complete proof timing remains future work.`
                       : "Choose another assignment or wait for more approved research capacity."}
                   </p>
                 </div>
               </div>
               <h2>Keep compute bounded</h2>
-              <Field
-                id="daily-cap"
-                label="Daily compute limit (USD)"
-                hint="Each session reserves up to $20. The agent stops when its funded allowance runs out."
-              >
-                <Input
-                  id="daily-cap"
-                  type="number"
-                  min={20}
-                  max={200}
-                  step={1}
-                  value={cap}
-                  onChange={(e) => setCap(e.target.value)}
-                  required
-                />
-              </Field>
+              {data.actor?.preview ? (
+                <>
+                  <Field
+                    id="daily-cap"
+                    label="Daily compute limit (USD)"
+                    hint="Each session reserves up to $20. The agent stops when its funded allowance runs out."
+                  >
+                    <Input
+                      id="daily-cap"
+                      type="number"
+                      min={20}
+                      max={200}
+                      step={1}
+                      value={cap}
+                      onChange={(e) => setCap(e.target.value)}
+                      required
+                    />
+                  </Field>
+                </>
+              ) : (
+                <p>
+                  Each launch includes one experiment with a maximum $3
+                  allocation. The shared research budget has a $15 daily
+                  ceiling. Further experiments require additional funded compute
+                  allowance.
+                </p>
+              )}
             </>
           ) : (
             <>
@@ -611,11 +624,19 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 </div>
                 <div>
                   <dt>Daily limit</dt>
-                  <dd>{money(Number(cap) * 100)}</dd>
+                  <dd>
+                    {data.actor?.preview
+                      ? money(Number(cap) * 100)
+                      : "$3 per agent · $15 shared ceiling"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Initial credit</dt>
-                  <dd>$0.00 · add preview credit after setup</dd>
+                  <dd>
+                    {data.actor?.preview
+                      ? "$0.00 · add preview credit after setup"
+                      : "One experiment after launch verification"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Reward recipient</dt>
@@ -636,11 +657,23 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   </p>
                 </div>
               </div>
-              <PreviewNote>
-                This registers a local research agent. It does not deploy a Pump
-                token or take a launch payment. Live launch requires the
-                verified fee route and chain integration.
-              </PreviewNote>
+              {data.actor?.preview ? (
+                <PreviewNote>
+                  This registers a local research agent. It does not deploy a
+                  Pump token or take a launch payment. Live launch requires the
+                  verified fee route and chain integration.
+                </PreviewNote>
+              ) : data.actor ? (
+                <PumpLaunch
+                  actor={data.actor}
+                  input={{ name, symbol, image, description, track }}
+                />
+              ) : (
+                <p>
+                  Connect your deployer wallet to prepare and review the launch
+                  transactions.
+                </p>
+              )}
             </>
           )}
           {problem && (
@@ -654,24 +687,32 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 Back to setup
               </Button>
             )}
-            <Submit busy={busy || imageBusy} disabled={!proposed || imageBusy}>
-              {step === 0 ? (
-                <>
-                  Review setup
-                  <ArrowRight size={16} />
-                </>
-              ) : data.actor ? (
-                "Register preview agent"
-              ) : (
-                "Connect deployer wallet"
-              )}
-            </Submit>
+            {(step === 0 || !data.actor || data.actor.preview) && (
+              <Submit
+                busy={busy || imageBusy}
+                disabled={!proposed || imageBusy}
+              >
+                {step === 0 ? (
+                  <>
+                    Review setup
+                    <ArrowRight size={16} />
+                  </>
+                ) : data.actor ? (
+                  "Register preview agent"
+                ) : (
+                  "Connect deployer wallet"
+                )}
+              </Submit>
+            )}
           </div>
         </form>
         <aside className="launch-aside">
           <Panel title="A focused research worker">
             <div className="aside-content">
-              <p>Funded agents investigate pinned Halo2 source. Follow their recorded work in the live lab.</p>
+              <p>
+                Funded agents investigate pinned Halo2 source. Follow their
+                recorded work in the live lab.
+              </p>
               <ul className="check-list">
                 <li>
                   <Check size={15} />
@@ -679,7 +720,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 </li>
                 <li>
                   <Check size={15} />
-                  Up to 40 model calls per session
+                  Up to 12 model calls per experiment
                 </li>
                 <li>
                   <Check size={15} />
@@ -687,26 +728,26 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 </li>
                 <li>
                   <Check size={15} />
-                  One final submission per epoch
+                  Recorded patches, tests and timings
                 </li>
               </ul>
               <div className="aside-rule" />
               <h3>Built around ZEC</h3>
               <p>
-                Once live, agent token fees will support compute. Approved ZEC
-                  rewards are reviewed and paid manually to the original deployer.
+                Agent token creator fees are allocated to compute. Approved ZEC
+                rewards are reviewed and paid manually to the original deployer.
               </p>
               <div className="fee-row">
-                <span>Requested total trade fee</span>
+                <span>Current bonding-curve trade fee</span>
                 <strong>3%</strong>
               </div>
               <div className="fee-row">
-                <span>Requested shared compute share</span>
+                <span>Shared compute share</span>
                 <strong>1 point</strong>
               </div>
               <p className="field-hint">
-                Final route fees and the remaining allocation are still being
-                resolved. No fee is charged in this preview.
+                0.95% Pump protocol + 1% shared compute + 1.05% agent compute.
+                Launch charge: 0.3 SOL, plus network fees and account rent.
               </p>
             </div>
           </Panel>
@@ -761,7 +802,10 @@ export function AgentDetail({
       </div>
       <Heading title={a.name} description={a.description}>
         <Status value={a.status} />
-        {own && (
+        {!a.preview && (
+          <LinkButton href="/lab">Open live experiment log</LinkButton>
+        )}
+        {own && a.preview && (
           <Button
             className="h-10"
             disabled={busy || a.status !== "ready"}
@@ -780,8 +824,8 @@ export function AgentDetail({
       )}
       {a.platform && (
         <PreviewNote>
-          Built-in platform agent. Its method is assigned, but research has not
-            started. Follow its execution status and recorded evidence in the live lab.
+          Built-in platform agent with its own research method. Follow actual
+          source reads, candidate patches and test results in the live lab.
         </PreviewNote>
       )}
       <div className="agent-summary">
@@ -836,11 +880,11 @@ export function AgentDetail({
                 <div className="rule-grid">
                   <div>
                     <strong>3%</strong>
-                    <span>minimum full-prover gain</span>
+                    <span>future full-prover target</span>
                   </div>
                   <div>
-                    <strong>2 hosts</strong>
-                    <span>independent reproduction</span>
+                    <strong>Manual</strong>
+                    <span>operator review & payouts</span>
                   </div>
                   <div>
                     <strong>≤ 5%</strong>
@@ -889,7 +933,15 @@ export function AgentDetail({
             title="Session history"
             description="A durable record of reservations and worker activity."
           >
-            {runs.length ? (
+            {!a.preview ? (
+              <div className="aside-content">
+                <p>
+                  Live experiments, frozen patches and benchmark evidence are
+                  recorded in the lab.
+                </p>
+                <TextLink href="/lab">View recorded research activity</TextLink>
+              </div>
+            ) : runs.length ? (
               <div className="session-list">
                 {runs.map((r) => (
                   <div key={r.id} className="session">
@@ -946,7 +998,19 @@ export function AgentDetail({
           </Panel>
         </TabsContent>
         <TabsContent value="compute">
-          {own ? (
+          {!a.preview ? (
+            <Panel title="Live compute">
+              <div className="aside-content">
+                <p>
+                  Experiments reserve up to $3 and obey the shared $15 daily
+                  ceiling. Token launch includes one initial experiment. Creator
+                  fees remain denominated in ZEC until the operator funds
+                  additional compute allowance.
+                </p>
+                <TextLink href="/lab">Open live research controls</TextLink>
+              </div>
+            </Panel>
+          ) : own ? (
             <div className="detail-grid">
               <Panel title="Add preview credit">
                 <form
@@ -1044,7 +1108,18 @@ export function AgentDetail({
           )}
         </TabsContent>
         <TabsContent value="submit">
-          {own ? (
+          {!a.preview ? (
+            <Panel title="Recorded agent candidates">
+              <div className="aside-content">
+                <p>
+                  Your worker freezes its candidate patch and submits it to the
+                  isolated evaluator. The operator reviews the resulting
+                  evidence in the lab.
+                </p>
+                <TextLink href="/lab">Inspect agent candidates</TextLink>
+              </div>
+            </Panel>
+          ) : own ? (
             <form className="panel form-panel" onSubmit={submit}>
               <h2>Freeze a research artifact</h2>
               <p className="muted">
@@ -1119,16 +1194,20 @@ export function AgentDetail({
                   <dd className="break-all mono">{data.zecMint}</dd>
                 </div>
                 <div>
-                  <dt>Requested total fee</dt>
-                  <dd>3% · route verification pending</dd>
+                  <dt>Configured launch trade fee</dt>
+                  <dd>
+                    {a.tokenMint
+                      ? "3% at launch · Pump rates can change"
+                      : "No token deployed"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Shared compute</dt>
-                  <dd>Requested 1 percentage point</dd>
+                  <dd>1 percentage point</dd>
                 </div>
                 <div>
-                  <dt>Remaining allocation</dt>
-                  <dd>Not finalized</dd>
+                  <dt>Agent compute / protocol</dt>
+                  <dd>1.05% / 0.95%</dd>
                 </div>
               </dl>
             </Panel>

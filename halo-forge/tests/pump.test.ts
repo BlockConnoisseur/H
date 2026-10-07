@@ -1,0 +1,207 @@
+import { test, before, after } from "node:test";
+import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import {
+  Keypair,
+  Transaction,
+  SystemProgram,
+  PublicKey,
+} from "@solana/web3.js";
+import { feeSharingConfigPda } from "@pump-fun/pump-sdk";
+import BN from "bn.js";
+import { NextRequest } from "next/server";
+import { hash, ZEC_MINT } from "../src/lib/domain";
+import {
+  splitCreatorReceipt,
+  COMPUTE_WALLET,
+  LAUNCH_LAMPORTS,
+} from "../src/lib/pump-policy";
+const dir = mkdtempSync(join(tmpdir(), "halo-pump-test-"));
+process.env.HALO_DATABASE_DRIVER = "sqlite";
+process.env.HALO_DATABASE_PATH = join(dir, "test.sqlite");
+process.env.HALO_EMPTY_STATE = "true";
+process.env.HALO_APP_ORIGIN = "http://localhost:3210";
+let pump: typeof import("../src/lib/pump-launch"),
+  fees: typeof import("../src/lib/pump-fees"),
+  route: typeof import("../src/app/api/pump/[...path]/route"),
+  store: typeof import("../src/lib/store");
+before(async () => {
+  pump = await import("../src/lib/pump-launch");
+  fees = await import("../src/lib/pump-fees");
+  route = await import("../src/app/api/pump/[...path]/route");
+  store = await import("../src/lib/store");
+});
+after(async () => {
+  await store.closeStore();
+  rmSync(dir, { recursive: true, force: true });
+});
+test("creator receipt splitting conserves all ZEC base units, including rounding and large values", () => {
+  for (const raw of [
+    "0",
+    "1",
+    "204",
+    "205",
+    "100000000",
+    "9999999999999999999999999",
+  ]) {
+    const p = splitCreatorReceipt(raw);
+    assert.equal(BigInt(p.sharedRaw) + BigInt(p.agentRaw), BigInt(raw));
+    assert.equal(BigInt(p.sharedRaw), (BigInt(raw) * 100n) / 205n);
+  }
+  assert.throws(() => splitCreatorReceipt("-1"));
+  assert.throws(() => splitCreatorReceipt("0.1"));
+});
+test("launch signature binding rejects changed fee recipient, amount, payer and partial signatures", () => {
+  const owner = Keypair.generate(),
+    other = Keypair.generate();
+  const build = (
+    to = new PublicKey(COMPUTE_WALLET),
+    amount = LAUNCH_LAMPORTS,
+  ) =>
+    new Transaction({
+      feePayer: owner.publicKey,
+      recentBlockhash: Keypair.generate().publicKey.toBase58(),
+    }).add(
+      SystemProgram.transfer({
+        fromPubkey: owner.publicKey,
+        toPubkey: to,
+        lamports: amount,
+      }),
+    );
+  const tx = build();
+  const expected = {
+    wire: "",
+    messageHash: hash(tx.serializeMessage().toString("base64")),
+    blockhash: tx.recentBlockhash!,
+    lastValidBlockHeight: 1,
+  };
+  assert.throws(
+    () =>
+      pump.validateSignedLaunch(
+        expected,
+        tx.serialize({ requireAllSignatures: false }).toString("base64"),
+        owner.publicKey.toBase58(),
+      ),
+    /missing a signature/,
+  );
+  tx.sign(owner);
+  assert.ok(
+    pump.validateSignedLaunch(
+      expected,
+      tx.serialize().toString("base64"),
+      owner.publicKey.toBase58(),
+    ).signature,
+  );
+  assert.throws(
+    () =>
+      pump.validateSignedLaunch(
+        expected,
+        tx.serialize().toString("base64"),
+        other.publicKey.toBase58(),
+      ),
+    /differs/,
+  );
+  for (const modified of [build(other.publicKey), build(undefined, 1)]) {
+    modified.sign(owner);
+    assert.throws(
+      () =>
+        pump.validateSignedLaunch(
+          expected,
+          modified.serialize().toString("base64"),
+          owner.publicKey.toBase58(),
+        ),
+      /differs/,
+    );
+  }
+});
+test("fee accounting accepts only the agent mint, ZEC, its sharing PDA and the fixed compute recipient", () => {
+  const mint = Keypair.generate().publicKey;
+  const event = {
+    timestamp: new BN(1),
+    mint,
+    sharingConfig: feeSharingConfigPda(mint),
+    admin: Keypair.generate().publicKey,
+    quoteMint: new PublicKey(ZEC_MINT),
+    distributed: new BN(205),
+    shareholders: [{ address: new PublicKey(COMPUTE_WALLET), shareBps: 10000 }],
+  };
+  assert.deepEqual(fees.distributionReceipt(event, mint.toBase58()), {
+    receivedRaw: "205",
+    sharedRaw: "100",
+    agentRaw: "105",
+  });
+  assert.equal(
+    fees.distributionReceipt(
+      { ...event, quoteMint: Keypair.generate().publicKey },
+      mint.toBase58(),
+    ),
+    null,
+  );
+  assert.equal(
+    fees.distributionReceipt(
+      {
+        ...event,
+        shareholders: [
+          { address: Keypair.generate().publicKey, shareBps: 10000 },
+        ],
+      },
+      mint.toBase58(),
+    ),
+    null,
+  );
+  assert.equal(
+    fees.distributionReceipt(event, Keypair.generate().publicKey.toBase58()),
+    null,
+  );
+});
+test("live launch API rejects cross-origin and unsigned callers before accessing RPC", async () => {
+  for (const [origin, status] of [
+    ["https://evil.example", 403],
+    ["http://localhost:3210", 401],
+  ] as const) {
+    const response = await route.POST(
+      new NextRequest("http://localhost:3210/api/pump/actions", {
+        method: "POST",
+        headers: { origin, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "prepare", input: {} }),
+      }),
+    );
+    assert.equal(response.status, status);
+  }
+  const state = await store.readState();
+  assert.equal(state.pumpLaunches?.length ?? 0, 0);
+  assert.equal(state.feeReceipts?.length ?? 0, 0);
+});
+test("public metadata does not expose signed transactions, deployer secrets or private research state", async () => {
+  const { assignmentFor } = await import("../src/lib/research");
+  await store.transact((s) => {
+    s.pumpLaunches = [
+      {
+        id: "test-id",
+        deployer: COMPUTE_WALLET,
+        mint: Keypair.generate().publicKey.toBase58(),
+        name: "Test Coin",
+        symbol: "TEST",
+        description: "A test of source metadata.",
+        image: null,
+        assignment: assignmentFor("S1-window", 2, 4),
+        createdAt: new Date().toISOString(),
+        create: {
+          wire: "PRIVATE",
+          messageHash: "PRIVATE",
+          blockhash: "PRIVATE",
+          lastValidBlockHeight: 1,
+        },
+      },
+    ];
+  });
+  const response = await route.GET(
+    new NextRequest("http://localhost:3210/api/pump/metadata/test-id"),
+  );
+  const metadata = await response.json();
+  assert.equal(metadata.name, "Test Coin");
+  assert.equal(JSON.stringify(metadata).includes("PRIVATE"), false);
+  assert.equal("create" in metadata, false);
+});
