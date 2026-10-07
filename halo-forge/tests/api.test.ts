@@ -5,6 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { NextRequest } from "next/server";
 import sharp from "sharp";
+import nacl from "tweetnacl";
+import bs58 from "bs58";
 const dir = mkdtempSync(join(tmpdir(), "halo-api-test-"));
 process.env.HALO_DATABASE_DRIVER = "sqlite";
 process.env.HALO_DATABASE_PATH = join(dir, "test.sqlite");
@@ -182,6 +184,51 @@ test("preview identity endpoint is disabled without explicit local configuration
   process.env.HALO_LOCAL_PREVIEW = "false";
   assert.equal((await route.POST(req("auth/preview", {}))).status, 403);
   process.env.HALO_LOCAL_PREVIEW = "true";
+});
+
+test("signed wallet authentication cannot turn unimplemented live launch or compute into preview success", async () => {
+  const pair = nacl.sign.keyPair();
+  const wallet = bs58.encode(pair.publicKey);
+  const challengeResponse = await route.POST(req("auth/challenge", { wallet }));
+  assert.equal(challengeResponse.status, 200);
+  const { id, message } = await challengeResponse.json();
+  const signature = bs58.encode(
+    nacl.sign.detached(new TextEncoder().encode(message), pair.secretKey),
+  );
+  const verified = await route.POST(req("auth/verify", { id, signature }));
+  assert.equal(verified.status, 200);
+  const cookie = verified.headers.get("set-cookie")!.split(";")[0];
+  try {
+    const state = await (
+      await route.GET(new NextRequest("http://127.0.0.1:3210/api/state", {
+        headers: { cookie },
+      }))
+    ).json();
+    assert.equal(state.actor.wallet, wallet);
+    assert.equal(state.actor.preview, false);
+    assert.equal(state.liveReady, false);
+    const beforeState = await database.readState();
+    for (const [action, input] of [
+      ["launch", {
+        name: "Live Boundary Scout", symbol: "LIVE", track: "auto",
+        description: "Verify real wallet launches cannot silently create preview tokens.",
+        dailyCap: 2000,
+      }],
+      ["topup", { agentId: "unfunded-agent", cents: 2000 }],
+      ["queue", { agentId: "unfunded-agent" }],
+    ] as const) {
+      const response = await route.POST(req("actions", {
+        action, input, key: `live-boundary-${action}`,
+      }, cookie));
+      assert.equal(response.status, 503);
+      assert.match((await response.json()).error, /Live launch and spending are not enabled/);
+    }
+    assert.deepEqual(await database.readState(), beforeState);
+    const replay = await route.POST(req("auth/verify", { id, signature }));
+    assert.equal(replay.status, 401);
+  } finally {
+    await route.POST(req("auth/logout", {}, cookie));
+  }
 });
 test("CSV export requires identity and contains only the owner's ledger", async () => {
   const url = "http://127.0.0.1:3210/api/ledger.csv";
