@@ -12,6 +12,7 @@
     "dev": "eve dev",
     "eval": "eve eval",
     "start": "eve start",
+    "gateway:stream": "node --env-file-if-exists=.env.local scripts/stream-gateway.ts",
     "typecheck": "tsc"
   },
   "dependencies": {

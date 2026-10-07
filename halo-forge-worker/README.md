@@ -14,4 +14,10 @@ Read [WORKER-CONTRACT.md](WORKER-CONTRACT.md) before configuring credentials. Th
 
 Five tools: `read_assignment`, `read_source`, `propose_patch`, `request_evaluation`, `read_evaluation`. Every request carries the runtime session ID and a deterministic operation key to a fixed HTTPS controller endpoint. Models cannot select a recipient, controller URL or service credential.
 
+## AI Gateway streaming check
+
+Set `AI_GATEWAY_API_KEY` in your environment or the ignored `.env.local`, then run `npm run gateway:stream` with Node 24. This reuses the installed AI SDK, streams a short response from `openai/gpt-6-astra`, and prints token usage and the generation ID. It makes one paid request with a 1,024-output-token limit, a 60-second timeout and no SDK retries. It never prints raw errors, request headers or credentials. A missing key or failed/incomplete stream exits nonzero.
+
+This standalone connection check does not start research sessions, call controller tools, launch tokens or enable payouts. The existing research worker model is unchanged.
+
 An Undici override to 7.29.1 removes the reported high-severity transitive advisories. Four moderate dependency findings remain through the local just-bash/sprintf-js chain (no patched sprintf-js release reported at build time). Keep this worker private and inactive until dependency and integration review is complete. This is not a cryptographic or deployment security audit.
