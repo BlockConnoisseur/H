@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Table,
@@ -392,10 +393,14 @@ export function Launch({ data, action, busy, connect }: PageProps) {
   const [symbol, setSymbol] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [imageBusy, setImageBusy] = useState(false);
-  const [description, setDescription] = useState("");
+  const [customDescription, setDescription] = useState("");
+  const [basicApproach, setBasicApproach] = useState(false);
   const [track, setTrack] = useState("auto");
   const proposed = allocateAssignment(data.agents, track);
   const proposedMethod = methods.find((m) => m.id === proposed?.methodId);
+  const description = basicApproach
+    ? "Start with the assigned research method. Read the pinned code, try one small improvement, and compare correctness tests and timing against the original. Record failures and tradeoffs for manual review."
+    : customDescription;
   const [cap, setCap] = useState("20");
   const [problem, setProblem] = useState("");
   const valid = () => {
@@ -495,21 +500,58 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   />
                 </Field>
               </div>
-              <Field
-                id="agent-description"
-                label="Research approach"
-                hint="A specific hypothesis helps your agent start with useful work."
-              >
-                <Textarea
-                  id="agent-description"
-                  value={description}
-                  maxLength={500}
-                  minLength={15}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Investigate repeated scalar conversions in MSM bucket passes…"
-                  required
+              <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-4">
+                <div>
+                  <label
+                    htmlFor="basic-approach"
+                    className="font-medium cursor-pointer"
+                  >
+                    Basic approach
+                  </label>
+                  <p id="basic-approach-hint" className="field-hint">
+                    Use a ready-made research brief. No technical write-up
+                    needed.
+                  </p>
+                </div>
+                <Switch
+                  id="basic-approach"
+                  checked={basicApproach}
+                  onCheckedChange={(checked) => {
+                    setBasicApproach(checked);
+                    setProblem("");
+                  }}
+                  aria-describedby="basic-approach-hint"
                 />
-              </Field>
+              </div>
+              {basicApproach ? (
+                <div className="disclosure" role="status">
+                  <GitBranch size={19} />
+                  <div>
+                    <strong>Start small. Test the result.</strong>
+                    <p>{description}</p>
+                    <p>
+                      Choose an assignment below, or let us balance research
+                      coverage.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <Field
+                  id="agent-description"
+                  label="Research approach"
+                  hint="A specific hypothesis helps your agent start with useful work."
+                >
+                  <Textarea
+                    id="agent-description"
+                    value={description}
+                    maxLength={500}
+                    minLength={15}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Investigate repeated scalar conversions in MSM bucket passes…"
+                    required
+                  />
+                </Field>
+              )}
               <h2>Choose an assignment</h2>
               <div
                 className="track-options"
@@ -599,6 +641,14 @@ export function Launch({ data, action, busy, connect }: PageProps) {
               </div>
               <dl className="detail-list">
                 <div>
+                  <dt>Research approach</dt>
+                  <dd>
+                    {basicApproach
+                      ? "Basic · guided experiment"
+                      : "Custom brief"}
+                  </dd>
+                </div>
+                <div>
                   <dt>Assignment</dt>
                   <dd>
                     {track === "auto"
@@ -647,6 +697,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   </dd>
                 </div>
               </dl>
+              <p className="field-hint">{description}</p>
               <div className="disclosure">
                 <LockKeyhole size={19} />
                 <div>
