@@ -87,7 +87,8 @@ function drafts(s: State) {
 function owned(s: State, actor: Actor, id: string) {
   requireActor(actor);
   const d = drafts(s).find((d) => d.id === id && d.deployer === actor.wallet);
-  if (!d || d.abandoned) throw new DomainError("Launch not found.", 404);
+  if (!d)
+    throw new DomainError("Launch not found for this connected wallet.", 404);
   return d;
 }
 function view(d: PumpDraft) {
@@ -100,6 +101,9 @@ function view(d: PumpDraft) {
     quoteMint: ZEC_MINT,
     protocolBps: PROTOCOL_BPS,
     creatorBps: CREATOR_BPS,
+    notice: d.abandoned
+      ? "This creation transaction expired without landing. Your setup is saved. Refresh expired creation to get a new transaction and mint address."
+      : undefined,
   };
 }
 export async function pumpConfiguration(c = pumpConnection()) {
@@ -138,7 +142,7 @@ async function pack(
   ix: TransactionInstruction[],
   mint?: Keypair,
 ): Promise<LaunchTx> {
-  const block = await c.getLatestBlockhash("finalized");
+  const block = await c.getLatestBlockhash("confirmed");
   const tx = new Transaction({ ...block, feePayer: payer }).add(
     ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
     ...ix,
@@ -193,7 +197,7 @@ export function validateSignedLaunch(
 export async function latestPumpLaunch(actor: Actor) {
   requireActor(actor);
   const d = drafts(await readState()).findLast(
-    (d) => d.deployer === actor.wallet && !d.abandoned,
+    (d) => d.deployer === actor.wallet,
   );
   return d ? view(d) : null;
 }
@@ -319,11 +323,32 @@ async function finalized(c: Connection, tx: LaunchTx) {
   if (status?.err) return false;
   return status?.confirmationStatus === "finalized";
 }
-export async function refreshPumpLaunch(actor: Actor, id: string) {
-  const d = owned(await readState(), actor, id),
-    c = pumpConnection();
+export async function refreshPumpLaunch(
+  actor: Actor,
+  id: string,
+  connection?: Connection,
+) {
+  const d = owned(await readState(), actor, id);
+  if (d.abandoned) return view(d);
+  const c = connection ?? pumpConnection();
   const createOk = await finalized(c, d.create);
-  if (!createOk) return view(d);
+  if (!createOk) {
+    if (
+      (await c.getBlockHeight("finalized")) > d.create.lastValidBlockHeight &&
+      !(await c.getAccountInfo(new PublicKey(d.mint), "finalized"))
+    ) {
+      return transact((s) => {
+        const current = owned(s, actor, id);
+        if (
+          !current.create.finalized &&
+          current.create.messageHash === d.create.messageHash
+        )
+          current.abandoned = true;
+        return view(current);
+      });
+    }
+    return view(d);
+  }
   const mint = new PublicKey(d.mint),
     curveInfo = await c.getAccountInfo(bondingCurvePda(mint), "finalized");
   if (!curveInfo?.owner.equals(PUMP_PROGRAM_ID))
@@ -461,6 +486,30 @@ export async function preparePumpRoute(actor: Actor, id: string) {
     return view(current);
   });
 }
+export async function checkPumpSigning(
+  actor: Actor,
+  id: string,
+  stage: "create" | "route",
+) {
+  const d = await refreshPumpLaunch(actor, id);
+  if (d.abandoned) throw new DomainError(d.notice!, 409);
+  const tx = d[stage];
+  if (!tx) throw new DomainError("Prepare this launch step first.", 409);
+  if (tx.finalized)
+    throw new DomainError(
+      "This step already finalized. Refresh confirmation to continue.",
+      409,
+    );
+  if (
+    (await pumpConnection().getBlockHeight("confirmed")) >=
+    tx.lastValidBlockHeight - 10
+  )
+    throw new DomainError(
+      "This transaction is expiring. Refresh the launch step before signing; no payment was submitted.",
+      409,
+    );
+  return d;
+}
 export async function submitPumpLaunch(
   actor: Actor,
   id: string,
@@ -469,6 +518,7 @@ export async function submitPumpLaunch(
 ) {
   const d = owned(await readState(), actor, id),
     expected = d[stage];
+  if (d.abandoned) return view(d);
   if (!expected) throw new DomainError("Prepare this launch step first.", 409);
   if (expected.finalized) return view(d);
   const validated = validateSignedLaunch(expected, signed, actor.wallet),
@@ -487,9 +537,19 @@ export async function submitPumpLaunch(
       throw new DomainError("Another signature was already submitted.", 409);
     current.signature = validated.signature;
   });
+  if ((await c.getBlockHeight("finalized")) > expected.lastValidBlockHeight) {
+    const current = await refreshPumpLaunch(actor, id);
+    return {
+      ...current,
+      notice:
+        current.notice ||
+        "This transaction has expired. Refresh this launch step before signing again.",
+    };
+  }
   try {
     await c.sendRawTransaction(validated.raw, {
       skipPreflight: false,
+      preflightCommitment: "confirmed",
       maxRetries: 2,
     });
   } catch {

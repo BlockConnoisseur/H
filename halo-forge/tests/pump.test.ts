@@ -1,4 +1,4 @@
-import { test, before, after } from "node:test";
+import { test, before, after, mock } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -8,6 +8,7 @@ import {
   Transaction,
   SystemProgram,
   PublicKey,
+  Connection,
 } from "@solana/web3.js";
 import { feeSharingConfigPda } from "@pump-fun/pump-sdk";
 import BN from "bn.js";
@@ -232,4 +233,86 @@ test("public metadata does not expose signed transactions, deployer secrets or p
   assert.equal(metadata.name, "Test Coin");
   assert.equal(JSON.stringify(metadata).includes("PRIVATE"), false);
   assert.equal("create" in metadata, false);
+});
+test("expired launch stays visible to its owner and can be inspected without another broadcast", async () => {
+  const { assignmentFor } = await import("../src/lib/research");
+  const actor = {
+    wallet: Keypair.generate().publicKey.toBase58(),
+    preview: false,
+    reviewer: false,
+  };
+  const id = "expired-launch";
+  const priorRpc = process.env.SOLANA_MAINNET_RPC_URL;
+  process.env.SOLANA_MAINNET_RPC_URL = "https://rpc.invalid";
+  try {
+    await store.transact((s) => {
+      s.pumpLaunches = [
+        {
+          id,
+          deployer: actor.wallet,
+          mint: Keypair.generate().publicKey.toBase58(),
+          name: "Preserved Test",
+          symbol: "TEST",
+          description: "Keep the original launch setup.",
+          image: null,
+          assignment: assignmentFor("S1-window"),
+          createdAt: new Date().toISOString(),
+          create: {
+            wire: "PRIVATE",
+            messageHash: "hash",
+            blockhash: "expired",
+            lastValidBlockHeight: 100,
+            signature: "unlanded",
+          },
+        },
+      ];
+    });
+    let mintExists = false;
+    const broadcast = mock.fn(async () => {
+      throw new Error("Must not broadcast an expired draft");
+    });
+    const c = {
+      getSignatureStatuses: async () => ({
+        context: { slot: 200 },
+        value: [null],
+      }),
+      getBlockHeight: async () => 200,
+      getAccountInfo: async () =>
+        mintExists
+          ? {
+              data: Buffer.alloc(0),
+              executable: false,
+              lamports: 1,
+              owner: new PublicKey(COMPUTE_WALLET),
+              rentEpoch: 1,
+            }
+          : null,
+      sendRawTransaction: broadcast,
+    } as unknown as Connection;
+    const refreshed = await pump.refreshPumpLaunch(actor, id, c);
+    assert.equal(refreshed.abandoned, true);
+    assert.match(refreshed.notice!, /expired without landing/);
+    assert.equal((await pump.latestPumpLaunch(actor))?.name, "Preserved Test");
+    assert.equal((await pump.refreshPumpLaunch(actor, id)).id, id);
+    assert.equal(
+      (await pump.submitPumpLaunch(actor, id, "create", "unused")).abandoned,
+      true,
+    );
+    await assert.rejects(pump.checkPumpSigning(actor, id, "create"), /expired/);
+    await assert.rejects(
+      pump.refreshPumpLaunch({ ...actor, wallet: COMPUTE_WALLET }, id),
+      /not found for this connected wallet/,
+    );
+    assert.equal(broadcast.mock.callCount(), 0);
+    // A minted token must never be discarded just because its signature lookup is temporarily missing.
+    await store.transact((s) => {
+      s.pumpLaunches![0].abandoned = false;
+    });
+    mintExists = true;
+    assert.equal((await pump.refreshPumpLaunch(actor, id, c)).abandoned, false);
+  } finally {
+    mock.restoreAll();
+    if (priorRpc === undefined) delete process.env.SOLANA_MAINNET_RPC_URL;
+    else process.env.SOLANA_MAINNET_RPC_URL = priorRpc;
+  }
 });

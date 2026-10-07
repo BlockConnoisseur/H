@@ -403,6 +403,32 @@ export function Launch({ data, action, busy, connect }: PageProps) {
     : customDescription;
   const [cap, setCap] = useState("20");
   const [problem, setProblem] = useState("");
+  const [restoring, setRestoring] = useState(false);
+  async function resumeLaunch() {
+    setRestoring(true);
+    setProblem("");
+    try {
+      const response = await fetch("/api/pump/current", { cache: "no-store" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+      const saved = result.launch;
+      if (!saved || saved.agentId)
+        throw new Error("There is no unfinished launch for this wallet.");
+      setName(saved.name);
+      setSymbol(saved.symbol);
+      setImage(saved.image);
+      setDescription(saved.description);
+      setBasicApproach(false);
+      setTrack(saved.assignment.track);
+      setStep(1);
+    } catch (e) {
+      setProblem(
+        e instanceof Error ? e.message : "Could not load your saved launch.",
+      );
+    } finally {
+      setRestoring(false);
+    }
+  }
   const valid = () => {
     if (name.trim().length < 3 || name.trim().length > 32) {
       setProblem("Choose an agent name between 3 and 32 characters.");
@@ -470,6 +496,17 @@ export function Launch({ data, action, busy, connect }: PageProps) {
           </div>
           {step === 0 ? (
             <>
+              {data.actor && !data.actor.preview && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-6"
+                  disabled={restoring}
+                  onClick={resumeLaunch}
+                >
+                  {restoring ? "Loading saved launch…" : "Resume saved launch"}
+                </Button>
+              )}
               <h2>Agent identity</h2>
               <CoinImagePicker
                 value={image}

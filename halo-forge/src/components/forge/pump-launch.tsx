@@ -43,6 +43,47 @@ export function PumpLaunch({ actor, input }: Props) {
       live = false;
     };
   }, [actor.wallet]);
+  const pending =
+    launch &&
+    !launch.abandoned &&
+    ((!launch.create.finalized && launch.create.signature) ||
+      (launch.route?.signature && !launch.route.finalized));
+  const launchId = launch?.id;
+  useEffect(() => {
+    if (!pending || !launchId) return;
+    let live = true;
+    let timer: ReturnType<typeof setTimeout>;
+    const id = launchId;
+    async function poll() {
+      try {
+        const r = await fetch("/api/pump/actions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "refresh", id }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        if (live) {
+          setLaunch(d.launch);
+          setError(d.launch.notice || "");
+        }
+      } catch (e) {
+        if (live)
+          setError(
+            e instanceof Error
+              ? e.message
+              : "Confirmation check failed. Refresh to retry.",
+          );
+        return;
+      }
+      if (live) timer = setTimeout(poll, 6000);
+    }
+    timer = setTimeout(poll, 6000);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [pending, launchId]);
   async function action(body: Record<string, unknown>) {
     setBusy(true);
     setError("");
@@ -130,15 +171,15 @@ export function PumpLaunch({ actor, input }: Props) {
           </div>
           <ol>
             <li>
-              {launch.create.finalized ? "✓" : "1."} Create the ZEC-paired token
-              · network fees and rent
+              {launch.create.finalized ? "✓ " : ""}Create the ZEC-paired token ·
+              network fees and rent
             </li>
             <li>
-              {launch.route?.finalized ? "✓" : "2."} Lock compute fee routing
-              and pay 0.3 SOL
+              {launch.route?.finalized ? "✓ " : ""}Lock compute fee routing and
+              pay 0.3 SOL
             </li>
             <li>
-              {launch.agentId ? "✓" : "3."} Verify the chain record and schedule
+              {launch.agentId ? "✓ " : ""}Verify the chain record and schedule
               the initial experiment
             </li>
           </ol>
@@ -159,7 +200,20 @@ export function PumpLaunch({ actor, input }: Props) {
             </>
           ) : (
             <>
-              {tx && !busy && (
+              {launch.abandoned && (
+                <p role="status">
+                  This transaction expired without creating a token. Your setup
+                  is saved. Refresh expired creation below; the new transaction
+                  will have a new mint address.
+                </p>
+              )}
+              {launch.create.finalized && !launch.route?.finalized && (
+                <p role="status">
+                  Token creation is confirmed. Next, prepare fee setup and
+                  approve the separate 0.3 SOL payment in your wallet.
+                </p>
+              )}
+              {tx && !busy && !launch.abandoned && !pending && (
                 <WalletConnection
                   actor={actor}
                   previewAvailable={false}
@@ -170,6 +224,24 @@ export function PumpLaunch({ actor, input }: Props) {
                       stage === "create"
                         ? "Sign token creation"
                         : "Sign fee setup · 0.3 SOL",
+                    beforeSign: async () => {
+                      const r = await fetch("/api/pump/actions", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          action: "check_signing",
+                          id: launch.id,
+                          stage,
+                        }),
+                      });
+                      const d = await r.json();
+                      if (!r.ok) {
+                        setError(d.error);
+                        throw new Error(d.error);
+                      }
+                      setLaunch(d.launch);
+                      return d.launch[stage].wire;
+                    },
                     onSigned: async (signed) => {
                       await action({
                         action: "submit",
@@ -185,33 +257,44 @@ export function PumpLaunch({ actor, input }: Props) {
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={busy}
+                  disabled={busy || launch.abandoned}
                   onClick={() => action({ action: "refresh", id: launch.id })}
                 >
                   {busy ? "Checking…" : "Refresh confirmation"}
                 </Button>
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant={
+                    stage === "route" || launch.abandoned ? "default" : "ghost"
+                  }
                   disabled={busy}
                   onClick={() =>
                     action(
                       stage === "route"
                         ? { action: "route", id: launch.id }
-                        : { action: "prepare", input },
+                        : {
+                            action: "prepare",
+                            input: {
+                              name: launch.name,
+                              symbol: launch.symbol,
+                              description: launch.description,
+                              image: launch.image,
+                              track: launch.assignment.track,
+                            },
+                          },
                     )
                   }
                 >
                   {stage === "route"
-                    ? "Prepare / refresh fee setup"
+                    ? "Prepare fee setup · 0.3 SOL"
                     : "Refresh expired creation"}
                 </Button>
               </div>
               <p className="field-hint">
-                After approving, refresh until finalized. If a request times
-                out, resume this launch; your recorded signature prevents
-                duplicate payment. An expired transaction must be refreshed
-                before signing again.
+                {pending ? "Checking confirmation automatically. " : ""}If a
+                request times out, resume this launch; your recorded signature
+                prevents duplicate payment. An expired transaction must be
+                refreshed before signing again.
               </p>
             </>
           )}

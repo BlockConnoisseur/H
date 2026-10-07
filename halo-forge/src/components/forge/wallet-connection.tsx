@@ -27,6 +27,7 @@ type Props = {
   transaction?: {
     wire: string;
     label: string;
+    beforeSign?: () => Promise<string>;
     onSigned: (signed: string) => Promise<void>;
   };
 };
@@ -104,8 +105,11 @@ function WalletChoices({
     if (transaction) {
       if (account.address !== actor?.wallet)
         throw new Error("Select the original deployer wallet before signing.");
+      const wire = transaction.beforeSign
+        ? await transaction.beforeSign()
+        : transaction.wire;
       const hex = Array.from(
-        Uint8Array.from(atob(transaction.wire), (c) => c.charCodeAt(0)),
+        Uint8Array.from(atob(wire), (c) => c.charCodeAt(0)),
         (b) => b.toString(16).padStart(2, "0"),
       ).join("");
       const signed = await kit!.signTransaction({
@@ -162,11 +166,12 @@ function WalletChoices({
     if (transaction) {
       if (publicKey.toString() !== actor?.wallet)
         throw new Error("Select the original deployer wallet before signing.");
+      const wire = transaction.beforeSign
+        ? await transaction.beforeSign()
+        : transaction.wire;
       const { Transaction } = await import("@solana/web3.js");
       const signed = await provider.signTransaction(
-        Transaction.from(
-          Uint8Array.from(atob(transaction.wire), (c) => c.charCodeAt(0)),
-        ),
+        Transaction.from(Uint8Array.from(atob(wire), (c) => c.charCodeAt(0))),
       );
       await transaction.onSigned(
         btoa(String.fromCharCode(...signed.serialize())),

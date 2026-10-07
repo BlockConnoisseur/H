@@ -5,6 +5,7 @@ import { DomainError, hash } from "@/lib/domain";
 import { readState } from "@/lib/store";
 import {
   latestPumpLaunch,
+  checkPumpSigning,
   preparePumpLaunch,
   preparePumpRoute,
   refreshPumpLaunch,
@@ -107,6 +108,13 @@ export async function POST(req: NextRequest) {
           .strict(),
         z
           .object({
+            action: z.literal("check_signing"),
+            id: z.string().uuid(),
+            stage: z.enum(["create", "route"]),
+          })
+          .strict(),
+        z
+          .object({
             action: z.literal("submit"),
             id: z.string().uuid(),
             stage: z.enum(["create", "route"]),
@@ -137,11 +145,13 @@ export async function POST(req: NextRequest) {
     const launch =
       p.action === "prepare"
         ? await preparePumpLaunch(actor, p.input)
-        : p.action === "route"
-          ? await preparePumpRoute(actor, p.id)
-          : p.action === "submit"
-            ? await submitPumpLaunch(actor, p.id, p.stage, p.signed)
-            : await refreshPumpLaunch(actor, p.id);
+        : p.action === "check_signing"
+          ? await checkPumpSigning(actor, p.id, p.stage)
+          : p.action === "route"
+            ? await preparePumpRoute(actor, p.id)
+            : p.action === "submit"
+              ? await submitPumpLaunch(actor, p.id, p.stage, p.signed)
+              : await refreshPumpLaunch(actor, p.id);
     if (launch.agentId) after(researchTick);
     return NextResponse.json(
       { launch },
