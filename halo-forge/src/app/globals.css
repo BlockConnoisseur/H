@@ -893,13 +893,16 @@ main {
   font-size: 0.6875rem;
   overflow-wrap: anywhere;
   min-width: 0;
-  flex: 0 1 auto;
-  max-width: calc(100% - 4.5rem);
+  flex: 1;
   user-select: all;
   color: var(--foreground);
 }
 .footer-copy-status {
   font-size: 0.6875rem;
+  flex-basis: 100%;
+}
+.footer-copy-status:empty {
+  display: none;
 }
 .inline-note {
   display: flex;
