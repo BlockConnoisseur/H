@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { launchRequest } from "../src/lib/launch-request";
+import { launchRequest, loadWorkspace } from "../src/lib/launch-request";
 test("temporary server failure retries exact signed payload, then returns saved launch", async () => {
   const requests: string[] = [];
   const fetcher = (async (_url, options) => {
@@ -33,4 +33,16 @@ test("wallet validation failures are not retried and temporary failures are boun
     );
     assert.equal(calls, status === 400 ? 1 : 3);
   }
+});
+
+test("workspace loading recovers from a temporary server failure", async () => {
+  let calls = 0;
+  const fetcher = (async () =>
+    ++calls === 1
+      ? new Response("unavailable", { status: 500 })
+      : Response.json({ agents: [] })) as typeof fetch;
+  assert.deepEqual(await loadWorkspace(fetcher, async () => {}), {
+    agents: [],
+  });
+  assert.equal(calls, 2);
 });

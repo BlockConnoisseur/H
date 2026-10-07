@@ -21,3 +21,18 @@ export function launchErrorKind(error: unknown) {
     return "insufficient_funds";
   return "unexpected_service_failure";
 }
+
+export function serviceErrorDetails(error: unknown) {
+  const code =
+    error && typeof error === "object" && "code" in error
+      ? String(error.code)
+      : "";
+  return {
+    kind: launchErrorKind(error),
+    code: /^[A-Z0-9_]{1,40}$/.test(code) ? code : undefined,
+    type:
+      error instanceof Error && /^[A-Za-z]{1,40}$/.test(error.name)
+        ? error.name
+        : "unknown",
+  };
+}

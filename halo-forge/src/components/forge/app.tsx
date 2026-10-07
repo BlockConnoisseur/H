@@ -34,6 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { short, type Data, type Action } from "./shared";
 import { Overview, Agents, AgentDetail, Launch } from "./research-pages";
 import { ForgeMark } from "./identity";
+import { loadWorkspace } from "@/lib/launch-request";
 import { LabPage } from "./lab-page";
 import {
   Challenges,
@@ -168,10 +169,9 @@ export function ForgeApp() {
   const [searchOpen, setSearchOpen] = useState(false);
   const load = useCallback(async () => {
     try {
-      const r = await fetch("/api/state", { cache: "no-store" });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
+      const d = await loadWorkspace();
       setData(d);
+      setError("");
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "Could not load the workspace.",
@@ -180,14 +180,12 @@ export function ForgeApp() {
   }, []);
   useEffect(() => {
     let active = true;
-    fetch("/api/state", { cache: "no-store" })
-      .then(async (r) => {
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error);
-        return d;
-      })
+    loadWorkspace()
       .then((d) => {
-        if (active) setData(d);
+        if (active) {
+          setData(d);
+          setError("");
+        }
       })
       .catch((e) => {
         if (active)

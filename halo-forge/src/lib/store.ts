@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import type { Pool, QueryResultRow } from "pg";
 import { createPostgresPool } from "./postgres";
 import { initialState, ensureResearchSetup, type State } from "./domain";
+import { serviceErrorDetails } from "./launch-error";
 
 const driver =
   process.env.HALO_DATABASE_DRIVER ||
@@ -42,7 +43,24 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
   sql: string,
   values: SQLInputValue[] = [],
 ): Promise<T[]> {
-  if (pool) return (await pool.query<T>(sql, values)).rows;
+  if (pool) {
+    // Only reads can be replayed here. Writes may have committed before a
+    // connection failed and must be reconciled by their idempotent caller.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return (await pool.query<T>(sql, values)).rows;
+      } catch (error) {
+        console.error(
+          "database_request_failure",
+          JSON.stringify(serviceErrorDetails(error)),
+        );
+        if (!/^\s*SELECT\b/i.test(sql) || attempt >= 2) throw error;
+        await new Promise((resolve) =>
+          setTimeout(resolve, 300 * (attempt + 1)),
+        );
+      }
+    }
+  }
   const ordered: SQLInputValue[] = [];
   const statement = sql
     .replaceAll("halo_private.", "")

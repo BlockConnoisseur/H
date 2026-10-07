@@ -35,3 +35,25 @@ export async function launchRequest(
     return data.launch;
   }
 }
+
+export async function loadWorkspace(
+  fetcher: typeof fetch = fetch,
+  wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms)),
+) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const response = await fetcher("/api/state", { cache: "no-store" });
+      if (response.status >= 500 && attempt < 2) {
+        await wait(1000 * (attempt + 1));
+        continue;
+      }
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || "Could not load the workspace.");
+      return data;
+    } catch (error) {
+      if (attempt >= 2) throw error;
+      await wait(1000 * (attempt + 1));
+    }
+  }
+}
