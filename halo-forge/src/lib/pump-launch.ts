@@ -27,6 +27,7 @@ import {
 } from "@solana/spl-token";
 import BN from "bn.js";
 import bs58 from "bs58";
+import nacl from "tweetnacl";
 import { z } from "zod";
 import { DomainError, hash, ZEC_MINT, type Actor, type State } from "./domain";
 import { allocateAssignment, type ResearchAssignment } from "./research";
@@ -51,6 +52,7 @@ export type LaunchTx = {
 };
 export type PumpDraft = {
   id: string;
+  requestId?: string;
   deployer: string;
   mint: string;
   name: string;
@@ -182,23 +184,85 @@ export function validateSignedLaunch(
 ) {
   if (!/^[A-Za-z0-9+/]+={0,2}$/.test(signed) || signed.length > 1800)
     throw new DomainError("Invalid signed transaction.");
-  let tx: Transaction;
+  let tx: VersionedTransaction;
   try {
-    tx = Transaction.from(Buffer.from(signed, "base64"));
+    tx = VersionedTransaction.deserialize(Buffer.from(signed, "base64"));
   } catch {
     throw new DomainError("Invalid signed transaction.");
   }
-  if (
-    hash(tx.serializeMessage().toString("base64")) !== expected.messageHash ||
-    tx.feePayer?.toBase58() !== deployer ||
-    !tx.verifySignatures() ||
-    !tx.signature
-  )
+  const message = tx.message.serialize();
+  if (tx.message.staticAccountKeys[0]?.toBase58() !== deployer)
     throw new DomainError(
-      "The signed transaction differs from your reviewed launch or is missing a signature.",
+      "The signing wallet differs from this launch's deployer. Select the original deployer wallet.",
       403,
     );
-  return { raw: tx.serialize(), signature: bs58.encode(tx.signature) };
+  if (hash(Buffer.from(message).toString("base64")) !== expected.messageHash)
+    throw new DomainError(
+      tx.message.recentBlockhash !== expected.blockhash
+        ? "The signed transaction has a different blockhash from the prepared launch. Nothing was submitted; resume this launch for a fresh approval."
+        : "The wallet changed the prepared transaction's message. Nothing was submitted. Your launch is saved; the operator can inspect the signing diagnostic.",
+      403,
+    );
+  for (let i = 0; i < tx.message.header.numRequiredSignatures; i++) {
+    const signature = tx.signatures[i];
+    if (!signature || signature.every((b) => b === 0))
+      throw new DomainError(
+        `The wallet returned a transaction missing a signature (${i === 0 ? "deployer" : "token mint"}). Nothing was submitted.`,
+        403,
+      );
+    if (
+      !nacl.sign.detached.verify(
+        message,
+        signature,
+        tx.message.staticAccountKeys[i].toBytes(),
+      )
+    )
+      throw new DomainError(
+        "The wallet signature does not verify against the returned transaction. Nothing was submitted.",
+        403,
+      );
+  }
+  // Verify and broadcast the exact wallet bytes, without legacy Transaction
+  // recompilation (which can reorder account metadata and invalidate signatures).
+  return {
+    raw: Buffer.from(signed, "base64"),
+    signature: bs58.encode(tx.signatures[0]),
+  };
+}
+export function launchSigningDiagnostic(expected: LaunchTx, signed: string) {
+  try {
+    const received = VersionedTransaction.deserialize(
+      Buffer.from(signed, "base64"),
+    );
+    const prepared = VersionedTransaction.deserialize(
+      Buffer.from(expected.wire, "base64"),
+    );
+    const summarize = (tx: VersionedTransaction) => ({
+      version: tx.version,
+      messageHash: hash(Buffer.from(tx.message.serialize()).toString("base64")),
+      blockhash: tx.message.recentBlockhash,
+      signerKeys: tx.message.staticAccountKeys
+        .slice(0, tx.message.header.numRequiredSignatures)
+        .map((k) => k.toBase58()),
+      validSignatures: tx.signatures.map((sig, i) =>
+        nacl.sign.detached.verify(
+          tx.message.serialize(),
+          sig,
+          tx.message.staticAccountKeys[i].toBytes(),
+        ),
+      ),
+      instructions: tx.message.compiledInstructions.map((ix) => ({
+        program: tx.message.staticAccountKeys[ix.programIdIndex]?.toBase58(),
+        accounts: ix.accountKeyIndexes.map((i) =>
+          tx.message.staticAccountKeys[i]?.toBase58(),
+        ),
+        dataHash: hash(Buffer.from(ix.data).toString("base64")),
+      })),
+    });
+    return { prepared: summarize(prepared), received: summarize(received) };
+  } catch {
+    return { malformed: true };
+  }
 }
 export async function latestPumpLaunch(actor: Actor) {
   requireActor(actor);
@@ -207,7 +271,33 @@ export async function latestPumpLaunch(actor: Actor) {
   );
   return d ? view(d) : null;
 }
-export async function preparePumpLaunch(actor: Actor, raw: unknown) {
+export async function savedPumpLaunches(actor: Actor, id?: string) {
+  requireActor(actor);
+  const state = await readState();
+  return {
+    launch: id ? view(owned(state, actor, id)) : null,
+    launches: drafts(state)
+      .filter((d) => d.deployer === actor.wallet && !d.agentId && !d.abandoned)
+      .map((d) => ({ id: d.id, name: d.name, symbol: d.symbol, mint: d.mint })),
+  };
+}
+export function findLaunchForRequest(
+  state: State,
+  actor: Actor,
+  requestId?: string,
+) {
+  return drafts(state).findLast(
+    (d) =>
+      d.deployer === actor.wallet &&
+      !d.abandoned &&
+      (requestId ? d.requestId === requestId : !d.agentId),
+  );
+}
+export async function preparePumpLaunch(
+  actor: Actor,
+  raw: unknown,
+  requestId?: string,
+) {
   requireActor(actor);
   if (process.env.HALO_PUMP_LAUNCH_ENABLED !== "true")
     throw new DomainError(
@@ -216,9 +306,8 @@ export async function preparePumpLaunch(actor: Actor, raw: unknown) {
     );
   const input = inputSchema.parse(raw),
     c = pumpConnection();
-  const existing = drafts(await readState()).find(
-    (d) => d.deployer === actor.wallet && !d.abandoned && !d.agentId,
-  );
+  if (requestId) z.string().uuid().parse(requestId);
+  const existing = findLaunchForRequest(await readState(), actor, requestId);
   if (existing) {
     await refreshPumpLaunch(actor, existing.id);
     const current = owned(await readState(), actor, existing.id);
@@ -262,13 +351,15 @@ export async function preparePumpLaunch(actor: Actor, raw: unknown) {
   });
   const create = await pack(c, payer, [ix], mint);
   return transact((s) => {
+    const raced = findLaunchForRequest(s, actor, requestId);
+    if (raced) return view(raced);
     if (
-      drafts(s).some(
+      drafts(s).filter(
         (d) => d.deployer === actor.wallet && !d.abandoned && !d.agentId,
-      )
+      ).length >= 5
     )
       throw new DomainError(
-        "Another launch is already prepared. Resume it.",
+        "You have five unfinished launches. Finish a saved launch before starting another.",
         409,
       );
     if (drafts(s).filter((d) => !d.abandoned && !d.agentId).length >= 100)
@@ -304,6 +395,7 @@ export async function preparePumpLaunch(actor: Actor, raw: unknown) {
       );
     const d: PumpDraft = {
       id,
+      requestId,
       deployer: actor.wallet,
       mint: mint.publicKey.toBase58(),
       name: input.name,
@@ -537,8 +629,23 @@ export async function submitPumpLaunch(
   if (d.abandoned) return view(d);
   if (!expected) throw new DomainError("Prepare this launch step first.", 409);
   if (expected.finalized) return view(d);
-  const validated = validateSignedLaunch(expected, signed, actor.wallet),
-    c = pumpConnection();
+  let validated: ReturnType<typeof validateSignedLaunch>;
+  try {
+    validated = validateSignedLaunch(expected, signed, actor.wallet);
+  } catch (e) {
+    // Public instruction metadata and hashes only; never log signed payloads,
+    // session cookies, signatures, credentials or source patches.
+    console.warn(
+      "pump_signature_rejected",
+      JSON.stringify({
+        id,
+        stage,
+        ...launchSigningDiagnostic(expected, signed),
+      }),
+    );
+    throw e;
+  }
+  const c = pumpConnection();
   if (stage === "route" && !d.create.finalized)
     throw new DomainError("Token creation is not finalized.", 409);
   // Save the expected signature before broadcast: a timeout can safely be reconciled or re-broadcast.

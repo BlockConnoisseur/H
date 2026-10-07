@@ -54,6 +54,7 @@ import type { PageProps } from "./app";
 import { ResearchFocus } from "./research-focus";
 import { MethodShape } from "./identity";
 import { allocateAssignment, methods, researchBrief } from "@/lib/research";
+import type { PumpDraft } from "@/lib/pump-launch";
 
 export function Overview({ data }: PageProps) {
   const actual = data.agents.filter((a) => !a.example);
@@ -405,21 +406,53 @@ export function Launch({ data, action, busy, connect }: PageProps) {
   const [customDescription, setDescription] = useState("");
   const [basicApproach, setBasicApproach] = useState(false);
   const [track, setTrack] = useState("auto");
-  const proposed = allocateAssignment(data.agents, track);
-  const proposedMethod = methods.find((m) => m.id === proposed?.methodId);
+  const [resumeDraft, setResumeDraft] = useState<PumpDraft | null>(null);
+  const [savedChoices, setSavedChoices] = useState<
+    { id: string; name: string; symbol: string; mint: string }[]
+  >([]);
+  const [requestId, setRequestId] = useState("");
+  const launchIntent = useRef<{ key: string; id: string } | null>(null);
   const description = basicApproach
     ? "Start with the assigned research method. Read the pinned code, try one small improvement, and compare correctness tests and timing against the original. Record failures and tradeoffs for manual review."
     : customDescription;
+  const setupKey = JSON.stringify({ name, symbol, image, description, track });
+  const activeResume =
+    resumeDraft &&
+    JSON.stringify({
+      name: resumeDraft.name,
+      symbol: resumeDraft.symbol,
+      image: resumeDraft.image,
+      description: resumeDraft.description,
+      track: resumeDraft.assignment.track,
+    }) === setupKey
+      ? resumeDraft
+      : null;
+  const proposed =
+    activeResume?.assignment ?? allocateAssignment(data.agents, track);
+  const proposedMethod = methods.find((m) => m.id === proposed?.methodId);
   const [cap, setCap] = useState("20");
   const [problem, setProblem] = useState("");
   const [restoring, setRestoring] = useState(false);
-  async function resumeLaunch() {
+  async function resumeLaunch(id?: string) {
     setRestoring(true);
     setProblem("");
     try {
-      const response = await fetch("/api/pump/current", { cache: "no-store" });
+      const response = await fetch(
+        id
+          ? `/api/pump/current?id=${encodeURIComponent(id)}`
+          : "/api/pump/current?list=1",
+        { cache: "no-store" },
+      );
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
+      if (!id) {
+        if (!result.launches?.length)
+          throw new Error("There is no unfinished launch for this wallet.");
+        if (result.launches.length === 1)
+          return await resumeLaunch(result.launches[0].id);
+        setSavedChoices(result.launches);
+        return;
+      }
       const saved = result.launch;
       if (!saved || saved.agentId)
         throw new Error("There is no unfinished launch for this wallet.");
@@ -429,6 +462,9 @@ export function Launch({ data, action, busy, connect }: PageProps) {
       setDescription(saved.description);
       setBasicApproach(false);
       setTrack(saved.assignment.track);
+      setResumeDraft(saved);
+      setSavedChoices([]);
+      setRequestId(saved.requestId || crypto.randomUUID());
       setStep(1);
     } catch (e) {
       setProblem(
@@ -470,6 +506,11 @@ export function Launch({ data, action, busy, connect }: PageProps) {
     if (!valid()) return;
     if (deploying) return;
     if (step < 2) {
+      if (step === 1 && !activeResume) {
+        if (launchIntent.current?.key !== setupKey)
+          launchIntent.current = { key: setupKey, id: crypto.randomUUID() };
+        setRequestId(launchIntent.current.id);
+      }
       setStep(step + 1);
       return;
     }
@@ -534,10 +575,26 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   variant="outline"
                   className="mt-6"
                   disabled={restoring}
-                  onClick={resumeLaunch}
+                  onClick={() => resumeLaunch()}
                 >
                   {restoring ? "Loading saved launch…" : "Resume saved launch"}
                 </Button>
+              )}
+              {!!savedChoices.length && (
+                <div className="grid gap-3 mt-4" aria-label="Saved launches">
+                  {savedChoices.map((saved) => (
+                    <Button
+                      key={saved.id}
+                      type="button"
+                      variant="outline"
+                      disabled={restoring}
+                      onClick={() => resumeLaunch(saved.id)}
+                    >
+                      Resume {saved.name} · ${saved.symbol} ·{" "}
+                      {short(saved.mint)}
+                    </Button>
+                  ))}
+                </div>
               )}
               <h2>Agent identity</h2>
               <CoinImagePicker
@@ -726,7 +783,9 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   </dd>
                 </div>
                 <div>
-                  <dt>Proposed method</dt>
+                  <dt>
+                    {activeResume ? "Reserved method" : "Proposed method"}
+                  </dt>
                   <dd>{proposedMethod?.name || "No open experiment"}</dd>
                 </div>
                 <div>
@@ -796,9 +855,24 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 </PreviewNote>
               ) : data.actor ? (
                 <PumpLaunch
+                  key={activeResume?.id || requestId}
                   actor={data.actor}
                   input={{ name, symbol, image, description, track }}
                   onBusyChange={setDeploying}
+                  requestId={requestId}
+                  resumeId={activeResume?.id}
+                  onNewLaunch={() => {
+                    setResumeDraft(null);
+                    setRequestId("");
+                    launchIntent.current = null;
+                    setName("");
+                    setSymbol("");
+                    setImage(null);
+                    setDescription("");
+                    setBasicApproach(false);
+                    setTrack("auto");
+                    setStep(0);
+                  }}
                 />
               ) : (
                 <p>

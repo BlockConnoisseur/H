@@ -133,6 +133,7 @@ test("launch signature binding rejects changed fee recipient, amount, payer and 
     /differs/,
   );
   for (const modified of [build(other.publicKey), build(undefined, 1)]) {
+    modified.recentBlockhash = tx.recentBlockhash;
     modified.sign(owner);
     assert.throws(
       () =>
@@ -141,7 +142,7 @@ test("launch signature binding rejects changed fee recipient, amount, payer and 
           modified.serialize().toString("base64"),
           owner.publicKey.toBase58(),
         ),
-      /differs/,
+      /changed the prepared transaction/,
     );
   }
 });
@@ -315,4 +316,116 @@ test("expired launch stays visible to its owner and can be inspected without ano
     if (priorRpc === undefined) delete process.env.SOLANA_MAINNET_RPC_URL;
     else process.env.SOLANA_MAINNET_RPC_URL = priorRpc;
   }
+});
+
+test("new launch IDs isolate unfinished coins and retries retain their original mint", async () => {
+  const state = await store.readState();
+  const base = state.pumpLaunches![0];
+  const actor = { wallet: base.deployer, preview: false, reviewer: false };
+  state.pumpLaunches = [
+    { ...base, id: "older", abandoned: false, requestId: "request-old" },
+    {
+      ...base,
+      id: "newer",
+      abandoned: false,
+      requestId: "request-new",
+      mint: Keypair.generate().publicKey.toBase58(),
+    },
+  ];
+  assert.equal(
+    pump.findLaunchForRequest(state, actor, "request-old")?.id,
+    "older",
+  );
+  assert.equal(
+    pump.findLaunchForRequest(state, actor, "request-new")?.id,
+    "newer",
+  );
+  assert.equal(pump.findLaunchForRequest(state, actor, "brand-new"), undefined);
+  assert.equal(
+    pump.findLaunchForRequest(
+      state,
+      { ...actor, wallet: Keypair.generate().publicKey.toBase58() },
+      "request-old",
+    ),
+    undefined,
+  );
+  state.pumpLaunches[1].agentId = "registered";
+  assert.equal(
+    pump.findLaunchForRequest(state, actor, "request-new")?.id,
+    "newer",
+  );
+});
+
+test("saved launch selection is wallet-bound and list summaries exclude transaction payloads", async () => {
+  const state = await store.readState(),
+    base = state.pumpLaunches![0];
+  const actor = { wallet: base.deployer, preview: false, reviewer: false };
+  const selected = await pump.savedPumpLaunches(actor, base.id);
+  assert.equal(selected.launch?.id, base.id);
+  assert.equal(JSON.stringify(selected.launches).includes("PRIVATE"), false);
+  await assert.rejects(
+    pump.savedPumpLaunches(
+      { ...actor, wallet: Keypair.generate().publicKey.toBase58() },
+      base.id,
+    ),
+    /not found/,
+  );
+});
+
+test("exact wallet bytes and every required signature are verified without reserializing", async () => {
+  const { VersionedTransaction } = await import("@solana/web3.js");
+  const payer = Keypair.generate(),
+    mint = Keypair.generate();
+  const tx = new Transaction({
+    feePayer: payer.publicKey,
+    recentBlockhash: Keypair.generate().publicKey.toBase58(),
+  }).add(
+    SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: mint.publicKey,
+      lamports: 1,
+      space: 1,
+      programId: SystemProgram.programId,
+    }),
+  );
+  tx.partialSign(mint);
+  const expected = {
+    wire: tx.serialize({ requireAllSignatures: false }).toString("base64"),
+    messageHash: hash(tx.serializeMessage().toString("base64")),
+    blockhash: tx.recentBlockhash!,
+    lastValidBlockHeight: 10,
+  };
+  const returned = VersionedTransaction.deserialize(
+    Buffer.from(expected.wire, "base64"),
+  );
+  returned.sign([payer]);
+  const raw = Buffer.from(returned.serialize());
+  assert.deepEqual(
+    pump.validateSignedLaunch(
+      expected,
+      raw.toString("base64"),
+      payer.publicKey.toBase58(),
+    ).raw,
+    raw,
+  );
+  returned.signatures[1] = new Uint8Array(64);
+  assert.throws(
+    () =>
+      pump.validateSignedLaunch(
+        expected,
+        Buffer.from(returned.serialize()).toString("base64"),
+        payer.publicKey.toBase58(),
+      ),
+    /missing a signature \(token mint\)/,
+  );
+  returned.signatures[0][0] ^= 1;
+  assert.throws(
+    () =>
+      pump.validateSignedLaunch(
+        expected,
+        Buffer.from(returned.serialize()).toString("base64"),
+        payer.publicKey.toBase58(),
+      ),
+    /does not verify/,
+  );
 });

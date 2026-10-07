@@ -9,6 +9,7 @@ export type SignLaunchTransaction = (wire: string) => Promise<string>;
 export async function deployPumpAgent({
   initial,
   input,
+  requestId,
   request,
   sign,
   progress,
@@ -16,6 +17,7 @@ export async function deployPumpAgent({
 }: {
   initial: Draft | null;
   input: Record<string, unknown>;
+  requestId?: string;
   request: Request;
   sign: SignLaunchTransaction;
   progress: (message: string) => void;
@@ -35,7 +37,11 @@ export async function deployPumpAgent({
           track: draft.assignment.track,
         }
       : input;
-    draft = await request({ action: "prepare", input: savedInput });
+    draft = await request({
+      action: "prepare",
+      input: savedInput,
+      ...(requestId ? { requestId } : {}),
+    });
   }
   for (const stage of ["create", "route"] as const) {
     if (draft.agentId || draft[stage]?.finalized) continue;

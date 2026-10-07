@@ -15,6 +15,9 @@ const WalletConnection = dynamic(() => import("./wallet-connection"), {
 type Props = {
   actor: Actor;
   onBusyChange?: (busy: boolean) => void;
+  requestId: string;
+  resumeId?: string;
+  onNewLaunch: () => void;
   input: {
     name: string;
     symbol: string;
@@ -23,33 +26,43 @@ type Props = {
     track: string;
   };
 };
-export function PumpLaunch({ actor, input, onBusyChange }: Props) {
+export function PumpLaunch({
+  actor,
+  input,
+  onBusyChange,
+  requestId,
+  resumeId,
+  onNewLaunch,
+}: Props) {
   const mounted = useRef(true);
   const [launch, setLaunch] = useState<PumpDraft | null>(null);
   const [busy, setBusy] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!resumeId);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState("");
   useEffect(() => {
     mounted.current = true;
     let live = true;
-    void fetch("/api/pump/current", { cache: "no-store" })
-      .then(async (r) => {
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error);
-        if (live) setLaunch(d.launch);
+    if (resumeId)
+      void fetch(`/api/pump/current?id=${encodeURIComponent(resumeId)}`, {
+        cache: "no-store",
       })
-      .catch((e) => {
-        if (live) setError(e.message);
-      })
-      .finally(() => {
-        if (live) setLoading(false);
-      });
+        .then(async (r) => {
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error);
+          if (live) setLaunch(d.launch);
+        })
+        .catch((e) => {
+          if (live) setError(e.message);
+        })
+        .finally(() => {
+          if (live) setLoading(false);
+        });
     return () => {
       live = false;
       mounted.current = false;
     };
-  }, [actor.wallet]);
+  }, [actor.wallet, resumeId]);
 
   async function deploy(sign: SignLaunchTransaction) {
     setBusy(true);
@@ -59,6 +72,7 @@ export function PumpLaunch({ actor, input, onBusyChange }: Props) {
       await deployPumpAgent({
         initial: launch,
         input,
+        requestId,
         sign: async (wire) => {
           if (!mounted.current)
             throw new Error("Deployment paused after leaving the page.");
@@ -211,8 +225,7 @@ export function PumpLaunch({ actor, input, onBusyChange }: Props) {
             type="button"
             variant="ghost"
             onClick={() => {
-              setLaunch(null);
-              setProgress("");
+              onNewLaunch();
             }}
           >
             Deploy another agent

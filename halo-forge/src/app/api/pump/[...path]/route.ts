@@ -5,6 +5,7 @@ import { DomainError, hash } from "@/lib/domain";
 import { readState } from "@/lib/store";
 import {
   latestPumpLaunch,
+  savedPumpLaunches,
   checkPumpSigning,
   preparePumpLaunch,
   preparePumpRoute,
@@ -70,7 +71,14 @@ export async function GET(req: NextRequest) {
     if (!actor || actor.preview)
       throw new DomainError("Connect your deployer wallet.", 401);
     return NextResponse.json(
-      { launch: await latestPumpLaunch(actor) },
+      req.nextUrl.searchParams.has("list") || req.nextUrl.searchParams.has("id")
+        ? await savedPumpLaunches(
+            actor,
+            req.nextUrl.searchParams.has("id")
+              ? z.string().uuid().parse(req.nextUrl.searchParams.get("id"))
+              : undefined,
+          )
+        : { launch: await latestPumpLaunch(actor) },
       { headers: { "Cache-Control": "private, no-store" } },
     );
   } catch (e) {
@@ -99,7 +107,13 @@ export async function POST(req: NextRequest) {
       throw new DomainError("Request is too large.", 413);
     const p = z
       .discriminatedUnion("action", [
-        z.object({ action: z.literal("prepare"), input: z.unknown() }).strict(),
+        z
+          .object({
+            action: z.literal("prepare"),
+            input: z.unknown(),
+            requestId: z.string().uuid().optional(),
+          })
+          .strict(),
         z
           .object({ action: z.literal("refresh"), id: z.string().uuid() })
           .strict(),
@@ -144,7 +158,7 @@ export async function POST(req: NextRequest) {
     }
     const launch =
       p.action === "prepare"
-        ? await preparePumpLaunch(actor, p.input)
+        ? await preparePumpLaunch(actor, p.input, p.requestId)
         : p.action === "check_signing"
           ? await checkPumpSigning(actor, p.id, p.stage)
           : p.action === "route"
