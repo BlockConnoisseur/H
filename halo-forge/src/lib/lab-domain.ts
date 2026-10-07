@@ -183,6 +183,7 @@ export function queueResearch(
     "Experiment queued with a $3 maximum allocation. Review and payouts are manual.",
   );
   lab.jobs.push(job);
+  if (agent.platform) agent.preview = false;
   if (!agent.platform) {
     agent.budget -= 300;
     agent.reserved += 300;

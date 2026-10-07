@@ -159,7 +159,7 @@ export function LabPage({ data, connect }: PageProps) {
       </div>
       <div className="lab-team">
         {data.agents
-          .filter((a) => !a.preview && !a.example)
+          .filter((a) => (a.platform || !a.preview) && !a.example)
           .map((a, i) => {
             const latest = lab?.jobs.find((j) => j.agentId === a.id);
             return (
@@ -182,7 +182,7 @@ export function LabPage({ data, connect }: PageProps) {
                 <div className="lab-station-bottom">
                   <span>
                     {latest
-                      ? `${latest.modelCalls} model calls`
+                      ? `${latest.modelCalls} calls authorized`
                       : "Assigned method"}
                   </span>
                   {(data.actor?.reviewer ||
@@ -345,7 +345,7 @@ export function LabPage({ data, connect }: PageProps) {
               </div>
               <div className="lab-receipts">
                 <div>
-                  <span>Model calls</span>
+                  <span>Calls authorized</span>
                   <strong>{job.modelCalls} / 12</strong>
                 </div>
                 <div>

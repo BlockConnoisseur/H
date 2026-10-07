@@ -7,6 +7,7 @@ async function main() {
     lab.dailyCapCents = 1500;
     const ids: string[] = [];
     for (const a of s.agents.filter((a) => a.platform)) {
+      a.preview = false;
       a.autoRun = true;
       const jobs = lab.jobs.filter((j) => j.agentId === a.id);
       if (

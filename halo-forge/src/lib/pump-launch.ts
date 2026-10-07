@@ -15,6 +15,7 @@ import {
   PUMP_PROGRAM_ID,
   PUMP_FEE_PROGRAM_ID,
   bondingCurvePda,
+  canonicalPumpPoolPdaWithQuote,
   feeSharingConfigPda,
   computeFeesBps,
   isSharingConfigEditable,
@@ -433,13 +434,14 @@ export async function preparePumpRoute(actor: Actor, id: string) {
     (await c.getBlockHeight("finalized")) <= d.route.lastValidBlockHeight
   )
     return d;
-  const { q } = await pumpConfiguration(c),
+  const { q, sdk } = await pumpConfiguration(c),
     payer = new PublicKey(d.deployer),
     mint = new PublicKey(d.mint);
+  const curve = await sdk.fetchBondingCurve(mint);
   const create = await PUMP_SDK.createFeeSharingConfig({
     creator: payer,
     mint,
-    pool: null,
+    pool: curve.complete ? canonicalPumpPoolPdaWithQuote(mint, quote) : null,
   });
   const update = await PUMP_SDK.updateFeeSharesV2({
     authority: payer,
@@ -509,4 +511,30 @@ export async function submitPumpLaunch(
     };
   }
   return refreshPumpLaunch(actor, id);
+}
+
+export async function expirePumpDrafts() {
+  const pending = drafts(await readState()).filter(
+    (d) => !d.abandoned && !d.agentId && !d.create.finalized,
+  );
+  if (!pending.length) return;
+  const c = pumpConnection(),
+    height = await c.getBlockHeight("finalized");
+  for (const draft of pending) {
+    if (height <= draft.create.lastValidBlockHeight) continue;
+    // Release only after finality proves the signature expired AND no mint exists.
+    // A timeout or a merely missing signature is never enough to free a paid launch.
+    if (await c.getAccountInfo(new PublicKey(draft.mint), "finalized"))
+      continue;
+    await transact((s) => {
+      const current = drafts(s).find((d) => d.id === draft.id);
+      if (
+        current &&
+        !current.agentId &&
+        !current.create.finalized &&
+        current.create.messageHash === draft.create.messageHash
+      )
+        current.abandoned = true;
+    });
+  }
 }

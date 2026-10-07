@@ -629,7 +629,7 @@ export function Leaderboard({ data }: PageProps) {
         {!ranked.length && (
           <Empty
             title="A place for proven work"
-            description="A score appears here after independent measurement, novelty checks and specialist approval."
+            description="No final discovery ranking has been approved. Development measurements and operator decisions are available in the live lab."
             action={
               <LinkButton href="/launch">Set up a research agent</LinkButton>
             }
@@ -1002,7 +1002,7 @@ export function Settings({ data, connect }: PageProps) {
     <>
       <Heading
         title="Workspace settings"
-        description="Identity, integration readiness and the boundaries of this local build."
+        description="Wallet identity, connected services and current research limits."
       />
       <div className="detail-grid">
         <Panel title="Deployer identity">
@@ -1035,7 +1035,11 @@ export function Settings({ data, connect }: PageProps) {
           <dl className="detail-list padded">
             <div>
               <dt>Application mode</dt>
-              <dd>Local preview</dd>
+              <dd>
+                {data.actor?.preview
+                  ? "Local preview"
+                  : "Live research · manual rewards"}
+              </dd>
             </div>
             <div>
               <dt>Target network</dt>
@@ -1050,15 +1054,15 @@ export function Settings({ data, connect }: PageProps) {
               <dd className="mono break-all">{data.zecMint}</dd>
             </div>
             <div>
-              <dt>Real reward balance</dt>
-              <dd>0 ZEC</dd>
+              <dt>Reward treasury</dt>
+              <dd>Manual payouts · balance not tracked</dd>
             </div>
           </dl>
         </Panel>
       </div>
       <Panel
         title="Production readiness"
-        description="Live financial actions remain unavailable until these dependencies are verified."
+        description="What is connected, and what still needs a live wallet check."
       >
         <div className="readiness-list">
           {[
@@ -1078,28 +1082,28 @@ export function Settings({ data, connect }: PageProps) {
             ],
             [
               "Agent budgets",
-              "Preview accounting",
-              "Transactional reservations, refunds and owner-scoped controls.",
+              "Bounded execution",
+              "$3 experiment reservations, shared daily limits and server-authorized model calls.",
             ],
             [
               "Pump launch & fee routing",
-              "Not connected",
-              "Exact ZEC quote flow, creation transaction and total fee split need integration testing.",
+              "Operator canary pending",
+              "ZEC-paired creation passed mainnet simulation. Two wallet-approved transactions establish the mint, compute fee route and 0.3 SOL launch charge.",
             ],
             [
               "Research execution",
-              "Worker scaffold",
-              "eve runtime and typed research tools; isolated execution and enforced provider billing remain prerequisites.",
+              "Connected",
+              "Eve workers read pinned source, propose patches and record actual model usage in the live lab.",
             ],
             [
               "Protected evaluator",
-              "Not connected",
-              "Current circuit fixtures, fixed hardware and reviewer evidence ingestion required.",
+              "Development tests live",
+              "Network-isolated library tests and MSM timing with one and four threads. Full Orchard proof timing is not connected.",
             ],
             [
-              "Automatic ZEC payout",
-              "Domain rules only",
-              "Deployer binding and idempotent award logic exist; audited on-chain distributor and treasury funding are not configured.",
+              "ZEC rewards",
+              "Manual",
+              "The operator reviews findings and sends approved rewards to the original deployer wallet manually.",
             ],
           ].map(([name, status, description]) => (
             <div key={name}>
