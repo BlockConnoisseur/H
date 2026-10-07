@@ -1,6 +1,6 @@
 import type { PumpDraft } from "./pump-launch";
 
-type Draft = PumpDraft & { notice?: string };
+type Draft = PumpDraft & { notice?: string; signingReady?: boolean };
 type Request = (body: Record<string, unknown>) => Promise<Draft>;
 function checkConfirmation(draft: Draft, stage: "create" | "route") {
   if (draft[stage]?.confirmation === "expired")
@@ -53,7 +53,32 @@ export async function deployPumpAgent({
       ...(requestId ? { requestId } : {}),
     });
   }
-  for (const stage of ["create", "route"] as const) {
+  const recoveries = { create: 0, route: 0 };
+  async function recoverExpired(current: Draft, stage: "create" | "route") {
+    if (++recoveries[stage] > 2)
+      throw new Error(
+        "The wallet approval expired repeatedly. Your confirmed steps are saved. Resume deployment when you can approve the wallet prompt promptly.",
+      );
+    progress(
+      "The previous approval window expired. Preparing a fresh wallet approval…",
+    );
+    if (stage === "route") return request({ action: "route", id: current.id });
+    return request({
+      action: "prepare",
+      input: {
+        name: current.name,
+        symbol: current.symbol,
+        description: current.description,
+        image: current.image,
+        track: current.assignment.track,
+      },
+      ...(current.requestId || requestId
+        ? { requestId: current.requestId || requestId }
+        : {}),
+    });
+  }
+  stages: for (let stageIndex = 0; stageIndex < 2; stageIndex++) {
+    const stage = (["create", "route"] as const)[stageIndex];
     let signedForRetry: string | undefined;
     if (draft.agentId || draft[stage]?.finalized) continue;
     if (stage === "route") {
@@ -63,6 +88,33 @@ export async function deployPumpAgent({
     if (draft[stage]?.finalized) continue;
     if (!draft[stage]?.signature) {
       draft = await request({ action: "check_signing", id: draft.id, stage });
+      // A mint is partially signed by the server, so its blockhash cannot be
+      // edited in the browser. Wait until the old transaction cannot land,
+      // then rebuild; never offer an approval with only seconds remaining.
+      for (
+        let waiting = 0;
+        draft.signingReady === false && waiting < 24;
+        waiting++
+      ) {
+        progress(
+          "Refreshing the wallet approval window. No payment is being sent…",
+        );
+        await wait(8000);
+        draft = await request({ action: "refresh", id: draft.id });
+        if (draft.abandoned || draft[stage]?.confirmation === "expired") break;
+        if (stage === "route")
+          draft = await request({ action: "route", id: draft.id });
+        draft = await request({ action: "check_signing", id: draft.id, stage });
+      }
+      if (draft.abandoned || draft[stage]?.confirmation === "expired") {
+        draft = await recoverExpired(draft, stage);
+        stageIndex--;
+        continue stages;
+      }
+      if (draft.signingReady === false)
+        throw new Error(
+          "The network could not provide a fresh approval window. Your launch is saved; resume deployment shortly.",
+        );
       const tx = draft[stage];
       if (!tx || draft.abandoned)
         throw new Error(
@@ -93,11 +145,12 @@ export async function deployPumpAgent({
     );
     // Eight-second polling stays below the API's 20/minute per-wallet limit.
     for (let attempt = 0; !draft[stage]?.finalized && attempt < 18; attempt++) {
+      if (draft.abandoned || draft[stage]?.confirmation === "expired") {
+        draft = await recoverExpired(draft, stage);
+        stageIndex--;
+        continue stages;
+      }
       checkConfirmation(draft, stage);
-      if (draft.abandoned)
-        throw new Error(
-          "Token creation expired without landing. Resume deployment to refresh it.",
-        );
       await wait(8000);
       draft =
         signedForRetry && attempt % 2 === 1
@@ -108,6 +161,11 @@ export async function deployPumpAgent({
               signed: signedForRetry,
             })
           : await request({ action: "refresh", id: draft.id });
+      if (draft.abandoned || draft[stage]?.confirmation === "expired") {
+        draft = await recoverExpired(draft, stage);
+        stageIndex--;
+        continue stages;
+      }
       checkConfirmation(draft, stage);
       if (draft[stage]?.confirmation === "confirming")
         progress(

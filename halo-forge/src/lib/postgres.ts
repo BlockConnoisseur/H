@@ -22,7 +22,7 @@ export function postgresConfig(url: string): PoolConfig {
         ? { ca: readFileSync(process.env.HALO_DATABASE_CA_PATH, "utf8") }
         : {}),
     },
-    max: 3,
+    max: process.env.VERCEL ? 1 : 3,
     connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 10000,
     statement_timeout: 15000,

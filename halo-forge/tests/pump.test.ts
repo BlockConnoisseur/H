@@ -303,7 +303,10 @@ test("expired launch stays visible to its owner and can be inspected without ano
       (await pump.submitPumpLaunch(actor, id, "create", "unused")).abandoned,
       true,
     );
-    await assert.rejects(pump.checkPumpSigning(actor, id, "create"), /expired/);
+    assert.equal(
+      (await pump.checkPumpSigning(actor, id, "create")).abandoned,
+      true,
+    );
     await assert.rejects(
       pump.refreshPumpLaunch({ ...actor, wallet: COMPUTE_WALLET }, id),
       /not found for this connected wallet/,
@@ -315,6 +318,18 @@ test("expired launch stays visible to its owner and can be inspected without ano
     });
     mintExists = true;
     assert.equal((await pump.refreshPumpLaunch(actor, id, c)).abandoned, false);
+    // A transaction observed on-chain must not be abandoned while its mint
+    // account is still absent at finalized commitment.
+    mintExists = false;
+    const confirming = {
+      ...c,
+      getSignatureStatuses: async () => ({
+        value: [{ err: null, confirmationStatus: "confirmed" }],
+      }),
+    } as unknown as Connection;
+    const pending = await pump.refreshPumpLaunch(actor, id, confirming);
+    assert.equal(pending.abandoned, false);
+    assert.equal(pending.create.confirmation, "confirming");
   } finally {
     mock.restoreAll();
     if (priorRpc === undefined) delete process.env.SOLANA_MAINNET_RPC_URL;

@@ -14,10 +14,16 @@ import {
 } from "@/lib/pump-launch";
 import { researchTick } from "@/lib/lab-runtime";
 import { prepareFeeClaim, submitFeeClaim, syncPumpFees } from "@/lib/pump-fees";
+import { launchErrorKind } from "@/lib/launch-error";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 800;
 function failure(e: unknown) {
+  if (!(e instanceof DomainError) && !(e instanceof z.ZodError))
+    console.error(
+      "pump_service_failure",
+      JSON.stringify({ kind: launchErrorKind(e) }),
+    );
   return NextResponse.json(
     {
       error:
@@ -25,7 +31,7 @@ function failure(e: unknown) {
           ? e.message
           : e instanceof z.ZodError
             ? "Invalid launch request."
-            : "The chain request could not be completed. Refresh this launch before retrying.",
+            : "The launch service is temporarily busy. Your progress is saved. Resume deployment to continue from the recorded transaction.",
     },
     {
       status:

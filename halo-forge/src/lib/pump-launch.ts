@@ -41,6 +41,7 @@ import {
 } from "./pump-policy";
 import { labState } from "./lab-domain";
 import { sweepCreatorFee } from "./pump-sweep";
+import { launchErrorKind } from "./launch-error";
 import {
   pumpComputeBudget,
   canReusePumpTransaction,
@@ -290,7 +291,6 @@ export async function savedPumpLaunches(actor: Actor, id?: string) {
         (d) =>
           d.deployer === actor.wallet &&
           !d.agentId &&
-          !d.abandoned &&
           !d.archivedAt,
       )
       .map((d) => ({ id: d.id, name: d.name, symbol: d.symbol, mint: d.mint })),
@@ -325,10 +325,10 @@ export async function preparePumpLaunch(
   if (requestId) z.string().uuid().parse(requestId);
   const existing = findLaunchForRequest(await readState(), actor, requestId);
   if (existing) {
-    await refreshPumpLaunch(actor, existing.id);
-    const current = owned(await readState(), actor, existing.id);
+    const current = await refreshPumpLaunch(actor, existing.id);
     if (
       current.create.finalized ||
+      current.create.confirmation === "confirming" ||
       (await c.getBlockHeight("finalized")) <=
         current.create.lastValidBlockHeight
     )
@@ -457,6 +457,7 @@ export async function refreshPumpLaunch(
   const createOk = createConfirmation === "finalized";
   if (!createOk) {
     if (
+      createConfirmation !== "confirming" &&
       (await c.getBlockHeight("finalized")) > d.create.lastValidBlockHeight &&
       !(await c.getAccountInfo(new PublicKey(d.mint), "finalized"))
     ) {
@@ -464,7 +465,8 @@ export async function refreshPumpLaunch(
         const current = owned(s, actor, id);
         if (
           !current.create.finalized &&
-          current.create.messageHash === d.create.messageHash
+          current.create.messageHash === d.create.messageHash &&
+          current.create.signature === d.create.signature
         )
           current.abandoned = true;
         return view(current);
@@ -639,23 +641,16 @@ export async function checkPumpSigning(
   stage: "create" | "route",
 ) {
   const d = await refreshPumpLaunch(actor, id);
-  if (d.abandoned) throw new DomainError(d.notice!, 409);
+  if (d.abandoned) return d;
   const tx = d[stage];
   if (!tx) throw new DomainError("Prepare this launch step first.", 409);
-  if (tx.finalized)
-    throw new DomainError(
-      "This step already finalized. Refresh confirmation to continue.",
-      409,
-    );
+  if (tx.finalized || tx.signature) return d;
   if (
     (await pumpConnection().getBlockHeight("confirmed")) >=
-    tx.lastValidBlockHeight - 10
+    tx.lastValidBlockHeight - 100
   )
-    throw new DomainError(
-      "This transaction is expiring. Refresh the launch step before signing; no payment was submitted.",
-      409,
-    );
-  return d;
+    return { ...d, signingReady: false };
+  return { ...d, signingReady: true };
 }
 export async function submitPumpLaunch(
   actor: Actor,
@@ -728,6 +723,7 @@ export async function submitPumpLaunch(
         id,
         stage,
         preflightRejected: e instanceof SendTransactionError,
+        kind: launchErrorKind(e),
         programFailures:
           e instanceof SendTransactionError
             ? e.logs?.filter((line) => /^Program \w+ failed:/.test(line))
@@ -753,6 +749,8 @@ export async function expirePumpDrafts() {
     height = await c.getBlockHeight("finalized");
   for (const draft of pending) {
     if (height <= draft.create.lastValidBlockHeight) continue;
+    const confirmation = await launchConfirmation(c, draft.create);
+    if (confirmation === "confirming" || confirmation === "finalized") continue;
     // Release only after finality proves the signature expired AND no mint exists.
     // A timeout or a merely missing signature is never enough to free a paid launch.
     if (await c.getAccountInfo(new PublicKey(draft.mint), "finalized"))
@@ -763,7 +761,8 @@ export async function expirePumpDrafts() {
         current &&
         !current.agentId &&
         !current.create.finalized &&
-        current.create.messageHash === draft.create.messageHash
+        current.create.messageHash === draft.create.messageHash &&
+        current.create.signature === draft.create.signature
       )
         current.abandoned = true;
     });

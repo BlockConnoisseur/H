@@ -8,6 +8,7 @@ import type { Actor } from "@/lib/domain";
 import type { PumpDraft } from "@/lib/pump-launch";
 import { deployPumpAgent, type SignLaunchTransaction } from "@/lib/launch-flow";
 import { COMPUTE_WALLET } from "@/lib/pump-policy";
+import { launchRequest } from "@/lib/launch-request";
 const WalletConnection = dynamic(() => import("./wallet-connection"), {
   ssr: false,
 });
@@ -83,19 +84,9 @@ export function PumpLaunch({
           // Always save a signature the user already approved, even on navigation.
           if (!mounted.current && body.action !== "submit")
             throw new Error("Deployment paused after leaving the page.");
-          const r = await fetch("/api/pump/actions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          });
-          const d = await r.json();
-          if (!r.ok)
-            throw new Error(
-              d.error ||
-                "Launch request failed. Resume deployment to check your saved progress.",
-            );
-          setLaunch(d.launch);
-          return d.launch;
+          const next = await launchRequest(body);
+          setLaunch(next);
+          return next;
         },
       });
     } catch (e) {

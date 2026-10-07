@@ -173,7 +173,7 @@ test("a dropped submission retries identical signed bytes without another wallet
   assert.deepEqual(submissions, ["same-signed-payment", "same-signed-payment"]);
 });
 
-test("an expired payment stops the spinner without another approval or claiming the fee was paid", async () => {
+test("repeated expiry is bounded and never signs a still-recorded payment", async () => {
   const d = draft();
   d.create.finalized = true;
   d.route = { ...tx("route"), signature: "expired" };
@@ -195,8 +195,80 @@ test("an expired payment stops the spinner without another approval or claiming 
         return structuredClone(d);
       },
     }),
-    /expired without landing.*not transferred/,
+    /expired repeatedly/,
   );
   assert.equal(approvals, 0);
-  assert.equal(polls, 2);
+  assert.ok(polls >= 2);
+});
+
+test("creation expiry automatically rebuilds and completes without a second deploy click", async () => {
+  let d = draft();
+  const approvals: string[] = [];
+  let preparations = 0;
+  const result = await deployPumpAgent({
+    initial: null,
+    input: {},
+    requestId: "same-request",
+    progress: () => {},
+    wait: async () => {},
+    sign: async (wire) => {
+      approvals.push(wire);
+      return `signed-${wire}`;
+    },
+    request: async (body) => {
+      if (body.action === "prepare") {
+        preparations++;
+        assert.equal(body.requestId, "same-request");
+        d = {
+          ...draft(),
+          id: `draft-${preparations}`,
+          create: tx(`create-${preparations}`),
+        };
+      }
+      if (body.action === "route") d.route ??= tx("route");
+      if (body.action === "submit") {
+        const stage = body.stage as "create" | "route";
+        d[stage]!.signature = `signature-${stage}`;
+        if (stage === "create" && preparations === 1) d.abandoned = true;
+        else d[stage]!.finalized = true;
+        if (stage === "route") d.agentId = "registered";
+      }
+      return structuredClone(d);
+    },
+  });
+  assert.equal(result.agentId, "registered");
+  assert.deepEqual(approvals, ["create-1", "create-2", "route"]);
+});
+
+test("near-expiry unsigned creation waits for expiry before offering a fresh approval", async () => {
+  let d: PumpDraft & { signingReady?: boolean } = draft();
+  let stale = true;
+  const approvals: string[] = [];
+  const result = await deployPumpAgent({
+    initial: d,
+    input: {},
+    progress: () => {},
+    wait: async () => {},
+    sign: async (wire) => {
+      approvals.push(wire);
+      return wire;
+    },
+    request: async (body) => {
+      if (body.action === "check_signing" && stale) d.signingReady = false;
+      if (body.action === "refresh" && d.signingReady === false)
+        d.abandoned = true;
+      if (body.action === "prepare") {
+        stale = false;
+        d = { ...draft(), create: tx("fresh") };
+      }
+      if (body.action === "route") d.route ??= tx("route");
+      if (body.action === "submit") {
+        d[body.stage as "create" | "route"]!.finalized = true;
+        if (body.stage === "route") d.agentId = "registered";
+      }
+      return structuredClone(d);
+    },
+  });
+  assert.equal(result.agentId, "registered");
+  assert.deepEqual(approvals, ["fresh", "route"]);
 });
