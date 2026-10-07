@@ -500,7 +500,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   />
                 </Field>
               </div>
-              <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-4">
+              <div className="approach-toggle flex items-center justify-between gap-4 rounded-lg border border-border p-4">
                 <div>
                   <label
                     htmlFor="basic-approach"

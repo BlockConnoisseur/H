@@ -37,6 +37,34 @@ after(async () => {
   await store.closeStore();
   rmSync(dir, { recursive: true, force: true });
 });
+test("public wallets can prepare launches without an operator launch, while the enable flag and real-wallet check remain", async () => {
+  const previous = process.env.HALO_PUMP_LAUNCH_ENABLED;
+  const actor = {
+    wallet: Keypair.generate().publicKey.toBase58(),
+    preview: false,
+    reviewer: false,
+  };
+  try {
+    process.env.HALO_PUMP_LAUNCH_ENABLED = "false";
+    await assert.rejects(
+      pump.preparePumpLaunch(actor, {}),
+      /Paid launches are not enabled/,
+    );
+    process.env.HALO_PUMP_LAUNCH_ENABLED = "true";
+    await assert.rejects(
+      pump.preparePumpLaunch({ ...actor, preview: true }, {}),
+      /real wallet signature/,
+    );
+    // Input validation is reached before RPC with no completed operator launch.
+    await assert.rejects(pump.preparePumpLaunch(actor, {}), {
+      name: "ZodError",
+    });
+    assert.equal((await store.readState()).pumpLaunches?.length ?? 0, 0);
+  } finally {
+    if (previous === undefined) delete process.env.HALO_PUMP_LAUNCH_ENABLED;
+    else process.env.HALO_PUMP_LAUNCH_ENABLED = previous;
+  }
+});
 test("creator receipt splitting conserves all ZEC base units, including rounding and large values", () => {
   for (const raw of [
     "0",

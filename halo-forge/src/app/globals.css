@@ -1001,6 +1001,71 @@ thead {
 .form-panel > p {
   margin-bottom: 20px;
 }
+.launch-layout .form-panel h2 {
+  margin: 32px 0 22px;
+  line-height: 1.5;
+}
+.launch-layout .field {
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.launch-layout .field-hint {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.approach-toggle {
+  padding: 20px;
+  margin: 6px 0 28px;
+}
+.approach-toggle label {
+  display: block;
+  line-height: 1.5;
+}
+.approach-toggle .field-hint {
+  margin-top: 10px;
+}
+.launch-layout .disclosure {
+  padding: 22px;
+  margin: 28px 0;
+}
+.launch-layout .disclosure strong {
+  display: block;
+  line-height: 1.6;
+}
+.launch-layout .disclosure p {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.85;
+}
+.launch-layout .track-options {
+  gap: 14px;
+}
+.launch-layout .track-option strong {
+  line-height: 1.6;
+}
+.launch-layout .track-option small {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.launch-layout .form-panel > p,
+.launch-layout .aside-content p {
+  line-height: 1.85;
+}
+.launch-layout .detail-list > div {
+  padding: 18px 0;
+  line-height: 1.7;
+}
+.pump-launch {
+  display: grid;
+  gap: 20px;
+  margin-top: 32px;
+  line-height: 1.85;
+}
+.pump-launch ol {
+  display: grid;
+  gap: 14px;
+}
 .step-bar {
   display: flex;
   gap: 18px;

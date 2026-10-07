@@ -204,16 +204,6 @@ export async function preparePumpLaunch(actor: Actor, raw: unknown) {
       "Paid launches are not enabled yet. The live transaction checks must pass first.",
       503,
     );
-  if (
-    actor.wallet !== COMPUTE_WALLET &&
-    !drafts(await readState()).some(
-      (d) => d.deployer === COMPUTE_WALLET && d.agentId,
-    )
-  )
-    throw new DomainError(
-      "The operator's first live launch must finish before public paid launches open.",
-      503,
-    );
   const input = inputSchema.parse(raw),
     c = pumpConnection();
   const existing = drafts(await readState()).find(
