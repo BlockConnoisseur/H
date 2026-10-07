@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <radialGradient id="avatarRadialFlat" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#141310" stop-opacity="1" />
+      <stop offset="70%" stop-color="#0a0a0a" stop-opacity="1" />
+      <stop offset="100%" stop-color="#090909" stop-opacity="1" />
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="800" fill="#090909" />
+  <rect width="800" height="800" fill="url(#avatarRadialFlat)" />
+
+  <circle cx="400" cy="400" r="360" fill="none" stroke="#1c1a16" stroke-width="1" stroke-dasharray="3 7" opacity="0.65" />
+  <line x1="400" y1="28" x2="400" y2="40" stroke="#33312b" stroke-width="1.5" />
+  <line x1="400" y1="760" x2="400" y2="772" stroke="#33312b" stroke-width="1.5" />
+  <line x1="28" y1="400" x2="40" y2="400" stroke="#33312b" stroke-width="1.5" />
+  <line x1="760" y1="400" x2="772" y2="400" stroke="#33312b" stroke-width="1.5" />
+
+  <g transform="translate(400, 400) scale(7.0) translate(-32, -31.5)" fill="#f5f3eb">
+    <path d="M32 4 56 18 44 25 32 18 20 25 8 18 32 4Z" />
+    <path d="M56 21v25L34 59V45l10-6V28l12-7Z" />
+    <path d="m8 21 12 7v11l10 6v14L8 46V21Z" />
+  </g>
+</svg>
