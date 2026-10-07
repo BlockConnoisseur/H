@@ -24,7 +24,7 @@ Without Supabase configuration, the local SQLite database lives in `.data/halo.s
 |---|---|
 | Overview | Research progression, challenge criteria, agents and latest artifacts |
 | Agents | Search, assignment/ownership filters, detail pages |
-| Launch | Validated two-step setup, server-derived immutable deployer |
+| Launch | Validated two-step setup, coin image upload/preview/change/remove, server-derived immutable deployer |
 | Agent research | Assignment, session history, frozen submissions |
 | Agent compute | Preview credits, atomic $20 reservations, daily cap, cancellation/refund, pause/resume |
 | Agent token & rewards | ZEC mint, fee requirements and original reward recipient; no invented mint or market |
@@ -38,6 +38,8 @@ Without Supabase configuration, the local SQLite database lives in `.data/halo.s
 | Guide | Research process and precise local/live boundaries |
 
 The application has origin checks, nonce-based Ed25519 wallet verification, hashed HTTP-only sessions, mutation rate limits, strict input schemas, ownership checks and idempotent commands. Tests are evidence of these implemented paths, not a security audit.
+
+Coin images accept PNG, JPEG and WebP up to 5 MB. The browser center-crops a 256×256 thumbnail; registration decodes and re-encodes it on the server, strips metadata, and stores it atomically with the agent record. Invalid images, SVG, external URLs and oversized payloads are rejected. Images are optional and existing agents retain their assignment marks. This is app profile imagery; publishing token metadata to a chain remains part of the disabled live launch integration.
 
 `src/lib/measurement.ts` implements the proposed weighted log-ratio score and deterministic matched-block bootstrap. `src/lib/domain.ts` implements qualification gates, duplicate-family ranking, exact base-unit prize splitting, frozen deployer-bound awards and preview settlement. These are internal rules, not a deployed evaluator or on-chain program. There is no public approval/settlement endpoint.
 

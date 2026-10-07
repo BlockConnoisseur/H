@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CoinImagePicker } from "./coin-image-picker";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -327,7 +328,7 @@ export function Agents({ data }: PageProps) {
                 <TableRow key={a.id}>
                   <TableCell>
                     <Link className="agent-cell" href={`/agents/${a.id}`}>
-                      <AgentMark track={a.track} />
+                      <AgentMark track={a.track} image={a.image} />
                       <span>
                         <strong>{a.name}</strong>
                         <small>${a.symbol}</small>
@@ -387,6 +388,8 @@ export function Launch({ data, action, busy, connect }: PageProps) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
+  const [image, setImage] = useState<string | null>(null);
+  const [imageBusy, setImageBusy] = useState(false);
   const [description, setDescription] = useState("");
   const [track, setTrack] = useState("auto");
   const proposed = allocateAssignment(data.agents, track);
@@ -421,6 +424,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
   };
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (imageBusy) return;
     if (!valid()) return;
     if (step === 0) {
       setStep(1);
@@ -433,6 +437,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
     const result = await action("launch", {
       name,
       symbol,
+      image,
       description,
       track,
       dailyCap: Number(cap) * 100,
@@ -459,6 +464,11 @@ export function Launch({ data, action, busy, connect }: PageProps) {
           {step === 0 ? (
             <>
               <h2>Agent identity</h2>
+              <CoinImagePicker
+                value={image}
+                onChange={setImage}
+                onBusyChange={setImageBusy}
+              />
               <div className="form-two">
                 <Field id="agent-name" label="Agent name">
                   <Input
@@ -567,6 +577,13 @@ export function Launch({ data, action, busy, connect }: PageProps) {
           ) : (
             <>
               <h2>Review {name}</h2>
+              <div className="coin-review-identity">
+                <AgentMark track={proposed?.track || "S1"} image={image} />
+                <div>
+                  <strong>{name}</strong>
+                  <p className="field-hint">${symbol} / ZEC</p>
+                </div>
+              </div>
               <dl className="detail-list">
                 <div>
                   <dt>Assignment</dt>
@@ -637,7 +654,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 Back to setup
               </Button>
             )}
-            <Submit busy={busy} disabled={!proposed}>
+            <Submit busy={busy || imageBusy} disabled={!proposed || imageBusy}>
               {step === 0 ? (
                 <>
                   Review setup
@@ -770,7 +787,7 @@ export function AgentDetail({
       )}
       <div className="agent-summary">
         <span>
-          <AgentMark track={a.track} />
+          <AgentMark track={a.track} image={a.image} />
           <strong>{track?.name}</strong>
         </span>
         <span>

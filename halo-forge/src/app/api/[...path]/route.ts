@@ -20,6 +20,7 @@ import {
   ZEC_MINT,
 } from "@/lib/domain";
 import { readState, transact, storageDriver } from "@/lib/store";
+import { normalizeCoinImage } from "@/lib/coin-image";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 function fail(error: unknown) {
@@ -195,6 +196,9 @@ export async function POST(req: NextRequest) {
         })
         .strict()
         .parse(body);
+      if (p.action === "launch" && p.input.image != null) {
+        p.input.image = await normalizeCoinImage(p.input.image);
+      }
       return NextResponse.json({
         result: await transact((s) =>
           execute(s, actor, p.action, p.input, p.key),

@@ -55,6 +55,7 @@ export type Agent = {
   preview: boolean;
   example: boolean;
   tokenMint: string | null;
+  image?: string | null;
 };
 export type Run = {
   id: string;
@@ -241,6 +242,12 @@ const launchSchema = z
     description: z.string().trim().min(15).max(500),
     track: z.enum(["auto", "S1", "S2", "S3"]),
     dailyCap: z.number().int().min(2000).max(20000),
+    image: z
+      .string()
+      .max(90000)
+      .regex(/^data:image\/webp;base64,[A-Za-z0-9+/]+={0,2}$/)
+      .nullable()
+      .optional(),
   })
   .strict();
 const submissionSchema = z

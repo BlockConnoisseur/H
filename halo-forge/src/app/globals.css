@@ -678,6 +678,7 @@ main {
   margin-bottom: 20px;
 }
 .agent-mark {
+  overflow: hidden;
   width: 35px;
   height: 35px;
   display: inline-grid;
@@ -690,6 +691,68 @@ main {
   border: 1px solid #4a4a48;
   border-radius: 9px;
   flex: none;
+}
+.agent-pfp {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.coin-image-field {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 1.25rem 0 1.75rem;
+}
+.coin-image-preview {
+  width: 6rem;
+  height: 6rem;
+  flex: none;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #4c4536;
+  border-radius: 1rem;
+  background: #171715;
+  color: #bbaa86;
+}
+.coin-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.coin-image-controls {
+  min-width: 0;
+}
+.coin-image-controls > strong {
+  font-size: 0.875rem;
+}
+.coin-image-controls .field-hint {
+  margin: 0.35rem 0 0.65rem;
+}
+.coin-image-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.coin-review-identity {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.25rem 0 1.5rem;
+}
+.coin-review-identity .agent-mark {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+@media (max-width: 480px) {
+  .coin-image-field {
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+  .coin-image-preview {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
 }
 .mark-S2 {
   background: #3c3226;

@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { NextRequest } from "next/server";
+import sharp from "sharp";
 const dir = mkdtempSync(join(tmpdir(), "halo-api-test-"));
 process.env.HALO_DATABASE_DRIVER = "sqlite";
 process.env.HALO_DATABASE_PATH = join(dir, "test.sqlite");
@@ -31,6 +32,53 @@ const req = (
     headers: { origin, cookie, "content-type": "application/json" },
     body: JSON.stringify(body),
   });
+test("coin PFP survives registration and reload; malformed images never create agents", async () => {
+  const auth = await route.POST(req("auth/preview", {}));
+  const cookie = auth.headers.get("set-cookie")!.split(";")[0];
+  const bytes = await sharp({
+    create: { width: 256, height: 256, channels: 3, background: "gold" },
+  })
+    .png()
+    .toBuffer();
+  const input = {
+    name: "Image Scout",
+    symbol: "PFP",
+    description: "Test coin image persistence with research registration.",
+    track: "auto",
+    dailyCap: 2000,
+    image: `data:image/png;base64,${bytes.toString("base64")}`,
+  };
+  const body = { action: "launch", input, key: "image-launch-test" };
+  const created = await route.POST(req("actions", body, cookie));
+  assert.equal(created.status, 200);
+  const { result } = await created.json();
+  const retry = await route.POST(req("actions", body, cookie));
+  assert.deepEqual((await retry.json()).result, result);
+  const state = await (
+    await route.GET(new NextRequest("http://127.0.0.1:3210/api/state"))
+  ).json();
+  const agent = state.agents.find((a: { id: string }) => a.id === result.id);
+  assert.match(agent.image, /^data:image\/webp;base64,/);
+  assert.equal(
+    state.agents.filter((a: { symbol: string }) => a.symbol === "PFP").length,
+    1,
+  );
+  const invalid = await route.POST(
+    req(
+      "actions",
+      {
+        ...body,
+        key: "invalid-image-test",
+        input: { ...input, image: "data:image/png;base64,YmFk" },
+      },
+      cookie,
+    ),
+  );
+  assert.equal(invalid.status, 400);
+  const after = await database.readState();
+  assert.equal(after.agents.filter((a) => a.symbol === "PFP").length, 1);
+});
+
 test("API rejects wrong origin, missing identity and malformed JSON", async () => {
   assert.equal(
     (await route.POST(req("auth/preview", {}, "", "https://attacker.example")))

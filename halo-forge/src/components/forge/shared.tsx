@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, FlaskConical, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -243,10 +244,27 @@ export function TextLink({
     </Link>
   );
 }
-export function AgentMark({ track }: { track: string }) {
+export function AgentMark({
+  track,
+  image,
+}: {
+  track: string;
+  image?: string | null;
+}) {
   return (
     <span className={`agent-mark mark-${track}`} aria-hidden="true">
-      {track}
+      {image ? (
+        <Image
+          src={image}
+          alt=""
+          width={64}
+          height={64}
+          unoptimized
+          className="agent-pfp"
+        />
+      ) : (
+        track
+      )}
     </span>
   );
 }
