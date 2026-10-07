@@ -67,6 +67,12 @@
   justify-content: space-between;
   letter-spacing: -0.035em;
   font-weight: 500;
+  gap: 0.75rem;
+}
+.lab-station h2 .agent-mark {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 .lab-station p {
   font-size: 0.8rem;

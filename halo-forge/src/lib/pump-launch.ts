@@ -57,6 +57,7 @@ export type LaunchTx = {
     "unsigned" | "pending" | "confirming" | "finalized" | "failed" | "expired";
 };
 export type PumpDraft = {
+  archivedAt?: string;
   id: string;
   requestId?: string;
   deployer: string;
@@ -100,7 +101,9 @@ function drafts(s: State) {
 }
 function owned(s: State, actor: Actor, id: string) {
   requireActor(actor);
-  const d = drafts(s).find((d) => d.id === id && d.deployer === actor.wallet);
+  const d = drafts(s).find(
+    (d) => d.id === id && d.deployer === actor.wallet && !d.archivedAt,
+  );
   if (!d)
     throw new DomainError("Launch not found for this connected wallet.", 404);
   return d;
@@ -273,7 +276,7 @@ export function launchSigningDiagnostic(expected: LaunchTx, signed: string) {
 export async function latestPumpLaunch(actor: Actor) {
   requireActor(actor);
   const d = drafts(await readState()).findLast(
-    (d) => d.deployer === actor.wallet,
+    (d) => d.deployer === actor.wallet && !d.archivedAt,
   );
   return d ? view(d) : null;
 }
@@ -283,7 +286,13 @@ export async function savedPumpLaunches(actor: Actor, id?: string) {
   return {
     launch: id ? view(owned(state, actor, id)) : null,
     launches: drafts(state)
-      .filter((d) => d.deployer === actor.wallet && !d.agentId && !d.abandoned)
+      .filter(
+        (d) =>
+          d.deployer === actor.wallet &&
+          !d.agentId &&
+          !d.abandoned &&
+          !d.archivedAt,
+      )
       .map((d) => ({ id: d.id, name: d.name, symbol: d.symbol, mint: d.mint })),
   };
 }
@@ -294,6 +303,7 @@ export function findLaunchForRequest(
 ) {
   return drafts(state).findLast(
     (d) =>
+      !d.archivedAt &&
       d.deployer === actor.wallet &&
       !d.abandoned &&
       (requestId ? d.requestId === requestId : !d.agentId),

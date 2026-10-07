@@ -222,6 +222,7 @@ export async function researchTick() {
     for (const agent of s.agents.filter(
       (a) =>
         a.autoRun &&
+        !a.archivedAt &&
         a.status !== "paused" &&
         (a.platform || (!a.preview && a.budget >= 300)),
     )) {

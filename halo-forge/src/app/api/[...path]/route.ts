@@ -22,7 +22,12 @@ import {
 import { readState, transact, storageDriver } from "@/lib/store";
 import { normalizeCoinImage } from "@/lib/coin-image";
 import { after } from "next/server";
-import { publicLab, labState, queueResearch, reviewResearch } from "@/lib/lab-domain";
+import {
+  publicLab,
+  labState,
+  queueResearch,
+  reviewResearch,
+} from "@/lib/lab-domain";
 import { dispatchResearch } from "@/lib/lab-runtime";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,7 +68,13 @@ export async function GET(req: NextRequest) {
       throw new DomainError("Not found.", 404);
     const actor = await actorFor(req.cookies.get(COOKIE)?.value);
     const s = await readState();
-    if(path === "lab") return NextResponse.json(publicLab(s,actor),{headers:{"Cache-Control":"no-store"}});
+    const visibleAgents = new Set(
+      s.agents.filter((a) => !a.archivedAt).map((a) => a.id),
+    );
+    if (path === "lab")
+      return NextResponse.json(publicLab(s, actor), {
+        headers: { "Cache-Control": "no-store" },
+      });
     // Audit, billing and raw artifacts are visible only to their owners/reviewers.
     const owned = new Set(
       s.agents.filter((a) => a.deployer === actor?.wallet).map((a) => a.id),
@@ -100,10 +111,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         actor,
-        agents: s.agents.filter((a) => !a.example),
-        runs: s.runs.filter((r) => owned.has(r.agentId) || actor?.reviewer),
+        agents: s.agents.filter((a) => !a.example && !a.archivedAt),
+        runs: s.runs.filter(
+          (r) =>
+            visibleAgents.has(r.agentId) &&
+            (owned.has(r.agentId) || actor?.reviewer),
+        ),
         findings: s.findings
-          .filter((f) => !f.example)
+          .filter((f) => !f.example && visibleAgents.has(f.agentId))
           .map((f) => ({
             ...f,
             patch:
@@ -111,12 +126,14 @@ export async function GET(req: NextRequest) {
                 ? f.patch
                 : "Private until publication.",
           })),
-        awards: s.awards,
+        awards: s.awards.filter((a) => visibleAgents.has(a.agentId)),
         ledger: s.ledger.filter((e) => e.agentId && owned.has(e.agentId)),
         audit: s.audit
           .filter((e) => e.actor === actor?.wallet || actor?.reviewer)
           .slice(0, 50),
-        ranking: rankFindings(s.findings).map((r) => ({
+        ranking: rankFindings(
+          s.findings.filter((f) => visibleAgents.has(f.agentId)),
+        ).map((r) => ({
           ...r,
           finding: { ...r.finding, patch: "" },
         })),
@@ -186,21 +203,41 @@ export async function POST(req: NextRequest) {
       res.cookies.delete(COOKIE);
       return res;
     } else if (path === "lab/actions") {
-      const actor=await actorFor(token);
-      if(!actor || actor.preview) throw new DomainError("Connect and sign with your wallet first.",401);
-      const p=z.discriminatedUnion("action",[
-        z.object({action:z.literal("queue"),agentId:z.string()}).strict(),
-        z.object({action:z.literal("review"),jobId:z.string().uuid(),decision:z.enum(["accepted","rejected"]),note:z.string().min(15).max(2000)}).strict(),
-        z.object({action:z.literal("pause"),paused:z.boolean()}).strict(),
-      ]).parse(body);
-      const result=await transact(s=>{
-        if(p.action==="queue") return {id:queueResearch(s,p.agentId,actor).id};
-        if(p.action==="review") {reviewResearch(s,actor,p.jobId,p.decision,p.note);return {id:p.jobId};}
-        if(!actor.reviewer) throw new DomainError("Operator access required.",403);
-        labState(s).enabled=!p.paused;return {enabled:!p.paused};
+      const actor = await actorFor(token);
+      if (!actor || actor.preview)
+        throw new DomainError("Connect and sign with your wallet first.", 401);
+      const p = z
+        .discriminatedUnion("action", [
+          z
+            .object({ action: z.literal("queue"), agentId: z.string() })
+            .strict(),
+          z
+            .object({
+              action: z.literal("review"),
+              jobId: z.string().uuid(),
+              decision: z.enum(["accepted", "rejected"]),
+              note: z.string().min(15).max(2000),
+            })
+            .strict(),
+          z
+            .object({ action: z.literal("pause"), paused: z.boolean() })
+            .strict(),
+        ])
+        .parse(body);
+      const result = await transact((s) => {
+        if (p.action === "queue")
+          return { id: queueResearch(s, p.agentId, actor).id };
+        if (p.action === "review") {
+          reviewResearch(s, actor, p.jobId, p.decision, p.note);
+          return { id: p.jobId };
+        }
+        if (!actor.reviewer)
+          throw new DomainError("Operator access required.", 403);
+        labState(s).enabled = !p.paused;
+        return { enabled: !p.paused };
       });
-      if(p.action==="queue") after(dispatchResearch);
-      return NextResponse.json({result});
+      if (p.action === "queue") after(dispatchResearch);
+      return NextResponse.json({ result });
     } else if (path === "actions") {
       const actor = await actorFor(token);
       if (!actor)

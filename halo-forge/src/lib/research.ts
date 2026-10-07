@@ -135,11 +135,15 @@ export function assignmentFor(
   };
 }
 export function allocateAssignment(
-  agents: { example: boolean; assignment?: ResearchAssignment }[],
+  agents: {
+    example: boolean;
+    archivedAt?: string;
+    assignment?: ResearchAssignment;
+  }[],
   track = "auto",
 ) {
   const active = agents
-    .filter((a) => !a.example && a.assignment)
+    .filter((a) => !a.example && !a.archivedAt && a.assignment)
     .map((a) => a.assignment!);
   const occupied = new Set(active.map((a) => a.key));
   const choices = methods

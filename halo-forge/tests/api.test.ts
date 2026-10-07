@@ -23,6 +23,34 @@ after(async () => {
   await database.closeStore();
   rmSync(dir, { recursive: true, force: true });
 });
+
+test("archived agents stay in accounting storage but leave the public directory", async () => {
+  const { initialState } = await import("../src/lib/domain");
+  const archived = {
+    ...initialState().agents[0],
+    id: "retired-rehearsal",
+    archivedAt: new Date().toISOString(),
+    platform: false,
+    budget: 300,
+    tokenMint: "retained-mint",
+  };
+  await database.transact((s) => {
+    s.agents.push(archived);
+  });
+  const response = await route.GET(
+    new NextRequest("http://127.0.0.1:3210/api/state"),
+  );
+  const body = await response.json();
+  assert.equal(
+    body.agents.some((a: { id: string }) => a.id === archived.id),
+    false,
+  );
+  const saved = (await database.readState()).agents.find(
+    (a) => a.id === archived.id,
+  );
+  assert.equal(saved?.budget, 300);
+  assert.equal(saved?.tokenMint, "retained-mint");
+});
 const req = (
   path: string,
   body: unknown,
@@ -200,28 +228,47 @@ test("signed wallet authentication cannot turn unimplemented live launch or comp
   const cookie = verified.headers.get("set-cookie")!.split(";")[0];
   try {
     const state = await (
-      await route.GET(new NextRequest("http://127.0.0.1:3210/api/state", {
-        headers: { cookie },
-      }))
+      await route.GET(
+        new NextRequest("http://127.0.0.1:3210/api/state", {
+          headers: { cookie },
+        }),
+      )
     ).json();
     assert.equal(state.actor.wallet, wallet);
     assert.equal(state.actor.preview, false);
     assert.equal(state.liveReady, false);
     const beforeState = await database.readState();
     for (const [action, input] of [
-      ["launch", {
-        name: "Live Boundary Scout", symbol: "LIVE", track: "auto",
-        description: "Verify real wallet launches cannot silently create preview tokens.",
-        dailyCap: 2000,
-      }],
+      [
+        "launch",
+        {
+          name: "Live Boundary Scout",
+          symbol: "LIVE",
+          track: "auto",
+          description:
+            "Verify real wallet launches cannot silently create preview tokens.",
+          dailyCap: 2000,
+        },
+      ],
       ["topup", { agentId: "unfunded-agent", cents: 2000 }],
       ["queue", { agentId: "unfunded-agent" }],
     ] as const) {
-      const response = await route.POST(req("actions", {
-        action, input, key: `live-boundary-${action}`,
-      }, cookie));
+      const response = await route.POST(
+        req(
+          "actions",
+          {
+            action,
+            input,
+            key: `live-boundary-${action}`,
+          },
+          cookie,
+        ),
+      );
       assert.equal(response.status, 503);
-      assert.match((await response.json()).error, /Live launch and spending are not enabled/);
+      assert.match(
+        (await response.json()).error,
+        /Live launch and spending are not enabled/,
+      );
     }
     assert.deepEqual(await database.readState(), beforeState);
     const replay = await route.POST(req("auth/verify", { id, signature }));

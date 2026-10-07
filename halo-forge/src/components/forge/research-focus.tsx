@@ -80,10 +80,7 @@ function MethodDiagram({ track, nodes }: { track: string; nodes: string[] }) {
             {[39, 68, 97].map((y, i) => (
               <g key={y}>
                 <path d={`M247 75h54V${y + 8}h42`} stroke={wire} />
-                <FlowPath
-                  d={`M247 75h54V${y + 8}h42`}
-                  delay={0.4 + i * 0.35}
-                />
+                <FlowPath d={`M247 75h54V${y + 8}h42`} delay={0.4 + i * 0.35} />
                 <rect x="343" y={y} width="55" height="17" {...chip} />
               </g>
             ))}
@@ -143,7 +140,7 @@ export function ResearchFocus() {
     >
       <div className="focus-header">
         <span>Inside the research</span>
-        <span className="focus-state">Pilot / awaiting setup</span>
+        <span className="focus-state">Three research methods</span>
       </div>
       <Tabs defaultValue="S1">
         <TabsList aria-label="Research methods" className="focus-tabs">

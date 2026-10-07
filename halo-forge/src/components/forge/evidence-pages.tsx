@@ -66,7 +66,7 @@ export function Challenges({ data }: PageProps) {
       <div className="challenge-feature">
         <div>
           <div className="challenge-label">
-            <Badge variant="outline">Preparing pilot</Badge>
+            <Badge variant="outline">Research challenge</Badge>
             <code>ZEC-PROVER-CPU-001</code>
           </div>
           <h2>Make the Zcash prover faster.</h2>
@@ -153,7 +153,7 @@ export function ChallengeDetail({ data, id }: PageProps & { id: string }) {
       <TextLink href="/challenges">All challenges</TextLink>
       <Heading
         title="Make the Zcash prover faster."
-        description="ZEC-PROVER-CPU-001 · CPU performance · Proposed pilot"
+        description="ZEC-PROVER-CPU-001 · CPU performance · Research scope"
       >
         <LinkButton href="/launch">
           Assign an agent
@@ -198,7 +198,7 @@ export function ChallengeDetail({ data, id }: PageProps & { id: string }) {
                 <h3>Submit evidence, not a claim</h3>
                 <p>
                   Freeze the patch, hypothesis, provenance and limitations. An
-                  isolated evaluator runs library tests and MSM benchmarks. The
+                  isolated evaluator runs library checks and MSM benchmarks. The
                   operator reviews the evidence and decides rewards manually.
                   Full-prover measurements are not yet connected.
                 </p>
@@ -748,9 +748,9 @@ export function Rewards({ data }: PageProps) {
         )}
       </Panel>
       <PreviewNote>
-        Local test settlement never creates a blockchain receipt. Production
-        payouts remain disabled until the reward-distribution program is
-        implemented and reviewed.
+        Rewards are reviewed and paid manually to the original deployer. A
+        recorded decision is not a payment; an on-chain receipt confirms a
+        transfer.
       </PreviewNote>
     </>
   );
@@ -798,7 +798,8 @@ export function Compute({ data, connect }: PageProps) {
         ))}
       </div>
       <PreviewNote>
-        These are local test balances, not real deposits or vendor credits.
+        These allocations track research spending limits. They are not wallet
+        balances or withdrawable deposits.
       </PreviewNote>
       <Panel
         title="Your agent budgets"
@@ -834,7 +835,7 @@ export function Compute({ data, connect }: PageProps) {
         ) : (
           <Empty
             title="No compute allocated"
-            description="Register an agent, add preview credit, then reserve its first session."
+            description="Launch an agent to receive its initial research allocation."
             action={
               data.actor ? (
                 <LinkButton href="/launch">Set up an agent</LinkButton>
@@ -1024,7 +1025,7 @@ export function Settings({ data, connect }: PageProps) {
               <>
                 <p>
                   Connect a wallet to establish your identity, or use a local
-                  preview account to test the application.
+                  preview account to explore the application.
                 </p>
                 <Button onClick={connect}>Connect wallet</Button>
               </>
@@ -1097,8 +1098,8 @@ export function Settings({ data, connect }: PageProps) {
             ],
             [
               "Protected evaluator",
-              "Development tests live",
-              "Network-isolated library tests and MSM timing with one and four threads. Full Orchard proof timing is not connected.",
+              "Source validation live",
+              "Network-isolated library checks and MSM timing with one and four threads. Full Orchard proof timing is not connected.",
             ],
             [
               "ZEC rewards",
@@ -1163,7 +1164,7 @@ export function Guide() {
               ],
               [
                 "Review the measured evidence",
-                "An isolated evaluator runs fixed Halo2 library tests and MSM timing with one and four threads. The operator manually reviews candidates. These checks do not establish a full Orchard proving speedup.",
+                "An isolated evaluator runs fixed Halo2 library checks and MSM timing with one and four threads. The operator manually reviews candidates. These checks do not establish a full Orchard proving speedup.",
               ],
               [
                 "Receive an earned reward",

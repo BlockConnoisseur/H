@@ -37,6 +37,7 @@ export const tracks = [
 ] as const;
 export type Actor = { wallet: string; preview: boolean; reviewer: boolean };
 export type Agent = {
+  archivedAt?: string;
   id: string;
   name: string;
   symbol: string;
@@ -184,7 +185,14 @@ export function ensureResearchSetup(state: State, platform = true) {
       "S3-chunks",
     ].entries()) {
       const agentId = `platform-${index + 1}`;
-      if (state.agents.some((a) => a.id === agentId)) continue;
+      const existing = state.agents.find((a) => a.id === agentId);
+      if (existing) {
+        if (existing.image !== "/platform-agent-logo.png") {
+          existing.image = "/platform-agent-logo.png";
+          changed = true;
+        }
+        continue;
+      }
       const assignment = assignmentFor(methodId);
       const brief = researchBrief(assignment);
       state.agents.push({
@@ -206,6 +214,7 @@ export function ensureResearchSetup(state: State, platform = true) {
         preview: true,
         example: false,
         tokenMint: null,
+        image: "/platform-agent-logo.png",
       });
       changed = true;
     }
@@ -265,7 +274,7 @@ const submissionSchema = z
   })
   .strict();
 const getAgent = (s: State, agentId: unknown) => {
-  const a = s.agents.find((a) => a.id === agentId);
+  const a = s.agents.find((a) => a.id === agentId && !a.archivedAt);
   if (!a) throw new DomainError("Agent not found.", 404);
   return a;
 };

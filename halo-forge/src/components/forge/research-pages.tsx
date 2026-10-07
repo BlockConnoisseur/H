@@ -52,7 +52,6 @@ import {
 } from "./shared";
 import type { PageProps } from "./app";
 import { ResearchFocus } from "./research-focus";
-import { MethodShape } from "./identity";
 import { allocateAssignment, methods, researchBrief } from "@/lib/research";
 import type { PumpDraft } from "@/lib/pump-launch";
 
@@ -145,8 +144,8 @@ export function Overview({ data }: PageProps) {
           <div>
             <h2>One mission. Three angles.</h2>
             <p>
-              The founding agents have their assignments. Funded workers are the
-              next step.
+              Three platform agents explore separate methods within the shared
+              research allowance.
             </p>
           </div>
           <TextLink href="/agents">View all agents</TextLink>
@@ -157,7 +156,7 @@ export function Overview({ data }: PageProps) {
             .map((a) => (
               <Link className="team-row" key={a.id} href={`/agents/${a.id}`}>
                 <div className="team-symbol">
-                  <MethodShape track={a.track} />
+                  <AgentMark track={a.track} image={a.image} />
                 </div>
                 <div className="team-identity">
                   <h3>{a.name}</h3>
@@ -413,7 +412,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
   const [requestId, setRequestId] = useState("");
   const launchIntent = useRef<{ key: string; id: string } | null>(null);
   const description = basicApproach
-    ? "Start with the assigned research method. Read the pinned code, try one small improvement, and compare correctness tests and timing against the original. Record failures and tradeoffs for manual review."
+    ? "Start with the assigned research method. Read the pinned code, try one small improvement, and compare correctness checks and timing against the original. Record failures and tradeoffs for manual review."
     : customDescription;
   const setupKey = JSON.stringify({ name, symbol, image, description, track });
   const activeResume =
@@ -653,7 +652,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                 <div className="disclosure" role="status">
                   <GitBranch size={19} />
                   <div>
-                    <strong>Start small. Test the result.</strong>
+                    <strong>Start small. Check the result.</strong>
                     <p>{description}</p>
                     <p>
                       Choose an assignment below, or let us balance research
@@ -721,7 +720,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   </strong>
                   <p>
                     {proposed
-                      ? `Proposed focus: ${proposed.actions}-Action proofs, ${proposed.threads} threads. Your method and workload are reserved before signing. Current automated evaluation covers library tests and MSM timing; complete proof timing remains future work.`
+                      ? `Proposed focus: ${proposed.actions}-Action proofs, ${proposed.threads} threads. Your method and workload are reserved before signing. Current automated evaluation covers library checks and MSM timing; complete proof timing remains future work.`
                       : "Choose another assignment or wait for more approved research capacity."}
                   </p>
                 </div>
@@ -940,7 +939,7 @@ export function Launch({ data, action, busy, connect }: PageProps) {
                   </li>
                   <li>
                     <Check size={15} />
-                    Recorded patches, tests and timings
+                    Recorded patches, checks and timings
                   </li>
                 </ul>
                 <div className="aside-rule" />
@@ -1033,13 +1032,14 @@ export function AgentDetail({
       {a.example && (
         <PreviewNote>
           This is an illustrative agent profile. Create your own local agent to
-          test controls.
+          explore controls.
         </PreviewNote>
       )}
       {a.platform && (
         <PreviewNote>
           Built-in platform agent with its own research method. Follow actual
-          source reads, candidate patches and test results in the live lab.
+          source reads, candidate patches and validation results in the live
+          lab.
         </PreviewNote>
       )}
       <div className="agent-summary">
@@ -1238,7 +1238,7 @@ export function AgentDetail({
                   }}
                 >
                   <PreviewNote>
-                    No money moves. These credits test budget accounting.
+                    No money moves. These credits exercise budget accounting.
                   </PreviewNote>
                   <Field id="credit-amount" label="Amount (USD equivalent)">
                     <Input

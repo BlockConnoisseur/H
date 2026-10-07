@@ -106,7 +106,7 @@ export function queueResearch(
   actor?: Actor,
 ): LabJob {
   const lab = labState(s),
-    agent = s.agents.find((a) => a.id === agentId);
+    agent = s.agents.find((a) => a.id === agentId && !a.archivedAt);
   if (!lab.enabled) throw new DomainError("Research execution is paused.", 503);
   if (!agent?.assignment || !agent.deployer)
     throw new DomainError("Agent needs an assignment and deployer.");
@@ -256,6 +256,7 @@ export function publicLab(s: State, actor: Actor | null) {
         ),
     ),
     jobs: lab.jobs
+      .filter((j) => !s.agents.find((a) => a.id === j.agentId)?.archivedAt)
       .slice(-150)
       .reverse()
       .map((j) => ({

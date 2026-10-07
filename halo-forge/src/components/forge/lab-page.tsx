@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Heading, Panel, Empty, money, short } from "./shared";
+import { Heading, Panel, Empty, money, short, AgentMark } from "./shared";
 import type { PageProps } from "./app";
 import type { PublicLab } from "@/lib/lab-domain";
 import type { FeeClaim } from "@/lib/pump-fees";
@@ -29,7 +29,7 @@ const labels: Record<string, string> = {
   queued: "Queued",
   dispatching: "Starting worker",
   researching: "Reading & proposing",
-  evaluating: "Running tests",
+  evaluating: "Running checks",
   awaiting_review: "Awaiting your review",
   failed: "Stopped with an error",
   cancelled: "Cancelled",
@@ -174,6 +174,7 @@ export function LabPage({ data, connect }: PageProps) {
                 </div>
                 <Link href={`/agents/${a.id}`}>
                   <h2>
+                    <AgentMark track={a.track} image={a.image} />
                     {a.name}
                     <ArrowUpRight size={18} />
                   </h2>
@@ -303,7 +304,7 @@ export function LabPage({ data, connect }: PageProps) {
           {!lab?.jobs.length ? (
             <Empty
               title="Waiting for the first run"
-              description="Source reads, candidate patches and test results will be recorded here. No activity is simulated."
+              description="Source reads, candidate patches and validation results will be recorded here. No activity is simulated."
             />
           ) : (
             lab.jobs.map((j) => (
@@ -514,7 +515,7 @@ export function LabPage({ data, connect }: PageProps) {
             The operator-funded allowance is {money(lab?.allocatedCents ?? 0)},
             with {money(lab?.committedCents ?? 0)} committed across experiments
             and a {money(lab?.dailyCapCents ?? 0)} daily ceiling. Jobs run
-            sequentially. Development tests use pinned Halo2 source in a
+            sequentially. Source validation use pinned Halo2 source in a
             network-isolated sandbox; improvements are not guaranteed.
           </p>
           <p>
