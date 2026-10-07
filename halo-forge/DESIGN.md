@@ -29,6 +29,10 @@ colors:
   focus-ink: "#242421"
   focus-muted: "#625d52"
   focus-rule: "#c8c5bd"
+  diagram-wire: "#454136"
+  diagram-chip: "#1e1d19"
+  diagram-chip-border: "#565147"
+  diagram-flow: "#ece5d3"
   focus-agent: "#e6e3da"
   focus-hover: "#d9d5c9"
   panel-border: "#2c2b27"
@@ -167,9 +171,9 @@ components:
     textColor: "{colors.foreground}"
     padding: "30px 18px"
   research-focus:
-    backgroundColor: "{colors.foreground}"
-    textColor: "{colors.focus-ink}"
-    rounded: "0"
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.surface}"
     padding: "23px 26px 0"
   forge-mark:
     textColor: "{colors.foreground}"
@@ -183,13 +187,13 @@ components:
 
 **Creative North Star: "The Zcash Research Register"**
 
-Black surfaces, warm white type and fine rules give Halo Forge the clarity of a cryptography research register. Larger Geist headings and a light conceptual research panel establish contrast. Geist Mono identifies code and detailed evidence counts; headline metrics use Geist. Gold remains a quiet navigation and state accent, while white carries primary actions.
+Black surfaces, warm white type and fine rules give Halo Forge the clarity of a cryptography research register. Larger Geist headings and a bordered conceptual research panel establish contrast. Geist Mono identifies code and detailed evidence counts; headline metrics use Geist. Gold remains a quiet navigation and state accent, while white carries primary actions.
 
 The Hashsmashers reference informs the horizontal shell and ruled records. The user rejected pixel typography and broad gold treatment. The refined identity uses an original three-part geometric mark, method-specific line diagrams and shadcn/ui controls. Research schematics explain the work without presenting projected results as achieved progress.
 
 **Key Characteristics:**
 - Black and white first, with restrained gold accents.
-- Three-part geometric mark and a light conceptual research panel.
+- Three-part geometric mark and a dark conceptual research panel with animated connector flow.
 - Larger Geist hierarchy, ruled agent records and method-specific SVG symbols.
 - Explicit preview, setup and conditional reward states.
 
@@ -210,7 +214,7 @@ The palette is predominantly black and warm white. Frontmatter records the activ
 - **Warm Paper** (foreground): reading text. **Muted Stone** (muted-foreground): descriptions and secondary details.
 - **Raised Charcoal** (popover), **Secondary Charcoal** (secondary) and **Muted Charcoal** (muted): overlay and interaction surfaces, with corresponding foreground tokens.
 - **Ruled Border** (border), **Panel Border** (panel-border) and **Field Border** (input): separators and form affordances.
-- **Research Ink** (focus-ink), **Research Muted** (focus-muted) and **Research Rule** (focus-rule): dark content on the light research panel. The footer link uses focus-agent and focus-hover fills.
+- **Research Ink** (focus-ink), **Research Muted** (focus-muted) and **Research Rule** (focus-rule): retired tokens from the former light research panel; the panel now uses card, muted-foreground and border tokens like other surfaces.
 - **Alternate Record** (row-alternate): the middle founding-agent row, providing restrained rhythm.
 
 The inherited shadcn accent pair is a warm interaction token, not permission to spread gold over major surfaces. Semantic success badges still contain local desaturated green literals; they are not the brand palette and are not promoted to frontmatter primitives.
@@ -225,7 +229,7 @@ The inherited shadcn accent pair is a warm interaction token, not permission to 
 
 Clean sans-serif headings establish a stronger hierarchy without pixel typography. The display role belongs to the overview mission: 54px below 1100px, 46px below 900px, then clamp(44px, 12.2vw, 64px) with 1.04 line-height below 600px. Both headline lines use the reading foreground. Standard page headings use headline and become 34px below 600px. Team section headings become 32px below 900px and use 1.06 line-height on phones. Panels use panel-title; directory agent names retain title while founding-agent rows use team-title.
 
-Headline metrics use the sans-serif metric role, becoming 32px on phones. Detailed evidence nodes retain 20px mono counts. Mission supporting copy is 16px/1.75 with a 47ch measure, 14px on tablets and 15px/1.65 on phones. The light research panel uses focus-title, becoming 24px on tablets and 28px on phones. Its explanatory text is 12px/1.65; final captions are 10px, with setup state 11px or 10px on phones. These caption sizes are local annotations, not a general reading scale.
+Headline metrics use the sans-serif metric role, becoming 32px on phones. Detailed evidence nodes retain 20px mono counts. Mission supporting copy is 16px/1.75 with a 47ch measure, 14px on tablets and 15px/1.65 on phones. The research panel uses focus-title, becoming 24px on tablets and 28px on phones. Its explanatory text is 12px/1.65; final captions are 10px, with setup state 11px or 10px on phones. These caption sizes are local annotations, not a general reading scale.
 
 Form labels retain label. Masthead navigation remains 12px (11px below 1100px). Research and method descriptions commonly use 13–14px, and inline text links now use 13px.
 
@@ -237,7 +241,7 @@ The desktop shell uses a full-width horizontal masthead with a 78px minimum heig
 
 At 1100px the masthead tightens. At 900px the masthead hides and navigation moves into the existing 280px shadcn Sheet. A single 68px mobile bar combines the geometric identity, menu, search and wallet action. Breadcrumbs hide; the disabled-research/payout notice remains directly beneath the bar. Main padding is 28px 24px, becoming 28px 20px at 600px.
 
-The overview lead uses minmax(0, 1.15fr)/minmax(0, 1fr) columns with a 60px gap, narrowing to 34px below 1100px and equal columns with a 28px gap below 900px. At 600px it stacks; the light research panel follows the hero with a 30px top gap and remains fully visible. Actions fill the width. Metrics form four ruled columns, reducing to two below 900px.
+The overview lead uses minmax(0, 1.15fr)/minmax(0, 1fr) columns with a 60px gap, narrowing to 34px below 1100px and equal columns with a 28px gap below 900px. At 600px it stacks; the research panel follows the hero with a 30px top gap and remains fully visible. Actions fill the width. Metrics form four ruled columns, reducing to two below 900px.
 
 Founding-agent records have five desktop columns: symbol, identity, method, status and arrow. Methods move to a second row below 900px and full-width below 600px. The middle record has a subtle alternate fill. Directory cards, launch and reading layouts retain their existing stack below 980px. Six evidence stages become two rows of three on narrow screens, without a connector across rows.
 
@@ -281,11 +285,11 @@ Desktop navigation is a horizontal masthead: neutral labels, a thin gold underli
 
 The original three-part geometric mark appears in desktop and mobile headers, the footer and the favicon. The desktop mark is 36px, tablet 29px, phone 27px and footer 23px. Use the supplied SVG paths; the previous Z coin emblem is no longer the site identity.
 
-The light research panel contrasts the dark shell with foreground-colored paper and research ink. Its three shadcn tabs—Scalars, Memory and Scheduling—use neutral labels, a dark selected underline, a subtle hover fill and an inset visible focus outline. Each selected method pairs a concrete explanation with a conceptual SVG diagram, labeled stages and a link to its assigned agent. Keep “Pilot / awaiting setup” and “Schematic, not results” visible. The desktop title/description reserves space to steady the panel between tabs; those minimum heights relax on phones.
+The research panel is a bordered card-surface block on the dark shell. Its three shadcn tabs—Scalars, Memory and Scheduling—use muted labels, a gold selected underline, a subtle hover fill and an inset visible focus outline. Each selected method pairs a concrete explanation with a conceptual SVG diagram, labeled stages and a link to its assigned agent. Diagram connectors carry a slowly traveling dash pulse to suggest work in motion; the Memory loop keeps the quiet gold accent. Keep “Pilot / awaiting setup” and “Schematic, not results” visible. The desktop title/description reserves space to steady the panel between tabs; those minimum heights relax on phones.
 
 ### Team register and evidence progression
 
-Founding-agent records combine a method-specific SVG symbol, identity, method description, written setup state and arrow. The whole record is a link. Symbols represent scalar layers, storage rows and scheduling lanes; they are not font glyphs. Desktop symbols are 56px, tablet 48px and phone 42px. Hover lifts only the symbol. The evidence progression uses 50px square nodes with 20px mono counts and one-pixel connectors. The active stage retains quiet warm text and border emphasis. Preview counts are explicitly illustrative.
+Founding-agent records combine a method-specific SVG symbol, identity, method description, written setup state and arrow. The panel's agent footer link is a darker raised band that brightens on hover. The whole record is a link. Symbols represent scalar layers, storage rows and scheduling lanes; they are not font glyphs. Desktop symbols are 56px, tablet 48px and phone 42px. Hover lifts only the symbol. The evidence progression uses 50px square nodes with 20px mono counts and one-pixel connectors. The active stage retains quiet warm text and border emphasis. Preview counts are explicitly illustrative.
 
 ## Do's and Don'ts
 

@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Check,
-  ChevronRight,
   CircleHelp,
   Compass,
   Cpu,
@@ -100,19 +99,13 @@ function Navigation({
           >
             <n.icon size={18} />
             {n.name}
-            {n.name === "Findings" && data && (
+            {n.name === "Findings" && data && data.findings.length > 0 && (
               <span className="nav-count">{data.findings.length}</span>
             )}
           </Link>
         ))}
       </nav>
       <div className="sidebar-bottom">
-        <div className="network-box">
-          <div>
-            <span className="tiny-dot amber" /> Local development
-          </div>
-          <p>Evidence before rewards.</p>
-        </div>
         <Link className="nav-link" href="/review" onClick={close}>
           <ShieldCheck size={18} />
           Review workspace
@@ -125,11 +118,6 @@ function Navigation({
           <Settings2 size={18} />
           Settings
         </Link>
-        <div className="sidebar-foot">
-          Built for better cryptography.
-          <br />
-          Measured. Reviewed. Reproducible.
-        </div>
       </div>
     </>
   );
@@ -236,18 +224,6 @@ export function ForgeApp() {
     setWalletOpen(false);
     setNotice(message);
   }
-  const current =
-    nav.find((n) => n.href !== "/" && path.startsWith(n.href))?.name ||
-    (
-      {
-        "/launch": "Launch agent",
-        "/review": "Review workspace",
-        "/settings": "Settings",
-        "/guide": "How it works",
-      } as Record<string, string>
-    )[path] ||
-    "Overview";
-
   let page: React.ReactNode;
   if (data) {
     const props = { data, action, busy, connect: () => setWalletOpen(true) };
@@ -304,6 +280,14 @@ export function ForgeApp() {
       </a>
       <aside className="sidebar masthead">
         <Navigation path={path} data={data} close={() => setMobile(false)} />
+        <Button
+          variant="outline"
+          className="wallet-button masthead-wallet"
+          onClick={() => setWalletOpen(true)}
+        >
+          <Wallet size={14} />
+          {data?.actor ? short(data.actor.wallet) : "Connect wallet"}
+        </Button>
       </aside>
       <div className="app-main">
         <header className="topbar">
@@ -325,11 +309,6 @@ export function ForgeApp() {
               <ForgeMark className="forge-mark" />
               <span>haloforge</span>
             </Link>
-            <span className="crumb-root">Research lab</span>
-            <ChevronRight size={14} />
-            <span className="current-page">{current}</span>
-          </div>
-          <div className="topbar-actions">
             <Button
               variant="ghost"
               className="search-button"
@@ -337,21 +316,25 @@ export function ForgeApp() {
             >
               <Search size={16} />
               <span>Search workspace</span>
-              <kbd>Ctrl K</kbd>
+              <kbd>⌘K</kbd>
             </Button>
+          </div>
+          <div className="topbar-actions">
             <div className="utility-links">
               <Link href="/guide">How it works</Link>
               <Link href="/review">Review</Link>
               <Link href="/settings">Settings</Link>
             </div>
-            <span className="header-divider" />
             <Button
               variant="outline"
               className="wallet-button"
+              aria-label={data?.actor ? "Connected wallet" : "Connect wallet"}
               onClick={() => setWalletOpen(true)}
             >
               <Wallet size={15} />
-              {data?.actor ? short(data.actor.wallet) : "Connect wallet"}
+              <span className="wallet-label">
+                {data?.actor ? short(data.actor.wallet) : "Connect wallet"}
+              </span>
             </Button>
           </div>
         </header>

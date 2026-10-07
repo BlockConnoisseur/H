@@ -40,6 +40,20 @@ const focuses = [
   },
 ];
 
+function FlowPath({ d, delay = 0 }: { d: string; delay?: number }) {
+  return (
+    <path
+      className="diagram-flow"
+      d={d}
+      style={{ animationDelay: `${delay}s` }}
+      aria-hidden="true"
+    />
+  );
+}
+
+const chip = { fill: "#1e1d19", stroke: "#565147" };
+const wire = "#454136";
+
 function MethodDiagram({ track, nodes }: { track: string; nodes: string[] }) {
   return (
     <div
@@ -47,7 +61,8 @@ function MethodDiagram({ track, nodes }: { track: string; nodes: string[] }) {
       aria-label={`${nodes.join(" to ")}. Conceptual research diagram.`}
     >
       <svg viewBox="0 0 440 150" fill="none" aria-hidden="true">
-        <path d="M60 75h310" stroke="#bdbbb4" strokeWidth="1" />
+        <path d="M60 75h310" stroke={wire} strokeWidth="1" />
+        <FlowPath d="M60 75h310" />
         {track === "S1" ? (
           <>
             {[0, 1, 2, 3].map((i) => (
@@ -57,85 +72,55 @@ function MethodDiagram({ track, nodes }: { track: string; nodes: string[] }) {
                 y={40 + i * 5}
                 width="49"
                 height="49"
-                fill="#eeece5"
-                stroke="#242421"
+                {...chip}
               />
             ))}
-            <rect x="193" y="48" width="54" height="54" fill="#242421" />
-            <path d="m210 75 8 8 14-18" stroke="#f5f3eb" strokeWidth="2" />
-            {[39, 68, 97].map((y) => (
+            <rect x="193" y="48" width="54" height="54" fill="#f5f3eb" />
+            <path d="m210 75 8 8 14-18" stroke="#12100a" strokeWidth="2" />
+            {[39, 68, 97].map((y, i) => (
               <g key={y}>
-                <path d={`M247 75h54V${y + 8}h42`} stroke="#706959" />
-                <rect
-                  x="343"
-                  y={y}
-                  width="55"
-                  height="17"
-                  fill="#dedbd1"
-                  stroke="#777064"
+                <path d={`M247 75h54V${y + 8}h42`} stroke={wire} />
+                <FlowPath
+                  d={`M247 75h54V${y + 8}h42`}
+                  delay={0.4 + i * 0.35}
                 />
+                <rect x="343" y={y} width="55" height="17" {...chip} />
               </g>
             ))}
           </>
         ) : track === "S2" ? (
           <>
             {[40, 62, 84].map((y) => (
-              <rect
-                key={y}
-                x="31"
-                y={y}
-                width="53"
-                height="16"
-                fill="#dedbd1"
-                stroke="#777064"
-              />
+              <rect key={y} x="31" y={y} width="53" height="16" {...chip} />
             ))}
-            <path d="M199 45h44v58h-44z" fill="#242421" />
+            <path d="M199 45h44v58h-44z" fill="#f5f3eb" />
             <path
               d="M177 102V35h87v78M176 102l-5-8m5 8 7-5M264 113l-6-6m6 6 5-8"
-              stroke="#71613e"
+              stroke="#c2a66b"
               strokeWidth="2"
             />
+            <FlowPath d="M177 102V35h87v78" delay={0.4} />
             {[40, 62, 84].map((y) => (
-              <rect
-                key={y}
-                x="343"
-                y={y}
-                width="55"
-                height="16"
-                fill="#eeece5"
-                stroke="#777064"
-              />
+              <rect key={y} x="343" y={y} width="55" height="16" {...chip} />
             ))}
           </>
         ) : (
           <>
             {[32, 54, 76, 98].map((y) => (
-              <rect
-                key={y}
-                x="32"
-                y={y}
-                width="50"
-                height="13"
-                fill="#dedbd1"
-                stroke="#777064"
-              />
+              <rect key={y} x="32" y={y} width="50" height="13" {...chip} />
             ))}
-            {[41, 68, 95].map((y) => (
+            {[41, 68, 95].map((y, i) => (
               <g key={y}>
                 <path
                   d={`M82 75h77V${y + 7}h35M246 ${y + 7}h51V75h47`}
-                  stroke="#a39c8d"
+                  stroke={wire}
                 />
-                <rect x="194" y={y} width="52" height="14" fill="#242421" />
-                <rect
-                  x="344"
-                  y={y}
-                  width="52"
-                  height="14"
-                  fill="#dedbd1"
-                  stroke="#777064"
+                <FlowPath
+                  d={`M82 75h77V${y + 7}h35M246 ${y + 7}h51V75h47`}
+                  delay={i * 0.4}
                 />
+                <rect x="194" y={y} width="52" height="14" fill="#e9e4d6" />
+                <rect x="344" y={y} width="52" height="14" {...chip} />
               </g>
             ))}
           </>

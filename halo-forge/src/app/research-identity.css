@@ -33,8 +33,9 @@
 .forge-hero {
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   align-items: center;
-  gap: 60px;
+  gap: 48px;
   padding: 20px 0 52px;
+  max-width: 1120px;
 }
 .forge-hero h1 {
   font-size: clamp(48px, 5.1vw, 76px);
@@ -55,9 +56,10 @@
   margin-top: 30px;
 }
 .research-focus {
-  --focus-ink: #242421;
-  background: var(--foreground);
-  color: var(--focus-ink);
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--panel-border);
+  border-radius: 2px;
   padding: 23px 26px 0;
   min-width: 0;
 }
@@ -72,7 +74,7 @@
 }
 .focus-state {
   font-size: 10px;
-  color: #666153;
+  color: var(--status-text);
   font-weight: 400;
 }
 .focus-tabs {
@@ -83,7 +85,7 @@
   padding: 0 !important;
   background: transparent !important;
   border-radius: 0 !important;
-  border-bottom: 1px solid #c8c5bd;
+  border-bottom: 1px solid var(--border);
   gap: 0 !important;
 }
 .focus-tabs [data-slot="tabs-trigger"] {
@@ -94,27 +96,33 @@
   border-radius: 0 !important;
   border-bottom: 2px solid transparent !important;
   background: transparent !important;
-  color: #656158 !important;
+  color: var(--muted-foreground) !important;
   box-shadow: none !important;
 }
 .focus-tabs [data-slot="tabs-trigger"][data-active] {
-  color: #191918 !important;
-  border-bottom-color: #242421 !important;
+  color: var(--foreground) !important;
+  border-bottom-color: var(--gold) !important;
 }
 .focus-tabs [data-slot="tabs-trigger"][aria-selected="true"] {
-  color: #191918 !important;
-  border-bottom-color: #242421 !important;
+  color: var(--foreground) !important;
+  border-bottom-color: var(--gold) !important;
 }
 .focus-tabs [data-slot="tabs-trigger"]:hover {
-  background: #e5e2d9 !important;
+  background: #1b1a17 !important;
 }
 .focus-tabs [data-slot="tabs-trigger"]:focus-visible {
-  outline: 2px solid #736346;
+  outline: 2px solid var(--ring);
   outline-offset: -4px;
 }
 .focus-content {
   padding-top: 22px;
   outline: none;
+  animation: focus-panel-in 0.3s ease-out;
+}
+@keyframes focus-panel-in {
+  from {
+    opacity: 0.35;
+  }
 }
 .focus-content h2 {
   font-size: 25px;
@@ -127,7 +135,7 @@
 }
 .focus-content > p {
   font-size: 12px;
-  color: #625d52;
+  color: var(--muted-foreground);
   line-height: 1.65;
   margin-top: 12px;
   min-height: 60px;
@@ -140,6 +148,19 @@
   width: 100%;
   height: auto;
 }
+.diagram-flow {
+  fill: none;
+  stroke: #ece5d3;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 7 53;
+  animation: diagram-flow 2.6s linear infinite;
+}
+@keyframes diagram-flow {
+  to {
+    stroke-dashoffset: -60;
+  }
+}
 .diagram-labels {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -147,6 +168,7 @@
   text-align: center;
   font-size: 10px;
   font-weight: 500;
+  color: var(--muted-foreground);
 }
 .focus-caption {
   display: flex;
@@ -154,8 +176,8 @@
   justify-content: space-between;
   gap: 7px;
   padding: 14px 0;
-  border-top: 1px solid #cbc8bf;
-  color: #676253;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
   font-size: 9px;
 }
 .focus-agent {
@@ -163,16 +185,17 @@
   justify-content: space-between;
   align-items: center;
   min-height: 56px;
-  background: #e6e3da;
+  background: #1a1917;
+  border-top: 1px solid var(--border);
   margin: 0 -26px;
   padding: 12px 26px;
-  color: #242421;
+  color: var(--foreground);
   font-size: 12px;
   font-weight: 550;
   transition: background 0.18s ease-out;
 }
 .focus-agent:hover {
-  background: #d9d5c9;
+  background: #242321;
 }
 .focus-agent > span {
   display: flex;
@@ -182,7 +205,7 @@
 .focus-agent-code {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #736346;
+  color: var(--gold);
 }
 .research-totals {
   padding: 22px 0;
@@ -349,10 +372,8 @@
     height: 68px;
     background: #090909;
   }
-  .topbar-left .crumb-root,
-  .topbar-left > svg,
-  .topbar-left .current-page {
-    display: none;
+  .topbar .wallet-button {
+    display: inline-flex;
   }
   .forge-hero {
     grid-template-columns: 1fr 1fr;
@@ -413,6 +434,9 @@
   .wallet-button {
     padding: 0 9px !important;
     font-size: 11px !important;
+  }
+  .wallet-label {
+    display: none;
   }
   main {
     padding: 28px 20px;

@@ -287,7 +287,7 @@ pre {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 34px 12px 18px;
+  padding: 20px 12px 16px;
   color: var(--muted-foreground);
   font-size: 11px;
 }
@@ -336,29 +336,8 @@ pre {
 }
 .sidebar-bottom {
   margin-top: auto;
-  padding-top: 36px;
-}
-.network-box {
-  border: 1px solid var(--border);
-  padding: 13px;
-  border-radius: 8px;
-  margin: 0 3px 18px;
-  font-size: 11px;
-}
-.network-box > div {
-  display: flex;
-  gap: 7px;
-  align-items: center;
-}
-.network-box p {
-  color: var(--muted-foreground);
-  margin-top: 4px;
-}
-.sidebar-foot {
-  padding: 18px 12px 0;
-  color: #9f9b93;
-  font-size: 10px;
-  line-height: 1.8;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
 }
 .app-main {
   margin-left: 226px;
@@ -382,12 +361,6 @@ pre {
   gap: 14px;
   font-size: 12px;
 }
-.crumb-root {
-  color: var(--muted-foreground);
-}
-.topbar-left svg {
-  color: #9f9b93;
-}
 .search-button {
   font-size: 12px !important;
   color: var(--muted-foreground) !important;
@@ -400,15 +373,11 @@ pre {
   padding: 1px 5px;
   border-radius: 4px;
 }
-.header-divider {
-  height: 23px;
-  width: 1px;
-  background: var(--border);
-}
 .wallet-button {
   font-size: 12px !important;
-  height: 35px !important;
+  height: 34px !important;
   padding: 0 12px !important;
+  gap: 7px;
 }
 .mobile-menu {
   display: none !important;
@@ -1935,9 +1904,6 @@ thead {
   .detail-grid {
     grid-template-columns: 1fr 1fr;
   }
-  .topbar-left .crumb-root {
-    display: none;
-  }
   .search-button span {
     display: none;
   }
@@ -1998,9 +1964,6 @@ thead {
   }
   .topbar-actions {
     gap: 9px;
-  }
-  .header-divider {
-    display: none;
   }
   .preview-strip {
     padding: 8px 18px;
@@ -2447,9 +2410,6 @@ textarea {
   padding: 0 max(32px, calc((100vw - 1280px) / 2));
   background: #10100f;
 }
-.topbar-left svg {
-  color: var(--muted-foreground);
-}
 .utility-links {
   display: flex;
   gap: 21px;
@@ -2464,6 +2424,13 @@ textarea {
 }
 .wallet-button {
   border-color: #74613a !important;
+}
+.masthead-wallet {
+  flex: none;
+  min-height: 34px !important;
+}
+.topbar .wallet-button {
+  display: none;
 }
 .preview-strip {
   padding: 7px max(32px, calc((100vw - 1280px) / 2));
@@ -2874,11 +2841,6 @@ main {
   }
   .topbar-actions {
     gap: 4px;
-  }
-  .topbar-left .crumb-root,
-  .topbar-left > svg,
-  .header-divider {
-    display: none;
   }
   .search-button {
     min-width: 40px;
