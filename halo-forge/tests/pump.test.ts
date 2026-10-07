@@ -9,7 +9,11 @@ import {
   SystemProgram,
   PublicKey,
   Connection,
+  ComputeBudgetProgram,
+  ComputeBudgetInstruction,
+  VersionedTransaction,
 } from "@solana/web3.js";
+import { canReusePumpTransaction } from "../src/lib/pump-compute-budget";
 import { feeSharingConfigPda } from "@pump-fun/pump-sdk";
 import BN from "bn.js";
 import { NextRequest } from "next/server";
@@ -427,5 +431,137 @@ test("exact wallet bytes and every required signature are verified without reser
         payer.publicKey.toBase58(),
       ),
     /does not verify/,
+  );
+});
+
+test("prepared payment and mint messages include a bounded priority price before simulation and signing", async () => {
+  const payer = Keypair.generate(),
+    mint = Keypair.generate();
+  const block = {
+    blockhash: Keypair.generate().publicKey.toBase58(),
+    lastValidBlockHeight: 100,
+  };
+  const simulated: VersionedTransaction[] = [];
+  const connection = {
+    getLatestBlockhash: async () => block,
+    simulateTransaction: async (tx: VersionedTransaction) => {
+      simulated.push(tx);
+      return { value: { err: null } };
+    },
+  } as unknown as Connection;
+  for (const creating of [false, true]) {
+    const instruction = creating
+      ? SystemProgram.createAccount({
+          fromPubkey: payer.publicKey,
+          newAccountPubkey: mint.publicKey,
+          lamports: 1,
+          space: 1,
+          programId: SystemProgram.programId,
+        })
+      : SystemProgram.transfer({
+          fromPubkey: payer.publicKey,
+          toPubkey: new PublicKey(COMPUTE_WALLET),
+          lamports: LAUNCH_LAMPORTS,
+        });
+    const prepared = await pump.packPumpTransaction(
+      connection,
+      payer.publicKey,
+      [instruction],
+      creating ? mint : undefined,
+    );
+    const decoded = Transaction.from(Buffer.from(prepared.wire, "base64"));
+    assert.equal(
+      ComputeBudgetInstruction.decodeSetComputeUnitLimit(
+        decoded.instructions[0],
+      ).units,
+      400_000,
+    );
+    const price = ComputeBudgetInstruction.decodeSetComputeUnitPrice(
+      decoded.instructions[1],
+    ).microLamports;
+    assert.equal((BigInt(price) * 400_000n) / 1_000_000n, 10_000n);
+    assert.equal(decoded.instructions.length, 3);
+    assert.deepEqual(decoded.instructions[2].data, instruction.data);
+    assert.deepEqual(decoded.instructions[2].keys, instruction.keys);
+    assert.ok(Buffer.from(prepared.wire, "base64").length <= 1232);
+    assert.equal(
+      hash(
+        Buffer.from(simulated.at(-1)!.message.serialize()).toString("base64"),
+      ),
+      prepared.messageHash,
+    );
+    assert.equal(canReusePumpTransaction(prepared, 90), true);
+    // Wallet adds only its signature. The mint's existing signature survives.
+    const signed = VersionedTransaction.deserialize(
+      Buffer.from(prepared.wire, "base64"),
+    );
+    signed.sign([payer]);
+    const raw = Buffer.from(signed.serialize());
+    assert.deepEqual(
+      pump.validateSignedLaunch(
+        prepared,
+        raw.toString("base64"),
+        payer.publicKey.toBase58(),
+      ).raw,
+      raw,
+    );
+    if (!creating) {
+      // The old Phantom failure remains rejected if a wallet changes the fee.
+      decoded.instructions[1] = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 1_000_000,
+      });
+      decoded.sign(payer);
+      assert.throws(
+        () =>
+          pump.validateSignedLaunch(
+            prepared,
+            decoded.serialize().toString("base64"),
+            payer.publicKey.toBase58(),
+          ),
+        /changed the prepared transaction/,
+      );
+    }
+  }
+  assert.equal(simulated.length, 2);
+});
+
+test("old unsigned transactions refresh their priority fee but submitted transactions remain protected until expiry", () => {
+  const payer = Keypair.generate();
+  const old = new Transaction({
+    feePayer: payer.publicKey,
+    recentBlockhash: Keypair.generate().publicKey.toBase58(),
+  }).add(
+    ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }),
+    SystemProgram.transfer({
+      fromPubkey: payer.publicKey,
+      toPubkey: new PublicKey(COMPUTE_WALLET),
+      lamports: LAUNCH_LAMPORTS,
+    }),
+  );
+  const prepared = {
+    wire: old.serialize({ requireAllSignatures: false }).toString("base64"),
+    lastValidBlockHeight: 100,
+  };
+  assert.equal(canReusePumpTransaction(prepared, 90), false);
+  assert.equal(
+    canReusePumpTransaction(
+      { ...prepared, signature: "already-submitted" },
+      90,
+    ),
+    true,
+  );
+  assert.equal(
+    canReusePumpTransaction(
+      { ...prepared, signature: "already-submitted" },
+      100,
+    ),
+    true,
+  );
+  assert.equal(
+    canReusePumpTransaction(
+      { ...prepared, signature: "already-submitted" },
+      101,
+    ),
+    false,
   );
 });

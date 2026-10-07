@@ -1,11 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { EventParser } from "@coral-xyz/anchor";
-import {
-  PublicKey,
-  Transaction,
-  ComputeBudgetProgram,
-  VersionedTransaction,
-} from "@solana/web3.js";
+import { PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
 import {
   OnlinePumpSdk,
   PUMP_PROGRAM_ID,
@@ -21,6 +16,10 @@ import {
 } from "./pump-launch";
 import { COMPUTE_WALLET, splitCreatorReceipt } from "./pump-policy";
 import { readState, transact } from "./store";
+import {
+  pumpComputeBudget,
+  canReusePumpTransaction,
+} from "./pump-compute-budget";
 export type FeeReceipt = {
   id: string;
   agentId: string;
@@ -76,7 +75,7 @@ export async function prepareFeeClaim(actor: Actor, agentId: string) {
   );
   if (
     prior &&
-    (await c.getBlockHeight("finalized")) <= prior.tx.lastValidBlockHeight
+    canReusePumpTransaction(prior.tx, await c.getBlockHeight("finalized"))
   )
     return prior;
   const q = await sdk.resolveQuoteMint(new PublicKey(ZEC_MINT));
@@ -86,7 +85,7 @@ export async function prepareFeeClaim(actor: Actor, agentId: string) {
   );
   const block = await c.getLatestBlockhash("finalized"),
     tx = new Transaction({ ...block, feePayer: payer }).add(
-      ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
+      ...pumpComputeBudget(),
       ...instructions,
     );
   const bytes = tx.serialize({ requireAllSignatures: false });

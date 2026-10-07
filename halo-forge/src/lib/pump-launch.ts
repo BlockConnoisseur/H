@@ -4,7 +4,6 @@ import {
   PublicKey,
   Keypair,
   Transaction,
-  ComputeBudgetProgram,
   SystemProgram,
   VersionedTransaction,
   type TransactionInstruction,
@@ -41,6 +40,10 @@ import {
 } from "./pump-policy";
 import { labState } from "./lab-domain";
 import { sweepCreatorFee } from "./pump-sweep";
+import {
+  pumpComputeBudget,
+  canReusePumpTransaction,
+} from "./pump-compute-budget";
 
 export type LaunchTx = {
   wire: string;
@@ -144,7 +147,7 @@ export async function pumpConfiguration(c = pumpConnection()) {
     );
   return { sdk, q };
 }
-async function pack(
+export async function packPumpTransaction(
   c: Connection,
   payer: PublicKey,
   ix: TransactionInstruction[],
@@ -152,7 +155,7 @@ async function pack(
 ): Promise<LaunchTx> {
   const block = await c.getLatestBlockhash("confirmed");
   const tx = new Transaction({ ...block, feePayer: payer }).add(
-    ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
+    ...pumpComputeBudget(),
     ...ix,
   );
   if (mint) tx.partialSign(mint);
@@ -349,7 +352,7 @@ export async function preparePumpLaunch(
     creatorFeeBps: new BN(CREATOR_BPS),
     holderReward: false,
   });
-  const create = await pack(c, payer, [ix], mint);
+  const create = await packPumpTransaction(c, payer, [ix], mint);
   return transact((s) => {
     const raced = findLaunchForRequest(s, actor, requestId);
     if (raced) return view(raced);
@@ -544,7 +547,7 @@ export async function preparePumpRoute(actor: Actor, id: string) {
   const c = pumpConnection();
   if (
     d.route &&
-    (await c.getBlockHeight("finalized")) <= d.route.lastValidBlockHeight
+    canReusePumpTransaction(d.route, await c.getBlockHeight("finalized"))
   )
     return d;
   const { q, sdk } = await pumpConfiguration(c),
@@ -564,7 +567,7 @@ export async function preparePumpRoute(actor: Actor, id: string) {
     quoteMint: quote,
     quoteTokenProgram: q.quoteTokenProgram,
   });
-  const route = await pack(c, payer, [
+  const route = await packPumpTransaction(c, payer, [
     sweepCreatorFee(payer, mint, curve.creator, quote, q.quoteTokenProgram),
     create,
     ...[payer, creatorVaultPda(feeSharingConfigPda(mint))].map((owner) =>
@@ -587,6 +590,7 @@ export async function preparePumpRoute(actor: Actor, id: string) {
     const current = owned(s, actor, id);
     if (
       current.route?.messageHash !== d.route?.messageHash ||
+      current.route?.signature !== d.route?.signature ||
       current.route?.finalized
     )
       throw new DomainError("Launch changed. Refresh before signing.", 409);
