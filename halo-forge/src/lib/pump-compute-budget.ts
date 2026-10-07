@@ -17,6 +17,9 @@ export function canReusePumpTransaction(
   if (finalizedHeight > tx.lastValidBlockHeight) return false;
   // Never replace a submitted transaction while it can still land.
   if (tx.signature) return true;
+  // Leave time for a human to review the wallet prompt instead of handing out
+  // a cached blockhash that is only a few seconds away from expiration.
+  if (finalizedHeight > tx.lastValidBlockHeight - 100) return false;
   const { message } = VersionedTransaction.deserialize(
     Buffer.from(tx.wire, "base64"),
   );

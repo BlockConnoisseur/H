@@ -6,6 +6,7 @@ import {
   Transaction,
   SystemProgram,
   VersionedTransaction,
+  SendTransactionError,
   type TransactionInstruction,
 } from "@solana/web3.js";
 import {
@@ -52,6 +53,8 @@ export type LaunchTx = {
   lastValidBlockHeight: number;
   signature?: string;
   finalized?: boolean;
+  confirmation?:
+    "unsigned" | "pending" | "confirming" | "finalized" | "failed" | "expired";
 };
 export type PumpDraft = {
   id: string;
@@ -413,16 +416,24 @@ export async function preparePumpLaunch(
     return view(d);
   });
 }
-async function finalized(c: Connection, tx: LaunchTx) {
-  if (tx.finalized) return true;
-  if (!tx.signature) return false;
+export async function launchConfirmation(
+  c: Connection,
+  tx: LaunchTx,
+): Promise<NonNullable<LaunchTx["confirmation"]>> {
+  if (tx.finalized) return "finalized";
+  if (!tx.signature) return "unsigned";
   const status = (
     await c.getSignatureStatuses([tx.signature], {
       searchTransactionHistory: true,
     })
   ).value[0];
-  if (status?.err) return false;
-  return status?.confirmationStatus === "finalized";
+  if (status?.err) return "failed";
+  if (status?.confirmationStatus === "finalized") return "finalized";
+  // An observed transaction can still be finalizing after its blockhash expires.
+  if (status) return "confirming";
+  return (await c.getBlockHeight("finalized")) > tx.lastValidBlockHeight
+    ? "expired"
+    : "pending";
 }
 export async function refreshPumpLaunch(
   actor: Actor,
@@ -432,7 +443,8 @@ export async function refreshPumpLaunch(
   const d = owned(await readState(), actor, id);
   if (d.abandoned) return view(d);
   const c = connection ?? pumpConnection();
-  const createOk = await finalized(c, d.create);
+  const createConfirmation = await launchConfirmation(c, d.create);
+  const createOk = createConfirmation === "finalized";
   if (!createOk) {
     if (
       (await c.getBlockHeight("finalized")) > d.create.lastValidBlockHeight &&
@@ -448,7 +460,10 @@ export async function refreshPumpLaunch(
         return view(current);
       });
     }
-    return view(d);
+    return {
+      ...view(d),
+      create: { ...d.create, confirmation: createConfirmation },
+    };
   }
   const mint = new PublicKey(d.mint),
     curveInfo = await c.getAccountInfo(bondingCurvePda(mint), "finalized");
@@ -466,7 +481,10 @@ export async function refreshPumpLaunch(
       "On-chain token configuration differs from the launch plan.",
       409,
     );
-  const routeOk = d.route && (await finalized(c, d.route));
+  const routeConfirmation = d.route
+    ? await launchConfirmation(c, d.route)
+    : undefined;
+  const routeOk = routeConfirmation === "finalized";
   if (routeOk) {
     const sharingAddress = feeSharingConfigPda(mint),
       info = await c.getAccountInfo(sharingAddress, "finalized");
@@ -536,7 +554,13 @@ export async function refreshPumpLaunch(
         });
       }
     }
-    return view(current);
+    return {
+      ...view(current),
+      create: { ...current.create, confirmation: createConfirmation },
+      route: current.route
+        ? { ...current.route, confirmation: routeConfirmation }
+        : undefined,
+    };
   });
 }
 export async function preparePumpRoute(actor: Actor, id: string) {
@@ -544,6 +568,7 @@ export async function preparePumpRoute(actor: Actor, id: string) {
   if (!d.create.finalized)
     throw new DomainError("Wait for token creation to finalize first.", 409);
   if (d.route?.finalized) return d;
+  if (d.route?.confirmation === "confirming") return d;
   const c = pumpConnection();
   if (
     d.route &&
@@ -673,13 +698,32 @@ export async function submitPumpLaunch(
         "This transaction has expired. Refresh this launch step before signing again.",
     };
   }
+  // Repeated submissions use identical signed bytes. If a node already sees
+  // the transaction, only reconcile it; never create another payment.
+  const confirmation = await launchConfirmation(c, {
+    ...expected,
+    signature: validated.signature,
+  });
+  if (confirmation !== "pending") return refreshPumpLaunch(actor, id);
   try {
     await c.sendRawTransaction(validated.raw, {
       skipPreflight: false,
       preflightCommitment: "confirmed",
-      maxRetries: 2,
+      maxRetries: 8,
     });
-  } catch {
+  } catch (e) {
+    console.warn(
+      "pump_broadcast_unconfirmed",
+      JSON.stringify({
+        id,
+        stage,
+        preflightRejected: e instanceof SendTransactionError,
+        programFailures:
+          e instanceof SendTransactionError
+            ? e.logs?.filter((line) => /^Program \w+ failed:/.test(line))
+            : undefined,
+      }),
+    );
     // Never turn an uncertain network response into permission to pay twice.
     return {
       ...view(owned(await readState(), actor, id)),

@@ -439,7 +439,7 @@ test("prepared payment and mint messages include a bounded priority price before
     mint = Keypair.generate();
   const block = {
     blockhash: Keypair.generate().publicKey.toBase58(),
-    lastValidBlockHeight: 100,
+    lastValidBlockHeight: 200,
   };
   const simulated: VersionedTransaction[] = [];
   const connection = {
@@ -491,6 +491,7 @@ test("prepared payment and mint messages include a bounded priority price before
       prepared.messageHash,
     );
     assert.equal(canReusePumpTransaction(prepared, 90), true);
+    assert.equal(canReusePumpTransaction(prepared, 190), false);
     // Wallet adds only its signature. The mint's existing signature survives.
     const signed = VersionedTransaction.deserialize(
       Buffer.from(prepared.wire, "base64"),
@@ -523,6 +524,34 @@ test("prepared payment and mint messages include a bounded priority price before
     }
   }
   assert.equal(simulated.length, 2);
+});
+
+test("confirmation distinguishes dropped, failed and landed transactions even beyond blockhash expiry", async () => {
+  let status: { err: unknown; confirmationStatus: string } | null = null;
+  let height = 90;
+  const c = {
+    getSignatureStatuses: async () => ({ value: [status] }),
+    getBlockHeight: async () => height,
+  } as unknown as Connection;
+  const tx = {
+    wire: "unused",
+    messageHash: "unused",
+    blockhash: "unused",
+    lastValidBlockHeight: 100,
+    signature: "signed",
+  };
+  assert.equal(await pump.launchConfirmation(c, tx), "pending");
+  height = 101;
+  assert.equal(await pump.launchConfirmation(c, tx), "expired");
+  status = { err: null, confirmationStatus: "confirmed" };
+  assert.equal(await pump.launchConfirmation(c, tx), "confirming");
+  status = { err: null, confirmationStatus: "finalized" };
+  assert.equal(await pump.launchConfirmation(c, tx), "finalized");
+  status = {
+    err: { InstructionError: [1, "InvalidArgument"] },
+    confirmationStatus: "finalized",
+  };
+  assert.equal(await pump.launchConfirmation(c, tx), "failed");
 });
 
 test("old unsigned transactions refresh their priority fee but submitted transactions remain protected until expiry", () => {

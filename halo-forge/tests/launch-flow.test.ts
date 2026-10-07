@@ -140,3 +140,63 @@ test("completed launch never requests another approval", async () => {
   await s.run();
   assert.deepEqual(s.signed, []);
 });
+
+test("a dropped submission retries identical signed bytes without another wallet approval", async () => {
+  const d = draft();
+  d.create.finalized = true;
+  d.route = tx("route");
+  const submissions: unknown[] = [];
+  let approvals = 0;
+  const result = await deployPumpAgent({
+    initial: d,
+    input: {},
+    progress: () => {},
+    wait: async () => {},
+    sign: async () => {
+      approvals++;
+      return "same-signed-payment";
+    },
+    request: async (body) => {
+      if (body.action === "submit") {
+        submissions.push(body.signed);
+        d.route!.signature = "same-signature";
+        if (submissions.length === 2) {
+          d.route!.finalized = true;
+          d.agentId = "registered";
+        }
+      }
+      return structuredClone(d);
+    },
+  });
+  assert.equal(result.agentId, "registered");
+  assert.equal(approvals, 1);
+  assert.deepEqual(submissions, ["same-signed-payment", "same-signed-payment"]);
+});
+
+test("an expired payment stops the spinner without another approval or claiming the fee was paid", async () => {
+  const d = draft();
+  d.create.finalized = true;
+  d.route = { ...tx("route"), signature: "expired" };
+  let polls = 0,
+    approvals = 0;
+  await assert.rejects(
+    deployPumpAgent({
+      initial: d,
+      input: {},
+      progress: () => {},
+      wait: async () => {},
+      sign: async () => {
+        approvals++;
+        return "must-not-sign";
+      },
+      request: async (body) => {
+        if (body.action === "refresh" && ++polls > 1)
+          d.route!.confirmation = "expired";
+        return structuredClone(d);
+      },
+    }),
+    /expired without landing.*not transferred/,
+  );
+  assert.equal(approvals, 0);
+  assert.equal(polls, 2);
+});
