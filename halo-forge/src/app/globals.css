@@ -1066,6 +1066,20 @@ thead {
   display: grid;
   gap: 14px;
 }
+.pump-launch .launch-progress-list {
+  gap: 24px;
+  padding: 24px 24px 24px 44px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.launch-progress-list p {
+  margin-top: 8px;
+  color: var(--muted-foreground);
+}
+.launch-progress-status {
+  padding: 16px 20px;
+  border-left: 2px solid var(--primary);
+}
 .step-bar {
   display: flex;
   gap: 18px;

@@ -19,7 +19,12 @@ import {
   feeSharingConfigPda,
   computeFeesBps,
   isSharingConfigEditable,
+  creatorVaultPda,
 } from "@pump-fun/pump-sdk";
+import {
+  createAssociatedTokenAccountIdempotentInstruction,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 import BN from "bn.js";
 import bs58 from "bs58";
 import { z } from "zod";
@@ -34,6 +39,7 @@ import {
   CREATOR_BPS,
 } from "./pump-policy";
 import { labState } from "./lab-domain";
+import { sweepCreatorFee } from "./pump-sweep";
 
 export type LaunchTx = {
   wire: string;
@@ -160,7 +166,7 @@ async function pack(
   );
   if (simulation.value.err)
     throw new DomainError(
-      `Wallet transaction simulation failed (${JSON.stringify(simulation.value.err)}). Check your SOL balance; nothing was submitted.`,
+      `Wallet transaction simulation failed (${JSON.stringify(simulation.value.err)}). Nothing was submitted. ${simulation.value.logs?.some((line) => /insufficient (funds|lamports)/i.test(line)) ? "Your wallet needs more SOL for the launch charge, fees and account rent." : "The on-chain program rejected this step; your existing launch is saved."}`,
       409,
     );
   return {
@@ -467,7 +473,17 @@ export async function preparePumpRoute(actor: Actor, id: string) {
     quoteTokenProgram: q.quoteTokenProgram,
   });
   const route = await pack(c, payer, [
+    sweepCreatorFee(payer, mint, curve.creator, quote, q.quoteTokenProgram),
     create,
+    ...[payer, creatorVaultPda(feeSharingConfigPda(mint))].map((owner) =>
+      createAssociatedTokenAccountIdempotentInstruction(
+        payer,
+        getAssociatedTokenAddressSync(quote, owner, true, q.quoteTokenProgram),
+        owner,
+        quote,
+        q.quoteTokenProgram,
+      ),
+    ),
     update,
     SystemProgram.transfer({
       fromPubkey: payer,

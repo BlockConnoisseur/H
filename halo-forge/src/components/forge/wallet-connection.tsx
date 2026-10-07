@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   AuthState,
   Chain,
@@ -14,6 +14,7 @@ import { LoaderCircle, LogOut, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { Actor } from "@/lib/domain";
+import type { SignLaunchTransaction } from "@/lib/launch-flow";
 import {
   establishWalletSession,
   turnkeySignature,
@@ -24,6 +25,10 @@ type Props = {
   actor: Actor | null;
   previewAvailable: boolean;
   onChanged: (message: string) => Promise<void>;
+  deployment?: {
+    label: string;
+    run: (sign: SignLaunchTransaction) => Promise<void>;
+  };
   transaction?: {
     wire: string;
     label: string;
@@ -69,8 +74,10 @@ function WalletChoices({
   onChanged,
   kit,
   transaction,
+  deployment,
 }: Props & { kit?: Kit }) {
   const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
   const [error, setError] = useState("");
   const ready = kit?.clientState === ClientState.Ready;
   const providers =
@@ -79,7 +86,8 @@ function WalletChoices({
     ) ?? [];
 
   async function run(fn: () => Promise<void>) {
-    if (busy) return;
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setError("");
     try {
@@ -92,6 +100,7 @@ function WalletChoices({
           : message,
       );
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   }
@@ -102,32 +111,38 @@ function WalletChoices({
       throw new Error(
         "Your wallet did not return a Solana account. Unlock it and try again.",
       );
-    if (transaction) {
+    if (transaction || deployment) {
       if (account.address !== actor?.wallet)
         throw new Error("Select the original deployer wallet before signing.");
-      const wire = transaction.beforeSign
-        ? await transaction.beforeSign()
-        : transaction.wire;
-      const hex = Array.from(
-        Uint8Array.from(atob(wire), (c) => c.charCodeAt(0)),
-        (b) => b.toString(16).padStart(2, "0"),
-      ).join("");
-      const signed = await kit!.signTransaction({
-        walletAccount: account,
-        unsignedTransaction: hex,
-        transactionType: "TRANSACTION_TYPE_SOLANA",
-      });
-      if (!/^(?:[a-fA-F0-9]{2})+$/.test(signed))
-        throw new Error(
-          "The wallet returned an unsupported transaction encoding.",
-        );
-      await transaction.onSigned(
-        btoa(
+      const sign: SignLaunchTransaction = async (wire) => {
+        const hex = Array.from(
+          Uint8Array.from(atob(wire), (c) => c.charCodeAt(0)),
+          (b) => b.toString(16).padStart(2, "0"),
+        ).join("");
+        const signed = await kit!.signTransaction({
+          walletAccount: account,
+          unsignedTransaction: hex,
+          transactionType: "TRANSACTION_TYPE_SOLANA",
+        });
+        if (!/^(?:[a-fA-F0-9]{2})+$/.test(signed))
+          throw new Error(
+            "The wallet returned an unsupported transaction encoding.",
+          );
+        return btoa(
           String.fromCharCode(
             ...Uint8Array.from(signed.match(/../g)!, (b) => parseInt(b, 16)),
           ),
-        ),
-      );
+        );
+      };
+      if (deployment) await deployment.run(sign);
+      else if (transaction)
+        await transaction.onSigned(
+          await sign(
+            transaction.beforeSign
+              ? await transaction.beforeSign()
+              : transaction.wire,
+          ),
+        );
       return;
     }
     await establishWalletSession(account.address, async ({ message }) =>
@@ -163,19 +178,25 @@ function WalletChoices({
         "No Solana wallet was found. Open Halo Forge in your wallet’s browser, or enable a Solana wallet extension and reload.",
       );
     const { publicKey } = await provider.connect();
-    if (transaction) {
+    if (transaction || deployment) {
       if (publicKey.toString() !== actor?.wallet)
         throw new Error("Select the original deployer wallet before signing.");
-      const wire = transaction.beforeSign
-        ? await transaction.beforeSign()
-        : transaction.wire;
-      const { Transaction } = await import("@solana/web3.js");
-      const signed = await provider.signTransaction(
-        Transaction.from(Uint8Array.from(atob(wire), (c) => c.charCodeAt(0))),
-      );
-      await transaction.onSigned(
-        btoa(String.fromCharCode(...signed.serialize())),
-      );
+      const sign: SignLaunchTransaction = async (wire) => {
+        const { Transaction } = await import("@solana/web3.js");
+        const signed = await provider.signTransaction(
+          Transaction.from(Uint8Array.from(atob(wire), (c) => c.charCodeAt(0))),
+        );
+        return btoa(String.fromCharCode(...signed.serialize()));
+      };
+      if (deployment) await deployment.run(sign);
+      else if (transaction)
+        await transaction.onSigned(
+          await sign(
+            transaction.beforeSign
+              ? await transaction.beforeSign()
+              : transaction.wire,
+          ),
+        );
       return;
     }
     await establishWalletSession(
@@ -211,7 +232,7 @@ function WalletChoices({
           <AlertDescription role="alert">{error}</AlertDescription>
         </Alert>
       )}
-      {transaction && actor ? (
+      {(transaction || deployment) && actor ? (
         <>
           <p className="field-hint">
             Review the transaction in your wallet. Only{" "}
@@ -231,7 +252,7 @@ function WalletChoices({
                 ) : (
                   <Wallet size={16} />
                 )}{" "}
-                {transaction.label} · {provider.info.name}
+                {deployment?.label ?? transaction?.label} · {provider.info.name}
               </Button>
             ))
           ) : (
@@ -245,7 +266,7 @@ function WalletChoices({
               ) : (
                 <Wallet size={16} />
               )}{" "}
-              {transaction.label}
+              {deployment?.label ?? transaction?.label}
             </Button>
           )}
         </>
@@ -332,7 +353,9 @@ function WalletChoices({
       {busy && (
         <p className="wallet-busy" role="status">
           <LoaderCircle size={15} className="animate-spin" />
-          Waiting for your wallet…
+          {deployment
+            ? "Deployment in progress. Keep this page open."
+            : "Waiting for your wallet…"}
         </p>
       )}
     </div>
