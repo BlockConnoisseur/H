@@ -1,0 +1,8 @@
+**/.env*
+**/.data/**
+**/.impeccable/**
+**/node_modules/**
+**/.next/**
+**/tests/**
+halo-forge-worker/**
+halo-forge-research/**

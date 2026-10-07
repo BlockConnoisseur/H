@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   poweredByHeader: false,
   serverExternalPackages: ["node:sqlite"],
+  outputFileTracingIncludes: { "/*": ["./certs/supabase-ca.crt"] },
   async redirects() {
     // Keep local wallet sessions and the server origin check on one hostname.
     if (process.env.HALO_APP_ORIGIN !== "http://localhost:3210") return [];
