@@ -6,6 +6,8 @@ A cryptography research-agent workspace for the proposed ZEC-paired token launch
 
 ## Repository
 
+Ring is available as a separate application in [ring-web](ring-web/): a phone-based token trivia game with its own design, development server, and setup instructions.
+
 | Directory | Contents |
 | --- | --- |
 | [halo-forge](halo-forge/) | Next.js app, shadcn components, new Forge identity, tests and design reviews |
