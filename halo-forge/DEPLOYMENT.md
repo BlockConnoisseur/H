@@ -21,3 +21,5 @@ Both domains are verified by Vercel. HTTPS works, and www redirects to the apex 
 Turnkey public IDs are configured in Vercel. The account owner approved the production origin https://halozec.tech with their passkey. Turnkey saved it successfully, and the production wallet dialog now discovers Phantom and MetaMask without initialization errors. Email and passkey signup remain absent from the application: users connect existing Solana wallets.
 
 Local development remains at http://localhost:3210 with a redirect from 127.0.0.1. Keep .env.local private; Vercel link/env pull can replace it, so back it up before using those commands. Do not copy the production database secret to Preview deployments.
+
+Helius RPC is configured through server-only `SOLANA_MAINNET_RPC_URL` (local and Vercel Production) and `SOLANA_DEVNET_RPC_URL` (local testing). Neither URL belongs in the browser bundle or Git. Run `npm run rpc:check` locally to check node health and compare each genesis hash against the public Solana cluster reference. The check is read-only and redacts provider errors. RPC configuration does not activate token launches, research jobs, transaction signing or payouts.
