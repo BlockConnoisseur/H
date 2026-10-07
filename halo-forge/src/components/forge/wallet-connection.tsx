@@ -1,21 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   AuthState,
+  Chain,
   ClientState,
-  OtpType,
   TurnkeyProvider,
-  WalletSource,
   useTurnkey,
   type TurnkeyProviderConfig,
-  type WalletAccount,
+  type WalletProvider,
 } from "@turnkey/react-wallet-kit";
-import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
-import { Fingerprint, LoaderCircle, LogOut, Mail, Wallet } from "lucide-react";
+import { LoaderCircle, LogOut, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { Actor } from "@/lib/domain";
 import {
@@ -23,7 +19,6 @@ import {
   turnkeySignature,
   walletPost,
 } from "@/lib/wallet-signin";
-import { short } from "./shared";
 
 type Props = {
   actor: Actor | null;
@@ -40,35 +35,15 @@ const config: TurnkeyProviderConfig | null =
         organizationId,
         authProxyConfigId,
         ui: { renderModalInProvider: false, supressMissingStylesError: true },
-        auth: {
-          autoRefreshSession: false,
-          createSuborgParams: {
-            emailOtpAuth: { customWallet: solanaWallet() },
-            passkeyAuth: {
-              customWallet: solanaWallet(),
-              passkeyName: "Halo Forge",
-            },
-          },
+        auth: { autoRefreshSession: false },
+        walletConfig: {
+          features: { connecting: true, auth: false },
+          chains: { solana: { native: true } },
         },
       }
     : null;
 
-function solanaWallet() {
-  return {
-    walletName: "Halo Forge",
-    walletAccounts: [
-      {
-        curve: "CURVE_ED25519" as const,
-        pathFormat: "PATH_FORMAT_BIP32" as const,
-        path: "m/44'/501'/0'/0'",
-        addressFormat: "ADDRESS_FORMAT_SOLANA" as const,
-      },
-    ],
-  };
-}
-
 export default function WalletConnection(props: Props) {
-  // Without public configuration, do not initialize the SDK with dummy IDs.
   if (!config) return <WalletChoices {...props} />;
   return (
     <TurnkeyProvider config={config}>
@@ -90,33 +65,11 @@ function WalletChoices({
 }: Props & { kit?: Kit }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [otp, setOtp] = useState<{
-    otpId: string;
-    otpEncryptionTargetBundle: string;
-    contact: string;
-  } | null>(null);
-  const [accounts, setAccounts] = useState<WalletAccount[] | null>(null);
-  const [captchaToken, setCaptchaToken] = useState<string>();
-  const captcha = useRef<TurnstileInstance>(null);
   const ready = kit?.clientState === ClientState.Ready;
-  const authenticated = kit?.authState === AuthState.Authenticated;
-  const methods = kit?.config?.ui?.authModal?.methods;
-  const emailEnabled = ready && methods?.emailOtpAuthEnabled === true;
-  const passkeyEnabled = ready && methods?.passkeyAuthEnabled === true;
-  const passkeyOrigin =
-    typeof window !== "undefined" &&
-    (window.location.protocol === "https:" ||
-      window.location.hostname === "localhost");
-  const siteKey = kit?.config?.turnstileSiteKey;
-  const captchaReady = !siteKey || !!captchaToken;
-  const restoredAccounts =
-    kit?.wallets
-      .filter((w) => w.source === WalletSource.Embedded)
-      .flatMap((w) => w.accounts)
-      .filter((a) => a.addressFormat === "ADDRESS_FORMAT_SOLANA") ?? [];
-  const choices = accounts ?? restoredAccounts;
+  const providers =
+    kit?.walletProviders.filter(
+      (provider) => provider.chainInfo.namespace === Chain.Solana,
+    ) ?? [];
 
   async function run(fn: () => Promise<void>) {
     if (busy) return;
@@ -135,23 +88,27 @@ function WalletChoices({
       setBusy(false);
     }
   }
-  function resetCaptcha() {
-    setCaptchaToken(undefined);
-    captcha.current?.reset();
-  }
-  async function refreshAccounts() {
-    const wallets = await kit!.refreshWallets();
-    const next = wallets
-      .filter((w) => w.source === WalletSource.Embedded)
-      .flatMap((w) => w.accounts)
-      .filter((a) => a.addressFormat === "ADDRESS_FORMAT_SOLANA");
-    setAccounts(next);
-    if (!next.length)
+
+  async function connectProvider(provider: WalletProvider) {
+    const account = await kit!.connectWalletAccount(provider);
+    if (account.addressFormat !== "ADDRESS_FORMAT_SOLANA")
       throw new Error(
-        "This Turnkey account has no Solana wallet. Connect an existing wallet or use an account created for Halo Forge.",
+        "Your wallet did not return a Solana account. Unlock it and try again.",
       );
+    await establishWalletSession(account.address, async ({ message }) =>
+      turnkeySignature(
+        await kit!.signMessage({
+          walletAccount: account,
+          message,
+          encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
+          hashFunction: "HASH_FUNCTION_NOT_APPLICABLE",
+        }),
+      ),
+    );
+    await onChanged("Wallet connected.");
   }
-  async function externalWallet() {
+
+  async function connectInjected() {
     const provider = (
       window as unknown as {
         solana?: {
@@ -165,42 +122,33 @@ function WalletChoices({
     ).solana;
     if (!provider?.signMessage)
       throw new Error(
-        "Open this site in your Solana wallet’s browser, or use email or a passkey to create a Turnkey wallet.",
+        "No Solana wallet was found. Open Halo Forge in your wallet’s browser, or enable a Solana wallet extension and reload.",
       );
     const { publicKey } = await provider.connect();
-    await establishWalletSession(publicKey.toString(), async ({ message }) => {
-      const signed = await provider.signMessage(
-        new TextEncoder().encode(message),
-        "utf8",
-      );
-      return signed.signature;
-    });
+    await establishWalletSession(
+      publicKey.toString(),
+      async ({ message }) =>
+        (await provider.signMessage(new TextEncoder().encode(message), "utf8"))
+          .signature,
+    );
     await onChanged("Wallet connected.");
   }
-  async function connectEmbedded(account: WalletAccount) {
-    await establishWalletSession(account.address, async ({ message }) => {
-      const signed = await kit!.signMessage({
-        walletAccount: account,
-        message,
-        encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-        hashFunction: "HASH_FUNCTION_NOT_APPLICABLE",
-      });
-      return turnkeySignature(signed);
-    });
-    await onChanged("Turnkey wallet connected.");
-  }
+
   async function signOut() {
     await walletPost("auth/logout", {});
-    let message = "Signed out.";
-    if (kit && authenticated) {
-      try {
-        await kit.logout();
-      } catch {
-        message =
-          "App signed out. Turnkey could not clear its session; reconnect to retry signing out of Turnkey.";
-      }
-    }
-    await onChanged(message);
+    const results = await Promise.allSettled([
+      ...providers
+        .filter((provider) =>
+          provider.connectedAddresses.includes(actor!.wallet),
+        )
+        .map((provider) => kit!.disconnectWalletAccount(provider)),
+      ...(kit?.authState === AuthState.Authenticated ? [kit.logout()] : []),
+    ]);
+    await onChanged(
+      results.some((result) => result.status === "rejected")
+        ? "Signed out of Halo Forge. Your wallet connection could not be cleared; disconnect it in your wallet if needed."
+        : "Signed out.",
+    );
   }
 
   return (
@@ -229,217 +177,47 @@ function WalletChoices({
         </>
       ) : (
         <>
-          {kit && !ready && (
+          {kit && !ready && kit.clientState !== ClientState.Error && (
             <p className="muted" role="status">
-              {kit.clientState === ClientState.Error
-                ? "Turnkey is unavailable. Try again or connect an existing wallet."
-                : "Preparing your secure wallet connection…"}
+              Finding your Solana wallets…
             </p>
           )}
-          {!kit && (
+          {kit?.clientState === ClientState.Error && (
             <p className="muted">
-              Email and passkey wallets are awaiting Turnkey configuration. You
-              can connect an existing Solana wallet below.
+              Wallet discovery is unavailable. Try connecting your browser
+              wallet below.
             </p>
           )}
-          {authenticated ? (
+          {ready && providers.length > 0 ? (
             <div className="wallet-account-list">
-              <p className="wallet-section-label">Choose your Solana wallet</p>
-              {choices.map((account) => (
+              {providers.map((provider) => (
                 <Button
-                  key={account.address}
-                  disabled={busy || !ready}
+                  key={provider.info.uuid || provider.info.name}
                   variant="outline"
-                  onClick={() => run(() => connectEmbedded(account))}
+                  disabled={busy}
+                  onClick={() => run(() => connectProvider(provider))}
                 >
-                  <Wallet size={16} /> Connect {short(account.address)}
+                  <Wallet size={16} />
+                  Connect {provider.info.name}
                 </Button>
               ))}
-              {!choices.length && (
-                <Button
-                  variant="outline"
-                  disabled={busy || !ready}
-                  onClick={() => run(refreshAccounts)}
-                >
-                  Load Solana wallets
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                disabled={busy}
-                onClick={() =>
-                  run(async () => {
-                    await kit!.logout();
-                    setAccounts(null);
-                    setOtp(null);
-                    setCode("");
-                  })
-                }
-              >
-                Use another Turnkey account
-              </Button>
             </div>
           ) : (
-            <>
-              {emailEnabled && (
-                <form
-                  className="wallet-email-form"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    void run(async () => {
-                      try {
-                        if (otp) {
-                          await kit!.completeOtp({
-                            ...otp,
-                            otpCode: code.trim(),
-                            otpType: OtpType.Email,
-                            captchaToken,
-                          });
-                          setCode("");
-                          setOtp(null);
-                          await refreshAccounts();
-                        } else {
-                          const contact = email.trim();
-                          const result = await kit!.initOtp({
-                            otpType: OtpType.Email,
-                            contact,
-                            captchaToken,
-                          });
-                          setOtp({ ...result, contact });
-                        }
-                      } finally {
-                        resetCaptcha();
-                      }
-                    });
-                  }}
-                >
-                  <Label htmlFor="wallet-email">Email address</Label>
-                  <Input
-                    id="wallet-email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    required
-                    maxLength={254}
-                    value={email}
-                    disabled={busy || !!otp}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                  {otp && (
-                    <>
-                      <p className="field-hint" role="status">
-                        Enter the code sent to {otp.contact}.
-                      </p>
-                      <Label htmlFor="wallet-code">Verification code</Label>
-                      <Input
-                        id="wallet-code"
-                        autoComplete="one-time-code"
-                        inputMode={
-                          kit?.config?.auth?.otpAlphanumeric
-                            ? "text"
-                            : "numeric"
-                        }
-                        maxLength={12}
-                        required
-                        value={code}
-                        disabled={busy}
-                        onChange={(e) => setCode(e.target.value)}
-                      />
-                    </>
-                  )}
-                  <Button type="submit" disabled={busy || !captchaReady}>
-                    <Mail size={16} />
-                    {otp ? "Verify email" : "Continue with email"}
-                  </Button>
-                  {otp && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      disabled={busy}
-                      onClick={() => {
-                        setOtp(null);
-                        setCode("");
-                        resetCaptcha();
-                      }}
-                    >
-                      Change email or request a new code
-                    </Button>
-                  )}
-                </form>
-              )}
-              {passkeyEnabled && (
-                <div className="wallet-passkey-actions">
-                  <Button
-                    variant="outline"
-                    disabled={busy || !passkeyOrigin}
-                    onClick={() =>
-                      run(async () => {
-                        await kit!.loginWithPasskey();
-                        await refreshAccounts();
-                      })
-                    }
-                  >
-                    <Fingerprint size={16} />
-                    Sign in with a passkey
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    disabled={busy || !passkeyOrigin || !captchaReady}
-                    onClick={() =>
-                      run(async () => {
-                        try {
-                          await kit!.signUpWithPasskey({
-                            passkeyDisplayName: "Halo Forge",
-                            captchaToken,
-                          });
-                          await refreshAccounts();
-                        } finally {
-                          resetCaptcha();
-                        }
-                      })
-                    }
-                  >
-                    Create a wallet with a passkey
-                  </Button>
-                  {!passkeyOrigin && (
-                    <p className="field-hint">
-                      Passkeys require HTTPS or localhost. Use email on this
-                      local IP address.
-                    </p>
-                  )}
-                </div>
-              )}
-              {siteKey && (
-                <Turnstile
-                  ref={captcha}
-                  siteKey={siteKey}
-                  options={{ theme: "dark", size: "flexible" }}
-                  onSuccess={setCaptchaToken}
-                  onExpire={() => setCaptchaToken(undefined)}
-                  onError={() => {
-                    setCaptchaToken(undefined);
-                    setError(
-                      "Verification could not load. Check your connection and try again.",
-                    );
-                  }}
-                />
-              )}
-            </>
+            <Button
+              variant="outline"
+              disabled={busy}
+              onClick={() => run(connectInjected)}
+            >
+              <Wallet size={16} />
+              Connect Solana wallet
+            </Button>
           )}
-          <div className="wallet-option-divider">
-            <span>Existing wallet</span>
-          </div>
-          <Button
-            variant="outline"
-            disabled={busy}
-            onClick={() => run(externalWallet)}
-          >
-            <Wallet size={16} />
-            Connect a Solana wallet
-          </Button>
           <p className="field-hint">
-            Sign-in verifies ownership. It does not request a transaction or
-            permission to spend.
+            Choose your wallet and approve the sign-in message. No email or
+            account registration required.
+          </p>
+          <p className="field-hint">
+            On mobile, open this site in your Solana wallet’s browser.
           </p>
           {previewAvailable && (
             <details className="wallet-development">

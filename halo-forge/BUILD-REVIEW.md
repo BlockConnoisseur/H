@@ -62,3 +62,11 @@ Removed the requested global preview strip and Pilot preparation caption. Added 
 
 
 Browser follow-up: the requested labels are absent, the custom wallet dialog loads on mobile and desktop, missing Turnkey IDs show an explicit setup-pending state, and injected-wallet errors remain inside the dialog. Saved turnkey-wallet.png. Production dependency audit reports zero advisories. Live OTP/passkey verification remains pending public IDs.
+
+## Turnkey configured and wallet-only connection, October 6, 2026
+
+The account owner approved adding both local Halo Forge origins to the existing Lotus/Sigil Auth Proxy. Public IDs were stored in ignored .env.local; existing Sigil settings were preserved. The app uses localhost consistently, with a temporary redirect from 127.0.0.1 only when the configured origin is http://localhost:3210.
+
+Following the wallet-only direction, removed email OTP and passkey signup from Halo Forge. Turnkey now discovers native Solana wallets, connects the selected provider and requests the server-issued sign-in challenge signature. No Turnkey signup or transaction is requested. Legacy injected wallet fallback and explicit development tools remain.
+
+Validation: 29 tests, TypeScript, lint and production build pass. Browser verified the IP-to-localhost redirect, the live SDK initialization, and named Phantom/MetaMask Solana provider buttons with no email/passkey form. Clicking Phantom reaches the wallet approval step. The owner subsequently approved the Phantom connection and sign-in message. The app displayed Wallet connected and the verified wallet identity persisted after a full page reload, completing the live end-to-end check. Token launches, paid workers and payouts remain disabled.

@@ -79,4 +79,4 @@ See [RESEARCH-ALLOCATION.md](RESEARCH-ALLOCATION.md) for the three platform agen
 
 ## Turnkey wallet connection
 
-The Connect wallet dialog now includes a headless Turnkey integration with shadcn controls for email OTP, passkeys and Solana account selection. See [TURNKEY.md](TURNKEY.md) for the two required public configuration IDs, origin setup and verification status. Existing injected Solana wallet sign-in remains available. The preview header strip and “Pilot preparation” caption were removed at the user's request; financial integration readiness is still recorded on Settings and in the action flows.
+The Connect wallet dialog uses Turnkey with shadcn controls to discover and connect existing Solana wallets. Email and passkey signup are removed from the app. Wallet ownership still requires a verified one-time message signature. See [TURNKEY.md](TURNKEY.md) for public configuration IDs, local origins, mobile limitations and verification status. A legacy injected Solana wallet fallback remains available. Financial integration readiness is recorded on Settings and in the action flows.
