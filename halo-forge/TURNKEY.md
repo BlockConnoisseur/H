@@ -27,6 +27,8 @@ Development identities remain under Development tools and only appear when the A
 
 ## Validation
 
-The live SDK configuration loaded successfully before the wallet-only refinement. Local cryptographic tests cover exact signature conversion, signer-address binding, changed-message rejection and failed-verification handling. Live Phantom sign-in completed successfully with the owner approval. The server verified the signature, the app displayed Wallet connected, and the authenticated wallet identity persisted after a full page reload. No development identity was used for this verification.
+The live SDK configuration loaded successfully before the wallet-only refinement. Local cryptographic tests cover exact signature conversion, signer-address binding, changed-message rejection and failed-verification handling. Local Phantom sign-in completed successfully with the owner approval. The server verified the signature, the app displayed Wallet connected, and the authenticated wallet identity persisted after a full page reload. No development identity was used for this verification.
 
 References: [Turnkey setup](https://docs.turnkey.com/solutions/embedded-wallets/integration-guide/react/getting-started), [wallet message signing](https://docs.turnkey.com/solutions/embedded-wallets/integration-guide/react/signing).
+
+Production follow-up: https://halozec.tech is approved and saved in the shared Auth Proxy allowed origins. The live site loads Phantom and MetaMask provider buttons with no email/signup form and no initialization errors. A production-domain wallet signature has not been separately verified.

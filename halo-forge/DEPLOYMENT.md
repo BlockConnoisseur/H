@@ -18,6 +18,6 @@ Namecheap remains the registrar and authoritative DNS provider. The default park
 
 Both domains are verified by Vercel. HTTPS works, and www redirects to the apex with HTTP 308. Existing mail settings were preserved.
 
-Turnkey public IDs are configured in Vercel. The production origin has been prepared in the shared Auth Proxy configuration; saving it requires the account owner's passkey confirmation. Email and passkey signup remain absent from the application: users connect existing Solana wallets.
+Turnkey public IDs are configured in Vercel. The account owner approved the production origin https://halozec.tech with their passkey. Turnkey saved it successfully, and the production wallet dialog now discovers Phantom and MetaMask without initialization errors. Email and passkey signup remain absent from the application: users connect existing Solana wallets.
 
 Local development remains at http://localhost:3210 with a redirect from 127.0.0.1. Keep .env.local private; Vercel link/env pull can replace it, so back it up before using those commands. Do not copy the production database secret to Preview deployments.
