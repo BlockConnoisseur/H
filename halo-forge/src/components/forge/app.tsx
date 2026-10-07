@@ -2,9 +2,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import bs58 from "bs58";
+import dynamic from "next/dynamic";
 import {
-  ArrowUpRight,
   Check,
   ChevronRight,
   CircleHelp,
@@ -12,7 +11,6 @@ import {
   Cpu,
   FlaskConical,
   LayoutDashboard,
-  LogOut,
   Menu,
   Orbit,
   Search,
@@ -57,13 +55,14 @@ const nav = [
   { href: "/rewards", name: "Rewards", icon: Wallet },
   { href: "/compute", name: "Compute", icon: Cpu },
 ];
-type Provider = {
-  connect: () => Promise<{ publicKey: { toString: () => string } }>;
-  signMessage: (
-    m: Uint8Array,
-    encoding?: string,
-  ) => Promise<{ signature: Uint8Array }>;
-};
+const WalletConnection = dynamic(() => import("./wallet-connection"), {
+  ssr: false,
+  loading: () => (
+    <p className="muted" role="status">
+      Loading wallet connection…
+    </p>
+  ),
+});
 export type PageProps = {
   data: Data;
   action: Action;
@@ -232,53 +231,10 @@ export function ForgeApp() {
       setBusy(false);
     }
   };
-  async function connect(preview = false) {
-    setBusy(true);
-    setError("");
-    try {
-      if (preview) {
-        await post("auth/preview", {});
-      } else {
-        const provider = (window as unknown as { solana?: Provider }).solana;
-        if (!provider?.signMessage)
-          throw new Error(
-            "No compatible injected Solana wallet was found. Open this app in a browser with Phantom or another signMessage-compatible wallet.",
-          );
-        const { publicKey } = await provider.connect();
-        const challenge = await post("auth/challenge", {
-          wallet: publicKey.toString(),
-        });
-        const signed = await provider.signMessage(
-          new TextEncoder().encode(challenge.message),
-          "utf8",
-        );
-        await post("auth/verify", {
-          id: challenge.id,
-          signature: bs58.encode(signed.signature),
-        });
-      }
-      await load();
-      setWalletOpen(false);
-      setNotice(
-        preview
-          ? "Local preview account connected. Test credits have no monetary value."
-          : "Wallet signature verified. Live financial operations remain disabled.",
-      );
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Sign-in failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
-  async function logout() {
-    try {
-      await post("auth/logout", {});
-      await load();
-      setWalletOpen(false);
-      setNotice("Signed out.");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not sign out.");
-    }
+  async function walletChanged(message: string) {
+    await load();
+    setWalletOpen(false);
+    setNotice(message);
   }
   const current =
     nav.find((n) => n.href !== "/" && path.startsWith(n.href))?.name ||
@@ -399,19 +355,6 @@ export function ForgeApp() {
             </Button>
           </div>
         </header>
-        <div className="preview-strip">
-          <FlaskConical size={13} />
-          <span>
-            Local preview · Live research and payouts disabled.
-            <span className="preview-long">
-              {" "}
-              Token launches are also disabled.
-            </span>
-          </span>
-          <Link href="/settings">
-            Readiness <ArrowUpRight size={12} />
-          </Link>
-        </div>
         <main id="main" tabIndex={-1}>
           <div className="messages" aria-live="polite">
             {error && (
@@ -469,7 +412,7 @@ export function ForgeApp() {
         </SheetContent>
       </Sheet>
       <Dialog open={walletOpen} onOpenChange={setWalletOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
           <DialogTitle>
             {data?.actor ? "Your deployer identity" : "Connect your wallet"}
           </DialogTitle>
@@ -477,50 +420,12 @@ export function ForgeApp() {
             Rewards belong to the wallet that originally deploys the agent.
             Sign-in does not authorize spending.
           </DialogDescription>
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {data?.actor ? (
-            <>
-              <div className="address-block">{data.actor.wallet}</div>
-              <p className="muted">
-                {data.actor.preview
-                  ? "Local preview identity. No private key or on-chain wallet is created."
-                  : "Solana signature verified. Live financial actions are currently disabled."}
-              </p>
-              <Button variant="outline" onClick={logout}>
-                <LogOut size={16} />
-                Sign out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                disabled={busy}
-                onClick={() => connect(false)}
-                className="h-11"
-              >
-                <Wallet size={16} />
-                Sign in with Solana wallet
-              </Button>
-              {data?.previewAvailable && (
-                <Button
-                  disabled={busy}
-                  variant="outline"
-                  className="h-11"
-                  onClick={() => connect(true)}
-                >
-                  <FlaskConical size={16} />
-                  Use local preview account
-                </Button>
-              )}
-              <p className="field-hint">
-                Local preview lets you test agent setup and budgets without real
-                funds.
-              </p>
-            </>
+          {walletOpen && (
+            <WalletConnection
+              actor={data?.actor ?? null}
+              previewAvailable={data?.previewAvailable ?? false}
+              onChanged={walletChanged}
+            />
           )}
         </DialogContent>
       </Dialog>

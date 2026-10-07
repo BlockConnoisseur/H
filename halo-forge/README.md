@@ -14,7 +14,7 @@ Copy-Item .env.example .env.local
 npm run dev -- --hostname 127.0.0.1 --port 3210
 ```
 
-Open http://127.0.0.1:3210. The configured `HALO_APP_ORIGIN` must match the browser origin exactly. Use **Connect wallet → Use local preview account** to exercise setup without funds. Wallet signature sign-in is also implemented for compatible injected Solana wallets; live spending remains disabled.
+Open http://127.0.0.1:3210. The configured `HALO_APP_ORIGIN` must match the browser origin exactly. Use **Connect wallet → Development tools → Use development account** to exercise setup without funds. Wallet signature sign-in is also implemented for compatible injected Solana wallets; live spending remains disabled.
 
 Without Supabase configuration, the local SQLite database lives in `.data/halo.sqlite`. Keep that file and its WAL together when backing up; stop the process or use SQLite's online backup facilities. Supabase Postgres is now supported through a restricted server role and verified TLS; see [SUPABASE.md](SUPABASE.md). Postgres state mutations lock the state row so concurrent requests cannot overwrite each other. The state document remains a low-volume preview design, not a scalable financial ledger. Sessions expire after 24 hours. Signing out of a preview identity makes its existing records read-only unless that session was preserved; preview identities are not recoverable wallets.
 
@@ -50,7 +50,7 @@ npm run typecheck
 npm run build
 ```
 
-26 local tests cover domain accounting, identity, API privacy/authorization, idempotency, eligibility, ranking, award destination, settlement replay and benchmark mathematics. Browser testing exercised local registration, credit, queue/cancel, immutable submission and responsive layout. See [BUILD-REVIEW.md](BUILD-REVIEW.md) for exact scope.
+29 local tests cover domain accounting, identity, API privacy/authorization, idempotency, eligibility, ranking, award destination, settlement replay and benchmark mathematics. Browser testing exercised local registration, credit, queue/cancel, immutable submission and responsive layout. See [BUILD-REVIEW.md](BUILD-REVIEW.md) for exact scope.
 
 The application production dependency audit reported zero advisories on October 6, 2026. The full development tree still reports nine high-severity findings in CLI/lint dependency chains; do not treat a clean production audit as a clean development audit. No breaking downgrade was applied automatically.
 
@@ -75,3 +75,8 @@ These are remaining engineering/infrastructure work, not just environment variab
 Design components come from shadcn/ui; Impeccable supplies the design workflow. No other design system, generated imagery or paid template was used.
 
 See [RESEARCH-ALLOCATION.md](RESEARCH-ALLOCATION.md) for the three platform agents, nine research methods, unique experiment allocation and startup behavior.
+
+
+## Turnkey wallet connection
+
+The Connect wallet dialog now includes a headless Turnkey integration with shadcn controls for email OTP, passkeys and Solana account selection. See [TURNKEY.md](TURNKEY.md) for the two required public configuration IDs, origin setup and verification status. Existing injected Solana wallet sign-in remains available. The preview header strip and “Pilot preparation” caption were removed at the user's request; financial integration readiness is still recorded on Settings and in the action flows.

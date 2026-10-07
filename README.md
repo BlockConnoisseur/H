@@ -23,7 +23,7 @@ Copy-Item .env.example .env.local
 npm run dev -- --hostname 127.0.0.1 --port 3210
 ```
 
-Open http://127.0.0.1:3210 and choose **Connect wallet → Use local preview account**. Keep preview mode on loopback only. The local SQLite database is created on first use and is excluded from Git. Supabase Postgres setup is documented in [SUPABASE.md](halo-forge/SUPABASE.md); database credentials stay in server-only configuration.
+Open http://127.0.0.1:3210 and choose **Connect wallet → Development tools → Use development account**. Keep preview mode on loopback only. The local SQLite database is created on first use and is excluded from Git. Supabase Postgres setup is documented in [SUPABASE.md](halo-forge/SUPABASE.md); database credentials stay in server-only configuration.
 
 ## Verify
 

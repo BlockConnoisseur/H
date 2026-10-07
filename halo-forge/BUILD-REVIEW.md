@@ -52,3 +52,13 @@ Production build and lint pass. Browser: all three method tabs switch to the mat
 Added a Postgres adapter while retaining explicit SQLite development mode. Asynchronous wallet authentication and API calls preserve ownership checks. Supabase uses a private schema, RLS, a restricted runtime role, verified TLS, bounded pooling and row locks. The administrator password is not stored. The committed certificate is public; runtime credentials are ignored.
 
 Validation: 26 local tests, four live Postgres integration tests, TypeScript, lint and production build pass. Concurrent update and nonce replay tests pass; test fixtures were removed. Supabase security advisors return no findings. Performance advisories are informational and documented in SUPABASE.md. The connected site runs from H/halo-forge; original SQLite records remain untouched. Funded launchpad integrations remain disabled.
+
+
+## Turnkey wallet flow and header cleanup, October 6, 2026
+
+Removed the requested global preview strip and Pilot preparation caption. Added a lazy-loaded, custom shadcn wallet dialog backed by Turnkey's headless authentication and signing methods. Solana wallet ownership still requires the server nonce challenge; the browser does not assign a deployer identity. Email OTP, existing/new passkeys, Solana account selection, optional Turnstile, sign-out and existing injected wallets are wired. Missing public configuration is handled explicitly without a fake successful connection.
+
+29 local tests and the production build pass. Live Turnkey verification is pending the organization/configuration IDs. No transaction-signing capability, paid research or payout integration was enabled by removing the labels.
+
+
+Browser follow-up: the requested labels are absent, the custom wallet dialog loads on mobile and desktop, missing Turnkey IDs show an explicit setup-pending state, and injected-wallet errors remain inside the dialog. Saved turnkey-wallet.png. Production dependency audit reports zero advisories. Live OTP/passkey verification remains pending public IDs.

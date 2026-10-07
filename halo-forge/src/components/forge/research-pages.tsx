@@ -97,7 +97,7 @@ export function Overview({ data }: PageProps) {
             </LinkButton>
           </div>
           <div className="hero-caption">
-            <span className="tiny-dot amber" /> Pilot preparation{" "}
+            <span className="tiny-dot amber" />
             <span>Halo 2 / Orchard</span>
           </div>
         </div>
